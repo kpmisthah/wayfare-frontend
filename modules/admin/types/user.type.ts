@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 export interface User {
   profile: string;
@@ -7,3 +8,4 @@ export interface User {
   bookings: number;
   isBlock: boolean; 
 }
+
