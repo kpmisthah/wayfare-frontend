@@ -4,7 +4,8 @@ import { signup } from "../services/auth.api";
 import { useRouter } from "next/navigation";
 
 
-export const useSignup = ({role='USER'}:UseSignupProps) => {
+
+export const useSignup = ({role='USER',redirectLogin,onSubmit}:UseSignupProps) => {
     const [signupData, setSignupData] = useState<SignupForm>({
     name: "",
     email: "",
@@ -57,9 +58,9 @@ export const useSignup = ({role='USER'}:UseSignupProps) => {
 
     try {
       console.log("Signup submitted:", signupData);
-      await signup({...signupData,role});
-     
-      router.push(`/otp?email=${encodeURIComponent(signupData.email)}&role=${role}`);
+      onSubmit({...signupData,role})
+      //&role=${role}
+      router.push(`/${redirectLogin}?email=${encodeURIComponent(signupData.email)}`);
 
     } catch (error:any) {
    
@@ -68,6 +69,7 @@ export const useSignup = ({role='USER'}:UseSignupProps) => {
       setIsLoading(false);
     }
   };
+  
   return {
     signupData,
     setSignupData,

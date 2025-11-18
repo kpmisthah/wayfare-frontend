@@ -1,9 +1,15 @@
 import api from "@/lib/api";
 import { User } from "../types/user.type";
 
-export const getUser = async ()=>{
+export const getUser = async (
+    page:number=1,
+    limit:number=5,
+    search:string =''
+) =>{
     try {
-        const response = await api.get('/users')
+        const response = await api.get('/users',{
+            params:{page,limit,search}
+        })
         return response.data
     } catch (error) {
         throw error
@@ -12,9 +18,7 @@ export const getUser = async ()=>{
 
 export const updateUser = async (id:string,updateData:Partial<User>)=>{
     try {
-        console.log(id,'id',updateData,'updateData')
         const response = await api.put(`/users/${id}`,updateData)
-        console.log(response)
         return response.data
     } catch (error) {
         throw error

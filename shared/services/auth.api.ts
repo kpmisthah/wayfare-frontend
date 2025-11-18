@@ -2,6 +2,8 @@ import api from "@/lib/api";
 
 export const login = async (data: { email: string; password: string ,role:string}) => {
   try {
+    console.log(data,'In service brooooooooo front end tooo');
+    
     const response = await api.post("/auth/signin", data);
     return response.data
   } catch (error) {
@@ -13,7 +15,6 @@ export const fetchUser = async () => {
   try {
     
     const response = await api.get("/auth/me");
-    console.log(response.data, "response");
     return response.data;
   } catch (error) {
     console.log(error,'errror frno fetch')
@@ -22,24 +23,22 @@ export const fetchUser = async () => {
 };
 
 export const signup = async (data: {
-  name: string;
+  name?: string;
   email: string;
   password: string;
   role:string
 }) => {
   try {
     const response = await api.post("/auth/signup", data);
-    console.log(response,'user already present?')
     return response.data;
   } catch (error) {
     throw error
   }
 };
 
-export const verifyOtp = async (otp: string,role:string) => {
+export const verifyOtp = async (otp: string) => {
   try {
-    const response = await api.post("/auth/verify-otp", { otp,role });
-    console.log(response, "response from otp");
+    const response = await api.post("/auth/verify-otp", { otp });
     return response.data;
   } catch (error) {
     console.log(error,'verify otp')
@@ -64,6 +63,8 @@ export const googleLogin = (): void => {
 export const forgotPassword = async (email: string) => {
   try {
     const response = await api.post("/auth/forgot-password", { email });
+    console.log(response.data,'in forgot password from backend');
+    
     return response.data;
   } catch (error) {
     console.log(error);
@@ -83,6 +84,7 @@ export const verifyForgotPassword = async (otp: string) => {
 
 export const resetPassword = async (email: string, password: string) => {
   try {
+    console.log(email,'email',password,'password','from reset-password service in frnotend');    
     const response = await api.post("/auth/reset-password", { email, password });
     return response.data;
   } catch (error) {
@@ -90,7 +92,7 @@ export const resetPassword = async (email: string, password: string) => {
     throw Error;
   }
 };
-//page refresh access token checking
+// page refresh access token checking
 export const checkAuth = async() =>{
   try {
   const res = await api.get('/auth/me')
@@ -98,5 +100,14 @@ export const checkAuth = async() =>{
   } catch (error) {
     throw error
   }
-
+}
+export const logout = async ()=>{
+  try {
+    const response = await api.post('/auth/logout')
+    console.log(response,'response in logouttttttt')
+    return response.data
+  } catch (error) {
+    console.log(error);
+    throw error
+  }
 }

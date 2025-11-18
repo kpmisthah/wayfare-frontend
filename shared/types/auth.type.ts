@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface SignupForm  {
   name: string;
   email: string;
@@ -42,13 +44,22 @@ export interface AuthError {
 
 export interface UseSignupProps {
     role?:"USER"|'AGENCY'|'ADMIN'
+    redirectUrl?:string
+    onSubmit:(data:{name?:string,email:string,password:string,role:string})=>Promise<void>
+    redirectLogin:string
 }
 
-// export interface SignupProps {
-//   role?: string;
-//   signupData: SignupForm;
-//   setSignupData: React.Dispatch<React.SetStateAction<SignupForm>>;
-//   errors: ErrorMessages;
-//   isLoading: boolean;
-//   onSubmit: () => void;
-// };
+export interface ResetProps {
+
+  redirectPath?: string;
+};
+
+export interface ForgotPasswordProps {
+  redirectUrl:string
+  children?:React.ReactNode
+}
+
+export interface OTPPageProps {
+  userEmail?: string;
+  redirectUrl:string  
+}

@@ -120,3 +120,21 @@
     @apply bg-background text-foreground;
   }
 }
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 20s linear infinite;
+}
+.loader-border {
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: white;
+  border-left-color: white;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 50%;
+}

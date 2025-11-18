@@ -3,28 +3,35 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { userActions } from "../../hooks/user-management/use-user-actions";
+// import { userActions } from "../../hooks/user-management/use-user-actions";
 import { EditUserDialog } from "./Edit-User-Dialog";
-import { DeleteConfirmDialog } from "./Delete-User-Dialog";
-
+import { useUsers } from "../../hooks/user-management/use-user-management";
+import debounce from "lodash.debounce"
+import { useMemo } from "react";
 const UserManagement = () => {
   const {
     editingUser,
-    deletingUser,
     editDialogOpen,
-    deleteDialogOpen,
     handleEditUser,
     handleSaveUser,
-    handleDeleteUser,
-    handleConfirmDelete,
     searchTerm,
     setSearchTerm,
-    filteredUsers,
+    // filteredUsers,
     setEditDialogOpen,
-    setDeleteDialogOpen,
     setEditingUser,
-    setDeletingUser,
-  } = userActions();
+    handleToggleBlockUser,
+    users,
+    page,
+    setPage,
+    totalPage
+  } = useUsers();
+    const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+      }, 500), 
+    [setSearchTerm]
+  );
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -38,8 +45,8 @@ const UserManagement = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                defaultValue={searchTerm}
+                onChange={(e) => debouncedSearch(e.target.value)}
                 className="pl-10 w-full"
               />
             </div>
@@ -71,10 +78,10 @@ const UserManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                   <tr key={user.id} className="border-b hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">{user.name}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{user.profile}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">user profile</td>
                     <td className="px-4 py-3 text-sm text-gray-700">{user.email}</td>
                     <td className="px-4 py-3 text-sm">
                       <Badge variant={user.isBlock === false ? "default" : "destructive"}>
@@ -91,14 +98,14 @@ const UserManagement = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDeleteUser(user)}
+                        <Button
+                        variant={user.isBlock ? "default" : "destructive"}
+                        size="sm"
+                        onClick={() => handleToggleBlockUser(user)}
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                          {user.isBlock ? "Unblock" : "Block"}
+                          </Button>
+
                       </div>
                     </td>
                   </tr>
@@ -109,13 +116,13 @@ const UserManagement = () => {
 
           {/* Mobile/Tablet Card View */}
           <div className="lg:hidden space-y-4">
-            {filteredUsers.map((user) => (
+            {users.map((user) => (
               <Card key={user.id} className="border border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="font-medium text-gray-900">{user.name}</h4>
-                      <p className="text-sm text-gray-600">{user.profile}</p>
+                      <p className="text-sm text-gray-600">user.profile</p>
                     </div>
                     <Badge variant={user.isBlock === false ? "default" : "destructive"}>
                       {user.isBlock === false ? "Active" : "Inactive"}
@@ -138,13 +145,12 @@ const UserManagement = () => {
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDeleteUser(user)}
+                    <Button
+                    variant={user.isBlock ? "default" : "destructive"}
+                    size="sm"
+                    onClick={() => handleToggleBlockUser(user)}
                     >
-                      <Trash2 className="w-4 h-4" />
+                    {user.isBlock ? "Unblock" : "Block"}
                     </Button>
                   </div>
                 </CardContent>
@@ -152,12 +158,30 @@ const UserManagement = () => {
             ))}
           </div>
           
-          {filteredUsers.length === 0 && (
+          {users.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-500">No users found matching your search.</p>
             </div>
           )}
         </CardContent>
+        <div className="flex justify-between items-center mt-6">
+          <Button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          variant="outline"
+          >
+            Previous
+            </Button>
+            <span className="text-sm text-gray-600">
+              Page {page} of {totalPage}
+              </span>
+              <Button
+              disabled={page === totalPage}
+              onClick={() => setPage(page + 1)}
+              variant="outline">
+                Next
+                </Button>
+                </div>
       </Card>
 
       {/* Your existing dialogs */}
@@ -168,12 +192,7 @@ const UserManagement = () => {
         onSave={handleSaveUser}
       />
 
-      <DeleteConfirmDialog
-        user={deletingUser}
-        isOpen={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        onConfirm={handleConfirmDelete}
-      />
+
     </div>
   );
 };

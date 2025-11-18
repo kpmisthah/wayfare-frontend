@@ -13,6 +13,9 @@ import {
   Bell,
   X
 } from 'lucide-react';
+import { useAuthStore } from '@/store/Auth';
+import { checkAuth } from '@/shared/services/auth.api';
+import { useLogout } from '@/shared/hooks/use-logout';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,8 +26,21 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+    const { setAuthUser, clearAuth } = useAuthStore();
+    const {handleLogout} = useLogout()
+    useEffect(() => {
+      const verifyUser = async () => {
+        try {
+          const userData = await checkAuth();
+          setAuthUser(userData); 
+        } catch (err) {
+          clearAuth();
+        }
+      };
+  
+      verifyUser();
+    }, []);
 
-  // Check if screen is mobile size
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -43,11 +59,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'agencies', label: 'Agency Details', icon: Building2 },
-    { id: 'bookings', label: 'Booking Management', icon: Calendar },
     { id: 'financial', label: 'Financial Management', icon: DollarSign },
     { id: 'payouts', label: 'Payout History', icon: CreditCard },
     { id: 'users', label: 'User Management', icon: Users },
-    { id: 'itineraries', label: 'Itinerary Management', icon: Map }
   ];
 
   const handleTabChange = (tab: string) => {
@@ -163,7 +177,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
               <button className="p-2 rounded-lg hover:bg-gray-100">
                 <Settings className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-lg hover:bg-gray-100">
+              <button className="p-2 rounded-lg hover:bg-gray-100" onClick={handleLogout}>
                 <LogOut className="w-5 h-5" />
               </button>
             </div>

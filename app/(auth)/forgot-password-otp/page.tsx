@@ -1,9 +1,9 @@
-import ForgotPasswordOtp from "@/modules/auth/components/Forgot-password-otp";
+import { UserForgotPassword } from "@/modules/auth/components/ForgotPasswordDialog"
 
 export default function ForgotPassword(){
     return(
         <>
-        <ForgotPasswordOtp />
+        <UserForgotPassword />
         </>
     )
 }

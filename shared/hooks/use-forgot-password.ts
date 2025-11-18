@@ -2,7 +2,9 @@ import { useState } from "react";
 import { forgotPassword } from "../services/auth.api";
 import { useRouter } from "next/navigation";
 
-export const useForgotPassword = () => {
+export const useForgotPassword = (redirectUrl:string) => {
+  console.log(redirectUrl,'in userHooks');
+  
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
@@ -26,18 +28,17 @@ export const useForgotPassword = () => {
 
     try {
       await forgotPassword(forgotEmail);
-      router.push("/forgot-password-otp");
+      localStorage.setItem('resetEmail',forgotEmail)
+      router.push(redirectUrl);
       setForgotPasswordSuccess(true);
     } catch (error: any) {
       const message =
         error?.response?.data.message ||
         error?.response?.message ||
         error?.message ||
-        "Failed to send reset email. Please try again";
+        "The Email didnt Exist";
 
       setForgotPasswordError(message);
-    } finally {
-      setForgotPasswordLoading(false);
     }
   };
 

@@ -1,11 +1,16 @@
-<<<<<<< HEAD
-
 export interface User {
-  profile: string;
+  profileImage: string | undefined;
+  bannerImage: string|undefined;
   id: string;
+  location:string
   name: string;
+  phone:string
   email: string;
-  bookings: number;
   isBlock: boolean; 
+  isVerified:boolean
 }
 
+interface PreferenceTag {
+  id:string;
+  name:string
+}

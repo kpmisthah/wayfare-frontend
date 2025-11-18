@@ -35,21 +35,7 @@ export const EditUserDialog = ({ user, isOpen, onOpenChange, onSave }:EditUserDi
               placeholder="Enter user name"
             />
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="profile">Profile</Label>
-            <Select value={formData.profile} onValueChange={(value) => handleChange('profile', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select profile" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Manager">Manager</SelectItem>
-                <SelectItem value="User">User</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
+                    
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -60,15 +46,7 @@ export const EditUserDialog = ({ user, isOpen, onOpenChange, onSave }:EditUserDi
               placeholder="Enter email address"
             />
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="isBlock"
-              checked={formData.isBlock}
-              onCheckedChange={(checked) => handleChange('isBlock', checked)}
-            />
-            <Label htmlFor="isBlock">Block User</Label>
-          </div>
+        
         </div>
         
         <div className="flex justify-end space-x-2">

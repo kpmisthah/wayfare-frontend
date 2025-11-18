@@ -12,18 +12,21 @@ import { useAuthStore } from '@/store/Auth';
 
 const HomePage: React.FC = () => {
   const { setAuthUser, clearAuth } = useAuthStore();
-  useEffect(() => {
-    const verifyUser = async () => {
-      try {
-        const userData = await checkAuth();
-        setAuthUser(userData); 
-      } catch (err) {
-        clearAuth();
-      }
-    };
+  // useEffect(() => {
+  //   const verifyUser = async () => {
+  //     try {
+  //       const userData = await checkAuth();
+  //       setAuthUser(userData); 
+  //     } catch (err) {
+  //       clearAuth();
+  //     }
+  //   };
 
-    verifyUser();
-  }, []);
+  //   const timer = setTimeout(()=>{
+  //      verifyUser();
+  //   },20000)
+  //  return()=>clearTimeout(timer)
+  // }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">

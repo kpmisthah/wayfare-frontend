@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/Auth";
 import { fetchUser, login, googleLogin } from "../services/auth.api";
 import { LoginForm, ErrorMessages, UseSignupProps } from "../types/auth.type";
 
-export const useLoginForm = ({role='USER'}:UseSignupProps) => {
+export const useLoginForm = ({role='USER',onSubmit,redirectLogin}:UseSignupProps) => {
   const [loginData, setLoginData] = useState<LoginForm>({
     email: "",
     password: "",
@@ -42,21 +42,13 @@ export const useLoginForm = ({role='USER'}:UseSignupProps) => {
     setErrors({});
 
     try {
-      await login({...loginData,role});
+
+      await onSubmit({...loginData,role})
       const user = await fetchUser();
       console.log(user,'login user admin or user')
       console.log(user.role, "user role");
       setAuthUser(user);
-      switch (user.role) {
-        case 'AGENCY':
-          router.push('/agency/dashboard')
-          break;
-        case 'ADMIN':
-          router.push('/admin/dashboard')
-          break;  
-        default:
-          router.push('/')
-      }
+      router.replace(redirectLogin)
     } catch (error: any) {
       const message =
         error?.response?.data.message ||

@@ -9,11 +9,14 @@ export default function AppInitializer({
   user,
   children
 }: {
-  user: User
+  user: User|null
   children: React.ReactNode
 }) {
   const [loaded,setLoaded] = useState(false)
   const setAuthUser = useAuthStore((state) => state.setAuthUser)
+  console.log(setAuthUser,'in appInitiazer');
+  console.log(user,'in App Initializer gooooyssss');
+  
   useEffect(() => {
     if (user) {
       setAuthUser(user)

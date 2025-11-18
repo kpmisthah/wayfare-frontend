@@ -1,8 +1,10 @@
-import OTPPage from "@/shared/components/reusables/Otp"
+import OTPPage from "@/shared/components/common/Otp"
 export default function OtpPage(){
     return(
         <>
-        <OTPPage />
+        <OTPPage 
+        redirectUrl ='/'
+        />
         </>
     )
 }

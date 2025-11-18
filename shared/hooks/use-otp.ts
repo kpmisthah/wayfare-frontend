@@ -16,7 +16,7 @@ interface APIResponse {
   data?: any;
 }
 
-export function useOtp(userEmail:string,role:string = 'USER') {
+export function useOtp(data:{userEmail:string,redirectUrl:string}) {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -71,38 +71,40 @@ export function useOtp(userEmail:string,role:string = 'USER') {
       setIsLoading(true);
       setError('');
       try {
-        const result = await verifyOtp(otpCode,role);
+        const result = await verifyOtp(otpCode);
         console.log(result,'from verifyOtp front end');
         if(result.message == 'Agency created successfully waiting admin approval'){
           setError('You account is pending admin approval')
           return
         }
         const user = await fetchUser();
+        console.log(user,'in userOtp hook setAuth strore aavudooo');
+        
         setAuthUser(user);
         // new Promise((resolve)=>setTimeout(resolve,10000))
-        switch (user.role) {
-          case "AGENCY":
-            router.push('/agency/dashboard')
-            break;
-          case "ADMIN" :
-            router.push('/admin/dashboard') 
-            break;
-          default:
-            router.push('/')
-        }
+        // switch (user.role) {
+          // case "AGENCY":
+            router.push(data.redirectUrl)
+            // break;
+          // case "ADMIN" :
+            // router.push('/admin/dashboard') 
+            // break;
+          // de  // router.push('/')fault:
+          
+        // }
       } catch (err) {
         if(err instanceof AxiosError){
         let msg = err?.response?.data?.message
         if(msg == 'User not found or Blocked'){
-          if(role == 'AGENCY'){
-            setError('You account is pending admin approval')
-          }else{
-            setError('You have been blocked by the admin.');
-          }
+          // if(role == 'AGENCY'){
+          //   setError('You account is pending admin approval')
+          // }else{
+          //   setError('You have been blocked by the admin.');
+          // }
           
         }else{
         setError('Something went wrong. Please try again.');
-        console.error('OTP verification error:', err,"role",role);
+        console.error('OTP verification error:', err,"role");
         }
        
         }
@@ -117,7 +119,7 @@ export function useOtp(userEmail:string,role:string = 'USER') {
     setIsResending(true);
     setError('');
     try {
-      let result = await resendOtp(userEmail)
+      let result = await resendOtp(data.userEmail)
       console.log(result,'result from backend')
       if (result.message == 'otp send successfully') {
         setTimeLeft(60);

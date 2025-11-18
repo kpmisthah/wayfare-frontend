@@ -1,4 +1,4 @@
-import { AgencyLogin } from "@/modules/agency/components/Agency-login";
+import { AgencyLogin } from "@/modules/agency/components/auth/Agency-login";
 
 const page = ()=>{
     return(

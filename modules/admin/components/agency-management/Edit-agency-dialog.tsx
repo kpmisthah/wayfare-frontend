@@ -9,16 +9,24 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { Button } from "@/shared/components/ui/button";
 import { Save } from "lucide-react";
 import { AgencyStatus } from "../../types/agency.status.enum";
+import { agencyActions } from "../../hooks/agency-management/use-agency-action";
 
 interface EditAgencyDialogProps {
   agency: Agency | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (agency: Agency) => void;
+  loading:boolean
 }
 
 export const EditAgencyDialog = ({
@@ -26,11 +34,12 @@ export const EditAgencyDialog = ({
   isOpen,
   onOpenChange,
   onSave,
+  loading
 }: EditAgencyDialogProps) => {
   const [formData, setFormData] = useState<Partial<Agency>>({
     name: "",
     email: "",
-    status: AgencyStatus.PENDING
+    status: AgencyStatus.PENDING,
   });
 
   useEffect(() => {
@@ -58,10 +67,9 @@ export const EditAgencyDialog = ({
         email: formData.email,
         status: formData.status!,
       });
-      onOpenChange(false);
+      // onOpenChange(false);
     }
   };
-
   if (!agency) return null;
 
   return (
@@ -96,8 +104,12 @@ export const EditAgencyDialog = ({
           <div className="space-y-2">
             <Label>Status</Label>
             <Select
-              value={formData.status ? AgencyStatus.INACTIVE : AgencyStatus.ACTIVE}
-              onValueChange={(value) => handleChange("status", value === "inactive")}
+              value={
+                formData.status ? AgencyStatus.INACTIVE : AgencyStatus.ACTIVE
+              }
+              onValueChange={(value) =>
+                handleChange("status", value === "inactive")
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
@@ -114,9 +126,13 @@ export const EditAgencyDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="flex items-center space-x-2">
+          <Button
+            onClick={handleSubmit}
+            className="flex items-center space-x-2"
+            disabled={loading}
+          >
             <Save className="w-4 h-4" />
-            <span>Save Changes</span>
+            {loading ? "Saving..." : "Save Change"}
           </Button>
         </div>
       </DialogContent>

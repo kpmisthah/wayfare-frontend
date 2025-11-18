@@ -1,10 +1,9 @@
 import api from "@/lib/api";
-import { AgencyStatus } from "../types/agency.status.enum";
-
 export const getAgencies = async ()=>{
     try {
-        const response = await api.get('/agencies')
-        console.log(response,'response getAgencies')
+        const response = await api.get('/admin/agencies',{
+            // params:{page,limit,search}
+        })
         return response.data
     } catch (error) {
         console.log(error);
@@ -13,11 +12,9 @@ export const getAgencies = async ()=>{
     }
 }
 
-export const updateAgencies = async (agencyId:string,status:AgencyStatus,email:string) =>{
+export const approvalAgencies = async (id:string) =>{
     try {
-        console.log('send id to bacend',agencyId,status,'status')
-        const response = await api.patch(`/agencies/${agencyId}`,{status,email})
-        console.log(response,'response form agencyUpdate')
+        const response = await api.patch(`/agency/${id}`)
         return response.data
     } catch (error) {
         console.log(error);
@@ -25,3 +22,19 @@ export const updateAgencies = async (agencyId:string,status:AgencyStatus,email:s
         
     }
 }
+
+
+
+export const updateAgencies = async (agencyId:string) =>{
+    try {
+        const response = await api.patch(`/agency/profile/${agencyId}`)
+        return response.data
+    } catch (error) {
+        console.log(error);
+        throw error
+        
+    }
+}
+
+
+
