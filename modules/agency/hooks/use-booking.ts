@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react"
-import { Booking } from "../types/booking.type"
-import { fetchBookingByAgency, updateBookingStatus } from "../services/booking.api"
+import { Booking, BookingData } from "../types/booking.type"
+import { fetchBookingByAgency, fetchBookingsByPackage, updateBookingStatus } from "../services/booking.api"
 import { BookingStatus } from "../types/booking.enum"
 
 export const useFetchBookingDetails = ()=>{
@@ -36,3 +36,27 @@ export const useUpdateBookingStatus = (setBooking: React.Dispatch<React.SetState
 
   return { changeStatus, loading };
 };
+
+export const useViewBookings = (pkgId:string)=>{
+  const [booking,setBooking]  = useState<BookingData[]>([])
+  try {
+    useEffect(()=>{
+      const loadBookingDetails = async()=>{
+        const data = await fetchBookingsByPackage(pkgId)
+        setBooking(data)
+      }
+      console.log(DataTransfer,'data')
+      loadBookingDetails()
+  },[pkgId])
+  useEffect(()=>{
+    console.log(booking,'booking inuseEffect');
+    
+  },[])
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    booking,
+    setBooking
+  }
+}

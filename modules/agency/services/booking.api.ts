@@ -45,3 +45,12 @@ export const fetchShortTripDetails = async () =>{
         
     }
 }
+
+export const fetchBookingsByPackage = async(packageId:string)=>{
+    try {
+        const response = await api.get(`/booking/${packageId}/bookings`)
+        return response.data
+    }catch(error){
+        console.log(error,'Error')
+    }
+}

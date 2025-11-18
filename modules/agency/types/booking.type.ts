@@ -8,3 +8,14 @@ export interface Booking {
   budget: number;
   status:BookingStatus
 }
+
+export interface BookingData {
+  id:string;
+  customerName:string;
+  status:BookingStatus
+  email:string;
+  phone:string;
+  totalPeople:number;
+  totalAmount:number;
+  destination:string;
+}
