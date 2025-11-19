@@ -31,7 +31,7 @@ export const Trips = () => {
     setCancelDialogOpen,
     page,
     totalPages,
-    loadMore
+    loadMore,
   } = useUserProfile();
   const [tripFilter, setTripFilter] = useState("all");
   // const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -42,7 +42,7 @@ export const Trips = () => {
     tripFilter === "all"
       ? trips
       : trips.filter((trip) => trip.bookingStatus === tripFilter);
-      console.log(filteredTrips,'filtered Tripss')
+  console.log(filteredTrips, "filtered Tripss");
   const getStatusColor = (status: string) => {
     switch (status) {
       case "upcoming":
@@ -86,7 +86,6 @@ export const Trips = () => {
                 onClick={async () => {
                   await cancelBooking(selectedTripForCancel.id);
                   setCancelDialogOpen(false);
-                  // optionally refresh trips state
                 }}
               >
                 Confirm
@@ -172,7 +171,6 @@ export const Trips = () => {
         {/* Trips Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTrips.map((trip) => (
-            
             <Card
               key={trip.id}
               className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
@@ -214,6 +212,12 @@ export const Trips = () => {
                       {trip.travellers} traveler{trip.travellers > 1 ? "s" : ""}
                     </span>
                   </div>
+                  <div className="flex items-center">
+                    <Plane className="w-4 h-4 mr-2" />
+                    <span>
+                      Planned Date:x{trip.travelDate}
+                    </span>
+                  </div>
                   {/* <div className="flex items-center justify-between">
                         <span className="font-semibold text-lg text-blue-600">${trip.price}</span>
                         {trip.rating && (
@@ -246,18 +250,19 @@ export const Trips = () => {
                     </Button>
                   )}
 
-                  {trip.bookingStatus === BookingStatus.PENDING && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleCancelClick(trip)}
-                      >
-                        <RefreshCw className="w-4 h-4 mr-1" />
-                        Cancel
-                      </Button>
-                    </>
+                  {/* {trip.bookingStatus === BookingStatus.PENDING && ( */}
+                  {trip.bookingStatus == BookingStatus.CONFIRMED && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleCancelClick(trip)}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Cancel
+                    </Button>
+                  </>
                   )}
 
                   {trip.bookingStatus === BookingStatus.CANCELLED && (
@@ -275,25 +280,27 @@ export const Trips = () => {
                 {(trip.bookingStatus === BookingStatus.PENDING ||
                   trip.bookingStatus === BookingStatus.CONFIRMED) && (
                   <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                    <div className="flex items-center text-yellow-800">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      {/* Cancel by {new Date(trip.cancellationDeadline).toLocaleDateString()} for {trip.refundPercentage}% refund */}
-                      cancel by new Date and this percentage
-                    </div>
+                    {/* <div className="flex items-center text-yellow-800">
+                      <AlertCircle className="w-3 h-3 mr-1" /> */}
+                    {/* Cancel by {new Date(trip.cancellationDeadline).toLocaleDateString()} for {trip.refundPercentage}% refund */}
+                    {/* cancel by new Date and this percentage */}
+                    {/* </div> */}
                   </div>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
-        {page < totalPages &&(
+        {page < totalPages && (
           <div className="text-center mt-6">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={loadMore}>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={loadMore}
+            >
               Load More
             </button>
           </div>
-        )
-        }
+        )}
         {filteredTrips.length === 0 && (
           <div className="text-center py-12">
             <Plane className="w-16 h-16 text-gray-300 mx-auto mb-4" />

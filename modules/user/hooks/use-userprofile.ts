@@ -42,6 +42,7 @@ export const useUserProfile = () => {
   const[page,setPage] = useState(1)
   const[totalPages,setTotalPages] = useState(1)
   const limit = 1
+  const[refreshWallet,setRefereshWallet] = useState(false)
   const { setUpdateUser, user, setAuthUser } = useAuthStore();
 
   useEffect(() => {
@@ -208,6 +209,7 @@ export const useUserProfile = () => {
       )
       setCancelDialogOpen(false)
       setSelectedTripForCancel(null)
+      setRefereshWallet(prev=>!prev)
     } catch (error) {
       console.log(error);
     }
@@ -260,6 +262,7 @@ export const useUserProfile = () => {
     setCancelDialogOpen,
     loadMore,
     page,
-    totalPages
+    totalPages,
+    refreshWallet
   };
 };

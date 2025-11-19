@@ -58,3 +58,4 @@ export interface Prop {
   avatarInputRef: RefObject<HTMLInputElement|null>;
 }
 
+export type ProfileTab = "overview" | "trips" | "shortTrips" | "connections" | "wallet" | "settings";

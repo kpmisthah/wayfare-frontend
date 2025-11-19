@@ -1,44 +1,11 @@
+'use client'
 import React from "react";
-import { Navigation,Heart,Star } from "lucide-react";
+import { Navigation, Heart, Star } from "lucide-react";
+import { useDestinations } from "../hooks/use-destination";
+import { useRouter } from "next/navigation";
 export const Destination = () => {
-    const popularDestinations = [
-    { 
-      name: 'Swiss Alps', 
-      country: 'Switzerland', 
-      rating: 4.9,
-      tours: 156,
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-      description: 'Stunning alpine scenery and pristine hiking trails',
-      price: 'From $1,200'
-    },
-    { 
-      name: 'Santorini', 
-      country: 'Greece', 
-      rating: 4.8,
-      tours: 298,
-      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&h=300&fit=crop',
-      description: 'Beautiful sunsets and stunning coastline',
-      price: 'From $899'
-    },
-    { 
-      name: 'Bali', 
-      country: 'Indonesia', 
-      rating: 4.7,
-      tours: 203,
-      image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=400&h=300&fit=crop',
-      description: 'Tropical paradise with rich culture',
-      price: 'From $650'
-    },
-    { 
-      name: 'Tokyo', 
-      country: 'Japan', 
-      rating: 4.9,
-      tours: 341,
-      image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop',
-      description: 'Modern city with traditional charm',
-      price: 'From $1,100'
-    },
-  ];
+  const { popularDestinations } = useDestinations();
+  const router = useRouter();
   return (
     <>
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -68,7 +35,7 @@ export const Destination = () => {
                   <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                      backgroundImage: `url('${destination.image}')`,
+                      backgroundImage: `url('${destination.picture[0]}')`,
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -79,33 +46,36 @@ export const Destination = () => {
                   </div>
                   <div className="absolute bottom-4 left-4 text-white">
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      {/* <Star className="w-4 h-4 text-yellow-400 fill-current" />
                       <span className="text-sm font-medium">
                         {destination.rating}
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-gray-900 text-lg">
-                      {destination.name}
+                      {destination.title}
                     </h3>
                     <span className="text-blue-600 font-semibold text-sm">
                       {destination.price}
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm mb-3">
-                    {destination.country}
+                    {destination.destination}
                   </p>
                   <p className="text-gray-500 text-sm mb-4">
                     {destination.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    {/* <span className="text-sm text-gray-500">
                       {destination.tours} experiences
-                    </span>
-                    <button className="text-blue-500 hover:text-blue-600 transition-colors text-sm font-medium">
+                    </span> */}
+                    <button
+                      onClick={() => router.push(`/packages/${destination.id}`)}
+                      className="text-blue-500 hover:text-blue-600 transition-colors text-sm font-medium"
+                    >
                       View Details
                     </button>
                   </div>

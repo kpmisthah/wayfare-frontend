@@ -32,7 +32,7 @@ const PackageCard = ({
         {/* Image */}
         <div className="relative overflow-hidden rounded-t-lg">
           <img
-            src={image}
+            src={image?.[0]|| '/27478f342a4f36852244127ebf48b485.jpg'}
             alt={title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />

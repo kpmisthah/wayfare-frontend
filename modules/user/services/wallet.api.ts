@@ -9,3 +9,13 @@ export const getWallet = async()=>{
         
     }
 }
+
+export const getWalletTransaction = async ()=>{
+    try {
+        const response = await api.get('/wallet/transactions')
+        return response.data
+    } catch (error) {
+        console.log(error);
+        
+    }
+}

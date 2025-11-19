@@ -26,7 +26,6 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
       clientSecret
     } = useBooking(id);
     const{wallet,isProcessing,payWithWallet} = useWallet() 
-  
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
     const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
     
@@ -37,7 +36,7 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
     
     const packagePrice = getNumericPrice(packages?.price || '0');
     const hasWalletBalance = wallet.balance >= packagePrice;
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

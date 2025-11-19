@@ -72,7 +72,7 @@ export const UserProfileTabs = () => {
       </TabsContent>
 
       <Connection />
-      <Wallet />
+      <Wallet activeTab={activeTab}/>
       <Settings />
     </Tabs>
   );

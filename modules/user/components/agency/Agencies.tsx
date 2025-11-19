@@ -69,10 +69,9 @@ const Agencies = () => {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="experience">Most Experienced</SelectItem>
+                  <SelectItem value="az">A → Z</SelectItem>
+                  <SelectItem value="za">Z → A</SelectItem>
                   <SelectItem value="packages">Most Packages</SelectItem>
-                  <SelectItem value="reviews">Most Reviews</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -135,3 +134,5 @@ const Agencies = () => {
 };
 
 export default Agencies;
+//...............................
+

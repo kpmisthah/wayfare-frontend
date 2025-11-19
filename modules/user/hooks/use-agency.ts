@@ -9,7 +9,7 @@ import { listAgencies, searchListAgencies } from "../services/agency-list.api";
 
 export const useAgencies = ()=>{
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("rating");  
+  const [sortBy, setSortBy] = useState("az");  
   const [agencies,setAgencies] = useState<Agency[]>([])
   // const [agency,setAgency] = useState<Agency>()
   const [page, setPage] = useState(1);
@@ -18,14 +18,14 @@ export const useAgencies = ()=>{
   useEffect(() => {
     const handler = setTimeout(()=>{
     const fetchAgencies = async () => {
-        const response = await searchListAgencies(searchTerm,page,limit);
+        const response = await searchListAgencies(searchTerm,page,limit,sortBy);
         setAgencies(response.data)
         setTotalPages(response.totalPages)
     };
     fetchAgencies();      
     },500)
     return ()=>clearTimeout(handler)
-  }, [searchTerm,page]);
+  }, [searchTerm,page,sortBy]);
   useEffect(()=>{
     console.log(agencies,'agenciessss')
   },[])

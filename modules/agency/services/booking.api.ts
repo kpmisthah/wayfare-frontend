@@ -10,6 +10,7 @@ export const bookPackage = async(data:{
 })=>{
     try {
         const response = await api.post('/booking/package',data)
+        console.log(response,'response from bookPackage api');
         return response.data
     } catch (error) {
         console.log(error);
