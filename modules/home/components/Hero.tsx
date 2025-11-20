@@ -1,6 +1,8 @@
 import React from "react";
 import { Camera,Globe,Calendar,PlayCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 export const HeroSection = () => {
+  const router = useRouter();
   return (
     <>
       <section className="relative">
@@ -36,14 +38,19 @@ export const HeroSection = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="bg-blue-500 text-white px-8 py-4 rounded-xl hover:bg-blue-600 transition-colors font-medium flex items-center space-x-2">
-                    <Calendar className="w-5 h-5" />
+                  <button
+                    onClick={() => router.push("/plan-trip")}
+                    className="bg-blue-500 text-white px-8 py-4 rounded-xl hover:bg-blue-600 transition-colors font-medium flex items-center space-x-2"
+                  >
                     <span>Plan Trip</span>
-                  </button>
-                  <button className="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-xl hover:bg-white/30 transition-all font-medium flex items-center space-x-2">
+                  </button>  
+                  <button
+                    onClick={() => router.push("/agencies")}
+                    className="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-xl hover:bg-white/30 transition-all font-medium flex items-center space-x-2"
+                  >
                     <PlayCircle className="w-5 h-5" />
                     <span>Explore Agencies</span>
-                  </button>
+                  </button>                  
                 </div>
               </div>
             </div>

@@ -29,14 +29,30 @@ export function middleware(request: NextRequest) {
   if (authPages.some((path) => url.pathname.startsWith(path)) && token) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-
-  const protectedUserPaths = ["/plan-trip"];
+  const agencyAuthPages = [
+    '/agency/login',
+    '/agency/signup',
+    '/agency/forgot-password',
+    '/agency/verify-otp',
+    '/agency/otp',
+    '/agency/forgot-password-otp'
+  ]
+  if(agencyAuthPages.some((path)=>url.pathname.startsWith(path) && token)){
+    return NextResponse.redirect(new URL('/agency',request.url))
+  }
+  const protectedUserPaths = ["/plan-trip","/booking",'/connection','/profile'];
   if (
     protectedUserPaths.some((path) => url.pathname.startsWith(path)) &&
     !token
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  // const agencyProtectedPaths = ['/agency']
+  // if(agencyProtectedPaths.some((path)=>url.pathname.startsWith(path)) && !token
+  // ){
+  //   return NextResponse.redirect(new URL('/agency/login',request.url))
+  // }
 
   return NextResponse.next();
 }
@@ -52,6 +68,10 @@ export const config = {
     "/reset-password",
     "/otp/:path*",
     "/forgot-password-otp",
-    "/plan-trip"
+    "/plan-trip",
+    "/booking/:path*",
+    "/connection/:path*",
+    '/profile',
+    // '/agency'
   ],
 };

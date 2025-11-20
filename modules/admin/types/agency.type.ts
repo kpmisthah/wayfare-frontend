@@ -7,6 +7,7 @@ export interface Agency {
   ownerName: string;
   websiteUrl: string;
   description: string;
+  reason:string
   user: {
     id:string
     name: string;

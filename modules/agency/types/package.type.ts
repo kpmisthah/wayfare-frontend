@@ -17,7 +17,7 @@ export interface PackageData {
   picture: File[];
   price: string;
   itinerary: Itinerary[];
-  status?: "ACTIVE";
+  status?: PackageStatus;
   vehicle: string;
   pickup_point: string;
   drop_point: string;

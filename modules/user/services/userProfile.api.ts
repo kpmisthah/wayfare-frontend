@@ -84,3 +84,13 @@ export const bookingCancel= async(id:string)=>{
     
   }
 }
+
+export const changePassword = async(data:{oldPassword:string,newPassword:string})=>{
+  try {
+    const response = await api.patch('/auth/change-password',data)
+    return response.data
+  } catch (error) {
+    console.log(error);
+    
+  }
+} 

@@ -55,8 +55,15 @@ export const useLoginForm = ({role='USER',onSubmit,redirectLogin}:UseSignupProps
         error?.response?.message ||
         error?.message ||
         "Login failed. Please try again";
-
+        console.log(message,'error message in login hook')
+      if (error?.response?.status === 403 || message.toLowerCase().includes("token")) {
+      setErrors({
+        general: "Your account has been blocked by the admin. Please contact support.",
+      });
+    }else{
       setErrors({ general: message });
+    }
+     
     } finally {
       setIsLoading(false);
     }

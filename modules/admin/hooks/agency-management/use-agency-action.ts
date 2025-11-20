@@ -8,6 +8,8 @@ import {approvalAgencies,getAgencies,updateAgencies} from "../../services/agency
 export const agencyActions = () => {
   // const { agencies, setAgencies, updateStatus,approvalAgent } = useAgencies();
   const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [agencyToBlock, setAgencyToBlock] = useState<Agency|null>(null);
   useEffect(() => {
     const fetchUser = async () => {
       const data = await getAgencies();
@@ -62,12 +64,12 @@ export const agencyActions = () => {
     }
   };
 
-  const handleApprovalAgency = async (updateAgency: Agency) => {
+  const handleApprovalAgency = async (updateAgency: Agency,action:"accept"|"reject",reason?:string) => {
     try {
       // let verified = updateAgency.user.verified = true
       console.log(updateAgency,'updateagenyc wehecn click accept button');
       
-      const newAGencies = await approvalAgencies(updateAgency.id);
+      const newAGencies = await approvalAgencies(updateAgency.id,action,reason);
       console.log(newAGencies, "newAgencies");
       setAgencies((prev) =>
         prev.map((agency) =>
@@ -173,6 +175,10 @@ export const agencyActions = () => {
     handleBlockAgency,
     setEditSaveLoadingId,
     editSaveLoadingId,
+    blockModalOpen,
+    setBlockModalOpen,
+    agencyToBlock,
+    setAgencyToBlock
     // handleApproveRequest,
   };
 };

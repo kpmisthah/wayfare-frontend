@@ -12,9 +12,9 @@ export const getAgencies = async ()=>{
     }
 }
 
-export const approvalAgencies = async (id:string) =>{
+export const approvalAgencies = async (id:string,action:string,reason?:string) =>{
     try {
-        const response = await api.patch(`/agency/${id}`)
+        const response = await api.patch(`/agency/${id}`,{action,reason})
         return response.data
     } catch (error) {
         console.log(error);

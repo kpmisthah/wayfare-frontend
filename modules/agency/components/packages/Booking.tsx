@@ -9,14 +9,14 @@ export const BookingsView = ({ pkg, onClose }) => {
   const {changeStatus} = useUpdateBookingStatus(setBooking);
   const [selectedBooking, setSelectedBooking] = useState<string|null>(null);
 
-  const totalRevenue = (pkg.bookings || []).reduce(
-    (sum, b) => sum + b.numberOfPeople * pkg.pricePerPerson,
-    0
-  );
-  const totalGuests = (pkg.bookings || []).reduce(
-    (sum, b) => sum + parseInt(b.numberOfPeople),
-    0
-  );
+  // const totalRevenue = (pkg.bookings || []).reduce(
+  //   (sum, b) => sum + b.numberOfPeople * pkg.pricePerPerson,
+  //   0
+  // );
+  // const totalGuests = (pkg.bookings || []).reduce(
+  //   (sum, b) => sum + parseInt(b.numberOfPeople),
+  //   0
+  // );
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -66,7 +66,7 @@ export const BookingsView = ({ pkg, onClose }) => {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      {/* <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-purple-50 p-4 rounded-lg">
           <p className="text-sm text-gray-600">Total Bookings</p>
           <p className="text-2xl font-bold text-purple-600">
@@ -81,7 +81,7 @@ export const BookingsView = ({ pkg, onClose }) => {
           <p className="text-sm text-gray-600">Total Revenue</p>
           <p className="text-2xl font-bold text-green-600">${totalRevenue}</p>
         </div>
-      </div>
+      </div> */}
       
       <div className="space-y-4">
         {booking && booking.length > 0 ? (
@@ -129,9 +129,7 @@ export const BookingsView = ({ pkg, onClose }) => {
                     <div>
                       <p className="text-sm text-gray-500">Travel Date</p>
                       <p className="text-gray-800">
-                        {booking.travelDate
-                          ? new Date(booking.travelDate).toLocaleDateString()
-                          : "date"}
+                        {booking.travelDate}
                       </p>
                     </div>
                     <div>
@@ -141,12 +139,12 @@ export const BookingsView = ({ pkg, onClose }) => {
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Booked On</p>
-                      <p className="text-gray-800">
+                      {/* <p className="text-sm text-gray-500">Booked On</p> */}
+                      {/* <p className="text-gray-800">
                         {booking.bookedAt
                           ? new Date(booking.bookedAt).toLocaleDateString()
                           : "-"}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                 </div>

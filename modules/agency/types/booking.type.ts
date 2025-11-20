@@ -18,4 +18,5 @@ export interface BookingData {
   totalPeople:number;
   totalAmount:number;
   destination:string;
+  travelDate:string
 }

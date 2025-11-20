@@ -110,8 +110,8 @@
 //   );
 // };
 //....................................................
-"use client"
-import BookingModal, { BookingsView } from "./Booking";
+"use client";
+import { BookingsView } from "./Booking";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -123,12 +123,16 @@ import {
   MapPin,
   DollarSign,
   X,
+  CheckCircle,
+  Ban,
 } from "lucide-react";
 import { useFetchPackages } from "../../hooks/use-fetch-packages";
 import { PackageData } from "../../types/package.type";
 import { useAddPackage } from "../../hooks/use-add-package";
 import { AddPackageForm } from "./basic-info";
-
+import { Button } from "@/shared/components/ui/button";
+import { PackageStatus } from "../../types/package.enum";
+import { updatePackageStatus } from "../../services/package.api";
 
 export const PackageManagement = () => {
   const {
@@ -139,7 +143,9 @@ export const PackageManagement = () => {
     setPage,
     page,
     totalPage,
+    loading,
   } = useFetchPackages();
+  console.log(packages,'packagess')
   const {
     showForm,
     setShowForm,
@@ -147,7 +153,7 @@ export const PackageManagement = () => {
     setFormData,
     initialFormData,
     handleEdit,
-    handleDelete,
+    // handleDelete,
     formData,
     editingPackage,
     handlePublish,
@@ -157,11 +163,51 @@ export const PackageManagement = () => {
     setPackageData,
     handleItineraryChange,
     removeArrayField,
-    isPublishing
+    isPublishing,
+    agency,
   } = useAddPackage(setPackages);
   const [viewingPackage, setViewingPackage] = useState<PackageData | null>(
-    null)
+    null
+  );
   const [showBookings, setShowBookings] = useState(null);
+  const handleBlock = async (pkg: PackageData) => {
+    const newStatus =
+      pkg.status === PackageStatus.ACTIVE
+        ? PackageStatus.INACTIVE
+        : PackageStatus.ACTIVE;
+    try {
+      await updatePackageStatus(newStatus, pkg.id);
+      setPackages((prev) =>
+        prev.map((item) =>
+          item.id == pkg.id ? { ...item, status: newStatus } : item
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+  if (!agency) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Complete Your Profile
+          </h2>
+          <p className="text-gray-600 mt-2">
+            To create a travel package, please complete your agency profile
+            first.
+          </p>
+          {/* <a
+            href="/agency/edit"
+            className="inline-block mt-6 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow hover:bg-indigo-700 transition"
+          >
+            Complete Profile
+          </a> */}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br ">
       <div className="max-w-7xl mx-auto">
@@ -183,116 +229,196 @@ export const PackageManagement = () => {
 
         {/* Package List */}
         {!showForm && !viewingPackage && !showBookings && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(!packages||packages.length === 0) ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-600">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
-                  alt="No packages"
-                  className="w-28 h-28 opacity-80 mb-4"
-                />
-                <h2 className="text-xl font-semibold mb-2">
-                  No Packages Available
-                </h2>
-                <p className="text-gray-500 mb-4">
-                  Start by adding your first travel package.
-                </p>
-
-                <button
-                  onClick={() => {
-                    setShowForm(true);
-                    setFormData(initialFormData);
-                    setEditingPackage(null)
-                  }}
-                  className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition"
-                >
-                  + Add Package
-                </button>
+          <div className="min-h-screen">
+            {loading ? (
+        
+              <div className="col-span-full flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
               </div>
             ) : (
-              packages.map((pkg) => (
-                <div
-                  key={pkg.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition"
-                >
-                  <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
-                    {pkg.picture && pkg.picture.length > 0 ? (
-                      <img
-                        src={pkg.picture[0]}
-                        alt={pkg.title}
-                        className="h-48 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-48 flex items-center justify-center text-white text-lg">
-                        No image
-                      </div>
-                    )}
+           
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+                {packages.length === 0 ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-600">
+                    <img
+                      src="https://cdn-icons-png.flaticon.com/512/4076/4076500.png"
+                      alt="No packages"
+                      className="w-24 h-24 mb-4 opacity-70"
+                    />
+
+                    <h3 className="text-xl font-semibold">
+                      No Packages Available
+                    </h3>
+                    <p className="text-sm mt-2">
+                      Click “Add Package” to create your first travel package.
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        setShowForm(true);
+                        setEditingPackage(null);
+                        setFormData(initialFormData);
+                      }}
+                      className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
+                    >
+                      <Plus size={18} /> Add Package
+                    </button>
                   </div>
-
-                  <div className="p-6">
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin size={18} className="text-indigo-600" />
-                        <span>{pkg.destination}</span>
+                ) : (
+              
+                  packages.map((pkg) => (
+                    <div
+                      key={pkg.id}
+                      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition"
+                    >
+                      {/* Image */}
+                      <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600">
+                        {pkg.picture?.[0] ? (
+                          <img
+                            src={pkg.picture[0]}
+                            alt={pkg.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full flex items-center justify-center text-white text-lg">
+                            No Image
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <DollarSign size={18} className="text-green-600" />
-                        <span className="font-semibold">
-                          ${pkg.price} per person
-                        </span>
-                      </div>
+                      {/* Body */}
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold mb-3">{pkg.title}</h3>
 
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar size={18} className="text-blue-600" />
-                        <span>{pkg.duration} days</span>
-                      </div>
+                        <div className="space-y-3 mb-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <MapPin size={18} className="text-indigo-600" />
+                            <span>{pkg.destination}</span>
+                          </div>
 
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Users size={18} className="text-purple-600" />
-                        <span className="font-semibold">
-                          {/* {pkg.bookings?.length || 0} bookings */}
-                        </span>
+                          <div className="flex items-center gap-2">
+                            <DollarSign size={18} className="text-green-600" />
+                            <span className="font-semibold">
+                              ${pkg.price} per person
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Calendar size={18} className="text-blue-600" />
+                            <span>{pkg.duration} days</span>
+                          </div>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex gap-2 mb-2">
+                          <Button
+                            onClick={() => setViewingPackage(pkg)}
+                            className="flex-1"
+                            variant="secondary"
+                            size="sm"
+                          >
+                            <Eye size={16} className="mr-1" /> View
+                          </Button>
+
+                          <Button
+                            onClick={() => setShowBookings(pkg)}
+                            className="flex-1"
+                            variant="secondary"
+                            size="sm"
+                          >
+                            <Users size={16} className="mr-1" /> Bookings
+                          </Button>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleEdit(pkg)}
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                          >
+                            <Edit2 size={16} className="mr-1" /> Edit
+                          </Button>
+
+                          <Button
+                            onClick={() => handleBlock(pkg)}
+                            variant={
+                              pkg.status === PackageStatus.INACTIVE
+                                ? "default"
+                                : "destructive"
+                            }
+                            size="sm"
+                            className="flex-1 relative"
+                            disabled={loading}
+                          >
+                            {pkg.status === PackageStatus.INACTIVE ? (
+                              <>
+                                <CheckCircle size={16} className="mr-1" />{" "}
+                                Unblock
+                              </>
+                            ) : (
+                              <>
+                                <Ban size={16} className="mr-1" /> Block
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setViewingPackage(pkg)}
-                        className="flex-1 bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition flex items-center justify-center gap-1"
-                      >
-                        <Eye size={16} /> View
-                      </button>
-
-                      <button
-                        onClick={() => setShowBookings(pkg)}
-                        className="flex-1 bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition flex items-center justify-center gap-1"
-                      >
-                        <Users size={16} /> Bookings
-                      </button>
-                    </div>
-
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={() => handleEdit(pkg)}
-                        className="flex-1 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg hover:bg-amber-200 transition flex items-center justify-center gap-1"
-                      >
-                        <Edit2 size={16} /> Edit
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(pkg.id)}
-                        className="flex-1 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition flex items-center justify-center gap-1"
-                      >
-                        <Trash2 size={16} /> Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
+                  ))
+                )}
+              </div>
             )}
           </div>
         )}
+
+        {/* Pagination - Only show if more than one page */}
+        {!showForm &&
+          !viewingPackage &&
+          !showBookings &&
+          packages.length > 0 &&
+          totalPage > 1 && (
+            <div className="flex justify-center items-center gap-6 mt-12 pb-8">
+              <Button
+                variant="outline"
+                size="lg"
+                disabled={page === 1 || loading}
+                onClick={prevPage}
+              >
+                ← Previous
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPage }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-10 h-10 rounded-full transition ${
+                      page === p
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+
+              <span className="text-sm text-gray-600 hidden sm:block">
+                Page {page} of {totalPage}
+              </span>
+
+              <Button
+                variant="outline"
+                size="lg"
+                disabled={page === totalPage || loading}
+                onClick={nextPage}
+              >
+                Next →
+              </Button>
+            </div>
+          )}
 
         {/* Package Form */}
         <AddPackageForm
@@ -469,31 +595,33 @@ export const PackageManagement = () => {
                 </p>
               </div>
 
-              {viewingPackage.picture.filter((g) => g).length > 0 && (
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Gallery</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    {viewingPackage.picture
-                      .filter((g) => g)
-                      .map((url, index) => (
-                        <div
-                          key={index}
-                          className="aspect-video bg-gray-200 rounded-lg overflow-hidden"
-                        >
-                          <img
-                            src={url}
-                            alt={`Gallery ${index + 1}`}
-                            className="w-full h-full object-cover"
-                            onError={(e) =>
-                              (e.target.src =
-                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EImage%3C/text%3E%3C/svg%3E')
-                            }
-                          />
-                        </div>
-                      ))}
+              {Array.isArray(viewingPackage?.picture) &&
+                viewingPackage.picture.filter(Boolean).length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Gallery</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      {viewingPackage.picture
+                        .filter((url): url is string => !!url) // TypeScript-friendly filter
+                        .map((url, index) => (
+                          <div
+                            key={index}
+                            className="aspect-video bg-gray-200 rounded-lg overflow-hidden"
+                          >
+                            <img
+                              src={url}
+                              alt={`Gallery ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src =
+                                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle"%3EImage%3C/text%3E%3C/svg%3E';
+                              }}
+                            />
+                          </div>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         )}
@@ -511,4 +639,3 @@ export const PackageManagement = () => {
     </div>
   );
 };
-

@@ -18,6 +18,7 @@ import {
   Utensils,
   Camera,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   usefetchAiTripPlan,
   useAiTripPlan,
@@ -29,6 +30,7 @@ const ShortTrip = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedTrip, setSelectedTrip] = useState(null);
   const { shortTrip } = usefetchAiTripPlan();
+  const router = useRouter();
   const getActivityIcon = (iconName: any) => {
     const icons = {
       hotel: <Hotel className="w-4 h-4" />,
@@ -337,7 +339,9 @@ const ShortTrip = () => {
             <p className="text-gray-600 mb-6">
               Generate your first AI-powered short trip itinerary
             </p>
-            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors">
+            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
+            onClick={()=>router.push('/plan-trip')}
+            >
               Create Itinerary
             </button>
           </div>

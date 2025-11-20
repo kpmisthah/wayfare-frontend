@@ -213,18 +213,11 @@ export const Header = () => {
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
                       <a
-                        href="#"
+                        href="/profile"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         <UserCircle className="w-4 h-4" />
                         <span>View Profile</span>
-                      </a>
-                      <a
-                        href="/profile"
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span>Settings</span>
                       </a>
                       <button
                         onClick={handleLogout}

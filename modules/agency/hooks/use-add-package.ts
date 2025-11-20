@@ -11,6 +11,7 @@ import {
   updatedPackage,
 } from "../services/package.api";
 import { getAgencyProfile } from "../services/agency.api";
+import { PackageStatus } from "../types/package.enum";
 
 export const useAddPackage = (
   setPackages?: React.Dispatch<React.SetStateAction<PackageData[]>>
@@ -32,7 +33,7 @@ export const useAddPackage = (
     price: "",
     title: "",
     vehicle: "",
-    status: "ACTIVE",
+    status: PackageStatus.ACTIVE,
   });
   const initialFormData = {
     title: "",
@@ -75,7 +76,7 @@ export const useAddPackage = (
     highlights: "",
     picture: [],
     price: "",
-    status: "ACTIVE",
+    status: PackageStatus.ACTIVE,
     vehicle: "",
     pickup_point: "",
     drop_point: "",
@@ -258,12 +259,12 @@ export const useAddPackage = (
     setPackageData(pkg);
     setShowForm(true);
   };
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this package?")) {
-      const updatedPackages = packages.filter((pkg) => pkg.id !== id);
-      saveData(updatedPackages);
-    }
-  };
+  // const handleDelete = (id) => {
+  //   if (window.confirm("Are you sure you want to delete this package?")) {
+  //     const updatedPackages = packages.filter((pkg) => pkg.id !== id);
+  //     saveData(updatedPackages);
+  //   }
+  // };
 
   const addArrayField = (field) => {
     setPackageData({
@@ -287,6 +288,8 @@ export const useAddPackage = (
       [field]: newArray,
     });
   };
+
+  
   return {
     packageData,
     setPackageData,
@@ -316,10 +319,9 @@ export const useAddPackage = (
     setShowForm,
     setEditingPackage,
     initialFormData,
-    handleDelete,
+    // handleDelete,
     handleEdit,
     formData,
-    isPublishing,
 
   };
 };

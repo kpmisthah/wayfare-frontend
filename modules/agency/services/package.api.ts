@@ -1,5 +1,6 @@
 import api from "@/lib/api";
 import { Itinerary, Package, PackageData, PackageListing } from "../types/package.type";
+import { PackageStatus } from "../types/package.enum";
 
 export const addPackage = async (data: {
   title: string;
@@ -84,4 +85,15 @@ export const updatedPackage = async (updatedPackage:Partial<PackageData>,package
   } catch (error) {
     
   }
+
+
 }
+  export const updatePackageStatus = async(status:PackageStatus,packageId:string) =>{
+    try {
+      const response = await api.patch(`/agency/package/status/${packageId}`,{status})
+      console.log(response.data,'respnseee')
+      return response.data
+    } catch (error) {
+      
+    }
+  }

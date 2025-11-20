@@ -11,7 +11,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { agencyActions } from "../../hooks/agency-management/use-agency-action";
 import { useState } from "react";
 import { AgencyDetailModal } from "./Agency-details-modal";
-import debounce from "lodash.debounce"
+import debounce from "lodash.debounce";
 import { useMemo } from "react";
 const AgencyManagement = () => {
   const {
@@ -28,18 +28,21 @@ const AgencyManagement = () => {
     setEditAgencyOpen,
     handleBlockAgency,
     handleApprovalAgency,
+      blockModalOpen,
+    setBlockModalOpen,
+    agencyToBlock,
+    setAgencyToBlock
   } = agencyActions();
-     const debouncedSearch = useMemo(
-      () =>
-        debounce((value: string) => {
-          setSearchTerm(value);
-        }, 500), 
-      [setSearchTerm]
-    );
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+      }, 500),
+    [setSearchTerm]
+  );
 
   const [expandedRows, setExpandedRows] = useState(new Set<string>());
   const [showDetailModal, setShowDetailModal] = useState(false);
-
   const toggleRowExpansion = (agencyId: string) => {
     const newExpanded = new Set(expandedRows);
     newExpanded.has(agencyId)
@@ -87,92 +90,148 @@ const AgencyManagement = () => {
           {/* Requests List */}
           {agencyTab === "requests" ? (
             <div className="space-y-4">
-              {filteredRequests.map((agency) => (
-                <div
-                  key={agency.user.id}
-                  className="border border-gray-200 rounded-lg"
-                >
-                  <div className="p-4 flex justify-between items-center">
-                    <div className="flex items-center gap-4 flex-1">
-                      <button
-                        onClick={() => toggleRowExpansion(agency.id)}
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        {expandedRows.has(agency.id) ? (
-                          <ChevronDown className="w-4 h-4" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4" />
-                        )}
-                      </button>
-                      <div className="grid grid-cols-1 md:grid-cols-4 flex-1 gap-4">
-                        <div>
-                          <p className="font-medium">{agency.user.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {agency.user.email}
-                          </p>
-                        </div>
-                        <div>
-                          <Badge variant="outline">Pending</Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedAgency(agency);
-                              setShowDetailModal(true);
-                            }}
-                          >
-                            <Eye className="w-4 h-4" />
-                            View
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleApprovalAgency(agency)}
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleApprovalAgency(agency)}
-                          >
-                            Reject
-                          </Button>
+              {filteredRequests.map((agency) => {
+                const isRejected =
+                  agency.reason &&
+                  agency.reason.trim() !== "" &&
+                  agency.reason.trim().toLowerCase() !== "null";
+                const isPending = !isRejected;
+
+                return (
+                  <div
+                    key={agency.user.id}
+                    className="border border-gray-200 rounded-lg"
+                  >
+                    <div className="p-4 flex justify-between items-center">
+                      <div className="flex items-center gap-4 flex-1">
+                        <button
+                          onClick={() => toggleRowExpansion(agency.id)}
+                          className="p-1 hover:bg-gray-100 rounded"
+                          disabled={!isPending} // Optional: disable expansion if rejected
+                        >
+                          {expandedRows.has(agency.id) ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </button>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 flex-1 gap-4">
+                          <div>
+                            <p className="font-medium">{agency.user.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {agency.user.email}
+                            </p>
+                          </div>
+
+                          <div>
+                            <Badge
+                              variant={isRejected ? "destructive" : "outline"}
+                              className={
+                                isRejected ? "bg-red-100 text-red-800" : ""
+                              }
+                            >
+                              {isRejected ? "Rejected" : "Pending"}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedAgency(agency);
+                                setShowDetailModal(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                              View
+                            </Button>
+
+                            {/* Only show action buttons if still pending */}
+                            {isPending ? (
+                              <>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleApprovalAgency(agency, "accept")
+                                  }
+                                >
+                                  Accept
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    const reason = prompt(
+                                      "Enter rejection reason:"
+                                    );
+                                    if (reason?.trim()) {
+                                      handleApprovalAgency(
+                                        agency,
+                                        "reject",
+                                        reason
+                                      );
+                                    }
+                                  }}
+                                >
+                                  Reject
+                                </Button>
+                              </>
+                            ) : (
+                              <span className="text-sm text-gray-500 italic">
+                                Action completed
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {expandedRows.has(agency.id) && (
-                    <div className="px-4 pb-4 border-t bg-gray-50">
-                      <p>
-                        <span className="font-medium">Owner:</span>{" "}
-                        {agency.ownerName ?? "Not Defined"}
-                      </p>
-                      <p>
-                        <span className="font-medium">License:</span>{" "}
-                        {agency.licenseNumber ?? "Not Defined"}
-                      </p>
-                      <p>
-                        <span className="font-medium">Website:</span>{" "}
-                        <a
-                          href={agency.websiteUrl}
-                          className="text-blue-600"
-                          target="_blank"
-                        >
-                          {agency.websiteUrl ?? "Not Defined"}
-                        </a>
-                      </p>
-                      <p>
-                        <span className="font-medium">Address:</span>{" "}
-                        {agency.address ?? "Not Defined"}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    {/* Expanded Details */}
+                    {expandedRows.has(agency.id) && (
+                      <div className="px-4 pb-4 border-t bg-gray-50">
+                        <p>
+                          <span className="font-medium">Owner:</span>{" "}
+                          {agency.ownerName ?? "Not Defined"}
+                        </p>
+                        <p>
+                          <span className="font-medium">License:</span>{" "}
+                          {agency.licenseNumber ?? "Not Defined"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Website:</span>{" "}
+                          <a
+                            href={agency.websiteUrl}
+                            className="text-blue-600 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {agency.websiteUrl ?? "Not Defined"}
+                          </a>
+                        </p>
+                        <p>
+                          <span className="font-medium">Address:</span>{" "}
+                          {agency.address ?? "Not Defined"}
+                        </p>
+
+                        {/* Show rejection reason if exists */}
+                        {isRejected && agency.reason && (
+                          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                            <p className="text-sm font-medium text-red-800">
+                              Rejection Reason:
+                            </p>
+                            <p className="text-sm text-red-700 mt-1">
+                              {agency.reason}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             /* Agencies Table */
@@ -217,15 +276,17 @@ const AgencyManagement = () => {
                         variant={
                           agency.user.isBlock ? "default" : "destructive"
                         }
-                        onClick={() =>
-                          handleBlockAgency({
-                            ...agency,
-                            user: {
-                              ...agency.user,
-                              isBlock: !agency.user.isBlock,
-                            },
-                          })
-                        }
+                        onClick={() =>{
+                          // handleBlockAgency({
+                          //   ...agency,
+                          //   user: {
+                          //     ...agency.user,
+                          //     isBlock: !agency.user.isBlock,
+                          //   },
+                          // })
+                          setAgencyToBlock(agency);
+                          setBlockModalOpen(true)
+                        }}
                       >
                         {loading === agency.id
                           ? "Updating..."
@@ -249,6 +310,63 @@ const AgencyManagement = () => {
         onClose={() => setShowDetailModal(false)}
         handleApprovalAgency={handleApprovalAgency}
       />
+      {/*Block/Unblock Confirmation Modal */}
+      {blockModalOpen && agencyToBlock && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {agencyToBlock.user.isBlock
+                ? "Activate Agency"
+                : "Deactivate Agency"}
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to{" "}
+              <span className="font-medium">
+                {agencyToBlock.user.isBlock ? "activate" : "deactivate"}
+              </span>{" "}
+              this agency?
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <strong className="text-sm">{agencyToBlock.user.name}</strong>
+              <span className="text-xs text-gray-500">
+                ({agencyToBlock.user.email})
+              </span>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setBlockModalOpen(false);
+                  setAgencyToBlock(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant={agencyToBlock.user.isBlock ? "default" : "destructive"}
+                size="sm"
+                onClick={() => {
+                  handleBlockAgency({
+                    ...agencyToBlock,
+                    user: {
+                      ...agencyToBlock.user,
+                      isBlock: !agencyToBlock.user.isBlock,
+                    },
+                  });
+                  setBlockModalOpen(false);
+                  setAgencyToBlock(null);
+                }}
+              >
+                {loading === agencyToBlock.id
+                  ? "Processing..."
+                  : "Yes, Confirm"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -11,6 +11,8 @@ export const useUsers = () => {
   
   const [editingUser, setEditingUser] = useState<User>();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<User | null>(null);
 
   const handleEditUser = (user:User) => {
     setEditingUser(user);
@@ -30,8 +32,8 @@ export const useUsers = () => {
     }
   };
   const handleToggleBlockUser = async(user:User) => {
-    alert("are u sure you want to blok the user")
     const updateStatus = !user.isBlock
+    console.log(updateStatus,'updatestatus')
     try {
       await update(user.id,{isBlock:updateStatus})
       setUsers((prev)=>
@@ -63,7 +65,9 @@ export const useUsers = () => {
 
   const update = async (id: string, updateData: Partial<User>) => {
     try {
-      await updateUser(id, updateData);
+      console.log(updateData,'update data in hook')
+      let result = await updateUser(id, updateData);
+      console.log(result,'updated user result')
       setUsers((prevUser) =>
         prevUser.map((user) =>
           user.id == id ? { ...updateData, ...user } : user
@@ -103,6 +107,9 @@ export const useUsers = () => {
     handleSaveUser,
     setEditingUser,
     handleToggleBlockUser,
-  
+    blockModalOpen,
+    setBlockModalOpen,
+    userToBlock,
+    setUserToBlock,
   };
 };

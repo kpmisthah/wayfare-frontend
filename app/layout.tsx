@@ -1,7 +1,6 @@
 import AppInitializer from "@/lib/AppInitializer";
 import { getUserFromServer } from "@/lib/getUser";
 import "./globals.css";
-import { SocketProvider } from "./(user)/socket-provider/SocketProvider";
 export default async function RootLayout({
   children,
 }: {

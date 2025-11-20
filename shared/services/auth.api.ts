@@ -85,11 +85,11 @@ export const verifyForgotPassword = async (otp: string) => {
 export const resetPassword = async (email: string, password: string) => {
   try {
     console.log(email,'email',password,'password','from reset-password service in frnotend');    
-    const response = await api.post("/auth/reset-password", { email, password });
+    const response = await api.patch("/auth/reset-password", { email, password });
     return response.data;
   } catch (error) {
     console.log(error);
-    throw Error;
+    throw new Error;
   }
 };
 // page refresh access token checking
