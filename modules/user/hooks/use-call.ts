@@ -528,20 +528,26 @@ export const useCall = (
   // use-call.ts (inside hook)
   const endCall = useCallback(() => {
   console.log("Ending call locally...");
-
+  // const {callerId,recipientId} = useCallStore()
+  const callerId = useCallStore.getState().callerId;
+  const recipientId = useCallStore.getState().recipientId;
+  const partnerId = currentUserId === callerId ? recipientId : callerId;
+  // const partnerId = currentUserId === callerId ? recipientId : callerId;
   // Determine who the other person is
-  let recipientId: string | undefined;
+  // let recipientId: string | undefined;
 
-  if (currentUserId && partnerUserId) {
-    // Simple: the other person is the partnerUserId passed to this hook
-    recipientId = partnerUserId;
+  // if (currentUserId && partnerUserId) {
+  //   // Simple: the other person is the partnerUserId passed to this hook
+  //   recipientId = partnerUserId;
+  // }
+
+  // // Signal end to the other user
+  // if (recipientId) {
+  //   socket.emit("endCall", { toUserId: recipientId });
+  // }
+  if (partnerId) {
+    socket.emit("endCall", { toUserId: partnerId });
   }
-
-  // Signal end to the other user
-  if (recipientId) {
-    socket.emit("endCall", { toUserId: recipientId });
-  }
-
   // Cleanup peer and streams
   if (peerRef.current) {
     peerRef.current.destroy();
@@ -556,12 +562,13 @@ export const useCall = (
   if (myVideo.current) myVideo.current.srcObject = null;
   if (partnerVideo.current) partnerVideo.current.srcObject = null;
 
+  setCallAccepted(false)
   setCallEnded(true);
   setLocalCallAccepted(false);
 
   // Reset global UI
   useCallStore.getState().endCallUI();
-}, [currentUserId, partnerUserId, socket, stream]);
+}, [currentUserId,socket, stream]);
   // END useCallback(endCall)
   // =========================================================================
   // NEW: Dedicated Effect for Local Video Display
@@ -739,6 +746,19 @@ export const useCall = (
 //       socket.off("callEnded", endCall);
 //     };
 //   }, [socket, endCall]);
+// ADD THIS INSIDE useCall hook — this is the ONLY thing that was missing
+useEffect(() => {
+  const handleRemoteEnd = () => {
+    console.log("Partner ended the call → FULL CLEANUP on MY side");
+    endCall(); // ← This stops camera, destroys peer, clears video
+  };
+
+  socket.on("callEnded", handleRemoteEnd);
+
+  return () => {
+    socket.off("callEnded", handleRemoteEnd);
+  };
+}, [socket, endCall]);
   return {
     myVideo,
     partnerVideo,
