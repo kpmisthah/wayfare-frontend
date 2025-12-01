@@ -13,7 +13,7 @@ import React from "react";
     
 
 interface Props {
-  status: TabOption | boolean;
+  status: TabOption | boolean|string;
 }
   const getStatusColor = (status:any) => {
     switch (status) {

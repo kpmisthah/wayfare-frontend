@@ -181,19 +181,14 @@ export const Notification = () => {
   };
 
   const handleAcceptConnection = (id: number, userName: string) => {
-    // Add your API call here to accept the connection
     console.log(`Accepted connection request from ${userName}`);
-    // Remove the notification after accepting
     deleteNotification(id);
-    // You can also show a success toast/message here
   };
 
   const handleRejectConnection = (id: number, userName: string) => {
-    // Add your API call here to reject the connection
     console.log(`Rejected connection request from ${userName}`);
-    // Remove the notification after rejecting
     deleteNotification(id);
-    // You can also show a message here
+
   };
 
   const getNotificationIcon = (type: string) => {
@@ -293,9 +288,9 @@ export const Notification = () => {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              All ({notifications.length})
+              All 
             </button>
-            <button
+            {/* <button
               onClick={() => setFilter("unread")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === "unread"
@@ -304,7 +299,7 @@ export const Notification = () => {
               }`}
             >
               Unread ({unreadCount})
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

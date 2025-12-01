@@ -15,8 +15,6 @@ export default function AppInitializer({
 }) {
   const [loaded,setLoaded] = useState(false)
   const setAuthUser = useAuthStore((state) => state.setAuthUser)
-  console.log(setAuthUser,'in appInitiazer');
-  console.log(user,'in App Initializer gooooyssss');
   useCallListeners(user?.id);
   useEffect(() => {
     if (user) {

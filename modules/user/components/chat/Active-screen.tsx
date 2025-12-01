@@ -1,4 +1,3 @@
-// ActiveCallScreen.tsx (New File - place in your main layout)
 
 "use client";
 import { useCallStore } from "@/store/useCallStore";
@@ -15,25 +14,9 @@ export default function ActiveCallScreen() {
   console.log(callType,'calllllttyppeee in actiev sctreeee')
   console.log(callerSignalData,'calllerrrsignaallldata-------------->');
   console.log(recipientId,'reciepinetIdddd==============');
-  // --- 1. HOOKS MUST BE CALLED UNCONDITIONALLY ---
-  // We pass the IDs, even if they are null, because the hook must run on every render.
-  // The useCall hook needs to be adapted to handle undefined/null inputs gracefully.
-  //   const partnerUserId = user?.id === callerId ? conversationId : callerId;
-//   const currentUserId = user?.id;
-// //   const activeConvoId = conversationId;
-//   let partnerUserId: string | undefined = undefined;
-//   // ✅ FIX: Call the hook unconditionally at the top level
-//   if (currentUserId) {
-//     if (currentUserId === callerId) {
-//       // I am the caller → partner is the recipient → stored in conversationId
-//       partnerUserId = recipientId || undefined
-//     } else if(callerId && callerId !== currentUserId){
-//       // I am the recipient → partner is the caller
-//       partnerUserId = callerId;
-//     }
-//   }
+
 const partnerUserId = user?.id === callerId ? recipientId : callerId;
-  // console.log(partnerUserId, "actual partner didd---------------------------");
+  console.log(partnerUserId, "actual partner didd---------------------------");
   const call = useCall(
     user?.id,
     partnerUserId!,

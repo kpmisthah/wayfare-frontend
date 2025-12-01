@@ -78,6 +78,8 @@ export const usePackages = (id:string)=>{
         setTotalPages(res.totalPages)
     }
     fetchPackages()
+    console.log(packages,'packagessssss');
+
   },[page,id])
   // useEffect(()=>{
   //   console.log(page,'pageeeee haahaahaa');

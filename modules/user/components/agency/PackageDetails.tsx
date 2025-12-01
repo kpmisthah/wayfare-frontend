@@ -76,20 +76,7 @@ const PackageDetails = ({ id }: { id: string }) => {
 
       {/* Hero Section */}
       <div className="relative">
-        {/* Back Button */}
-        <div className="absolute top-4 left-4 z-10">
-          <Link href="/agencies/1">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="bg-background/90 backdrop-blur"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Agency
-            </Button>
-          </Link>
-        </div>
-
+   
         {/* Main Image */}
         <div className="relative h-96 md:h-[500px] overflow-hidden">
           <img

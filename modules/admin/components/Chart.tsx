@@ -1,20 +1,21 @@
 import { ResponsiveContainer,LineChart,CartesianGrid,XAxis,YAxis,Tooltip,Line,PieChart,Pie,Cell } from "recharts";
+import { ChartProps } from "../types/dahsboard.type";
 
-const Chart = () => {
-    const revenueData = [
-    { month: 'Jan', revenue: 125000, bookings: 280 },
-    { month: 'Feb', revenue: 145000, bookings: 320 },
-    { month: 'Mar', revenue: 165000, bookings: 380 },
-    { month: 'Apr', revenue: 185000, bookings: 420 },
-    { month: 'May', revenue: 205000, bookings: 480 },
-    { month: 'Jun', revenue: 225000, bookings: 520 }
-  ];
+const Chart = ({ revenueData, bookingStatusData }:ChartProps) => {
+  //   const revenueData = [
+  //   { month: 'Jan', revenue: 125000, bookings: 280 },
+  //   { month: 'Feb', revenue: 145000, bookings: 320 },
+  //   { month: 'Mar', revenue: 165000, bookings: 380 },
+  //   { month: 'Apr', revenue: 185000, bookings: 420 },
+  //   { month: 'May', revenue: 205000, bookings: 480 },
+  //   { month: 'Jun', revenue: 225000, bookings: 520 }
+  // ];
 
-   const bookingStatusData = [
-    { name: 'Confirmed', value: 45, color: '#3B82F6' },
-    { name: 'Pending', value: 30, color: '#F59E0B' },
-    { name: 'Cancelled', value: 25, color: '#EF4444' }
-  ];
+  //  const bookingStatusData = [
+  //   { name: 'Confirmed', value: 45, color: '#3B82F6' },
+  //   { name: 'Pending', value: 30, color: '#F59E0B' },
+  //   { name: 'Cancelled', value: 25, color: '#EF4444' }
+  // ];
 
   return (
     <>

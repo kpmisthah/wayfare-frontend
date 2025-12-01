@@ -7,7 +7,6 @@ import {
 import { PersonalInformation } from "./personal-information";
 import { TravelPreferences } from "./travel-preferences";
 import { useUserProfile } from "../../hooks/use-userprofile";
-import { Connection } from "./tabs/connection";
 import { Trips } from "./tabs/trip";
 import { Wallet } from "./tabs/wallet";
 import { Settings } from "./tabs/settings";
@@ -38,12 +37,6 @@ export const UserProfileTabs = () => {
         </TabsTrigger>
 
         <TabsTrigger
-          value="connections"
-          className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg"
-        >
-          Connections
-        </TabsTrigger>
-        <TabsTrigger
           value="wallet"
           className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg"
         >
@@ -70,8 +63,6 @@ export const UserProfileTabs = () => {
       <TabsContent value="shortTrips" className="space-y-6">
         <ShortTrip />
       </TabsContent>
-
-      <Connection />
       <Wallet activeTab={activeTab}/>
       <Settings />
     </Tabs>

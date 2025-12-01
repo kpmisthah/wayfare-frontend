@@ -8,9 +8,6 @@ import AgencyManagement from './agency-management/Agency-Management';
 import FinancialManagement from './Financial-Management';
 
 
-
-// ... import other admin screens
-
 const AdminApp = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 

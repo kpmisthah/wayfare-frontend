@@ -1,38 +1,8 @@
+import { useRecentBookings } from "../hooks/use-recent-bookings";
 import StatusBadge from "./StatusBadge";
-import { Booking } from "../types/booking.type";
+
 const RecentActivity = () => {
-  const bookings: Booking[] = [
-    {
-      id: "BK001",
-      customer: "John Doe",
-      agency: "Adventure Tours",
-      destination: "Manali",
-      date: "2024-02-15",
-      cost: 25000,
-      status: "confirmed",
-      payment: "paid",
-    },
-    {
-      id: "BK002",
-      customer: "Jane Smith",
-      agency: "Mountain Explorers",
-      destination: "Goa",
-      date: "2024-02-20",
-      cost: 18000,
-      status: "pending",
-      payment: "pending",
-    },
-    {
-      id: "BK003",
-      customer: "Mike Johnson",
-      agency: "Beach Paradise",
-      destination: "Kerala",
-      date: "2024-02-25",
-      cost: 32000,
-      status: "confirmed",
-      payment: "paid",
-    },
-  ];
+    const{bookings,loading} = useRecentBookings()
   return (
     <>
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -62,22 +32,22 @@ const RecentActivity = () => {
               </tr>
             </thead>
             <tbody>
-              {bookings.slice(0, 5).map((booking) => (
+              {bookings?.map((booking) => (
                 <tr key={booking.id} className="border-b border-gray-200">
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {booking.id}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {booking.customer}
+                    {booking.customerName}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {booking.agency}
+                    {booking.agencyName}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
                     {booking.destination}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    ₹{booking.cost.toLocaleString()}
+                    ₹{booking.amount}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={booking.status} />

@@ -16,9 +16,11 @@ export const useFetchPackages = () => {
     try {
       const loadPackages = async () => {
         const data = await fetchPackages(page, limit);
-        console.log(data.items,'in fetch packagess')
+        // console.log(data.items,'in fetch packagess')
+        setPage(data.page);
         setPackages(data.items||[]);
         setTotalPage(data.totalPages);
+        setTotalPage(data.total);
       };
       loadPackages();
     } catch (error) {

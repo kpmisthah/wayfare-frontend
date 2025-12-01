@@ -7,7 +7,7 @@ import { Header } from "@/shared/components/layout/Header";
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { ProfileModal, TravelCompanionProfile } from "./mathing-profile";
-
+import { useRouter } from "next/navigation";
 
 type Traveler = {
     id: string,
@@ -21,6 +21,7 @@ type Traveler = {
 export function TravelItinerary({ id,destination }: { id: string,destination:string }) {
   const{travellersData} = useFetchtravellers(destination)
   const { tripPlan } = useAiTripPlan(id,destination);
+  const router = useRouter()
   const [selectedTraveler, setSelectedTraveler] = useState<Traveler | null>(
     null
   );
@@ -124,7 +125,7 @@ export function TravelItinerary({ id,destination }: { id: string,destination:str
           </div>
             <div className="text-center">
               <button
-                onClick={() => setShowAll(!showAll)}
+                onClick={()=>router.push('/connection')}
                 className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
               >
                 View All

@@ -90,7 +90,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
       {/* Cover Image */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img
-          src={agency?.user.image}
+          src={agency?.user.profileImage}
           alt="Cover Image"
           className="w-full h-full object-cover"
         />
@@ -101,7 +101,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
           <div className="container mx-auto">
             <div className="flex items-end gap-6">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={agency?.user.image} alt={agency?.user.name} />
+                <AvatarImage src={agency?.user.profileImage} alt={agency?.user.name} />
                 <AvatarFallback className="text-2xl">AS</AvatarFallback>
               </Avatar>
 

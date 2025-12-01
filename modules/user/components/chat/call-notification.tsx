@@ -8,10 +8,6 @@ export default function CallNotificationManager() {
   const { user } = useAuthStore(); // Get current user
   const { isIncomingCall, callerId, conversationId, callType, endCallUI } =
     useCallStore();
-  // NOTE: You must adapt useCall to work without specific partnerUserId and conversationId here.
-  // It only needs the currentUserId to listen for incoming calls.
-  // We pass null/undefined for the other two.
-  // const call = useCall(user?.id, callerId!,conversationId||"global_listener");
   console.log(isIncomingCall,'incoming call in call notificationUi---------')
   console.log(callerId,'calletId in call notificaition==========');
   console.log(conversationId,'conversationId in call notification===========');
@@ -32,19 +28,7 @@ export default function CallNotificationManager() {
   if (!isIncomingCall) {
     return null;
   }
-  //   if (!call.receivingCall || call.callAccepted) {
-  //     return null;
-  //   }
-  // const handleAccept = async () => {
-  //   // 1. Run the WebRTC setup (which updates the global store to isCallActive: true)
-  //   await call.acceptCall();
-  //   // No need to close the modal here; acceptCall updates the store, and isIncomingCall becomes false
-  // };
-  // const handleReject = () => {
-  //   // 1. Tell the other side the call is rejected/ended
-  //   call.endCall();
-  //   // 2. The endCall function handles calling endCallUI() to reset the store
-  // };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 z-[9999] flex items-center justify-center">
       <div className="bg-white p-10 rounded-2xl text-center shadow-2xl animate-pulse">

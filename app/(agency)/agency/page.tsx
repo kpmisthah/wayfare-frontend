@@ -6,7 +6,7 @@ import DashboardLayout from "@/modules/agency/components/layout/DashboardLayout"
 import { Dashboard } from "@/modules/agency/components/dashboard/DashboardOverview";
 import { PackageManagement } from "@/modules/agency/components/packages/PackageManagement";
 import { BookingManagement } from "@/modules/agency/components/bookings/BookingManagement";
-import { AddPackage } from "@/modules/agency/components/packages/AddPackage";
+import { AgencyWallet } from "@/modules/agency/components/packages/AddPackage";
 import { AnalyticsFeedback } from "@/modules/agency/components/analytics/AnalyticsFeedback";
 import AgencyProfile  from "@/modules/agency/components/profile/AgencyProfile";
 
@@ -23,8 +23,8 @@ const TravelAgencyDashboard = () => {
         return <PackageManagement />;
       case "bookings":
         return <BookingManagement />;
-      case "add-package":
-        return <AddPackage />;
+      case "AgencyWallet":
+        return <AgencyWallet />;
       case "analytics":
         return <AnalyticsFeedback />;
       case "profile":

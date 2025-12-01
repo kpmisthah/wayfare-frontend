@@ -39,7 +39,7 @@ export const useCallStore = create<CallState>((set) => ({
     conversationId: conversationId,
     callType: callType,
   }),
-startCallUI: (conversationId, recipientId,callerId, callType) =>
+startCallUI: (conversationId, callerId,recipientId, callType) =>
     set({
       isCallActive:true,
       isIncomingCall: false,

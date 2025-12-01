@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays, LayoutDashboard, MapPin, Package, Plus, User, X } from "lucide-react";
+import { BarChart3, CalendarDays, LayoutDashboard, MapPin, Package, Plus, User, Wallet, X } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobileMenuOpen }: {
   activeTab: string;
@@ -11,7 +11,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isMobileMenuOpen, setIsMobile
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'packages', label: 'Package Management', icon: Package },
     { id: 'bookings', label: 'Booking Management', icon: CalendarDays },
-    { id: 'add-package', label: 'Add New Package', icon: Plus },
+    { id: 'AgencyWallet', label: 'Wallet', icon: Wallet },
     { id: 'analytics', label: 'Analytics & Feedback', icon: BarChart3 },
     { id: 'profile', label: 'Agency Profile', icon: User },
   ];

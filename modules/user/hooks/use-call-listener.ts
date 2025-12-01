@@ -23,7 +23,7 @@ export const useCallListeners = (currentUserId: string | undefined) => {
     
     const handleIncomingCall = (data: any) => {
       console.log("Global: Incoming call event received:", data);
-      console.log(data.from,'data fromm.....')
+      console.log(data.from,'***********data fromm.....and ',currentUserId,'cucusudfcsdf**********')
       // Safety check: Don't notify if the caller is me
       if (data.from === currentUserId) {
         console.log("Global: Ignoring my own incoming call event.");

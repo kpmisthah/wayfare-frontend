@@ -148,6 +148,7 @@ export default function TravelConnections() {
                   Skip
                 </button>
                 <button
+                disabled={likedUsers.includes(selectedUser.id)}
                   onClick={() => {
                     handleConnect(selectedUser.id)
                   }}
@@ -215,13 +216,7 @@ export default function TravelConnections() {
                   </div>
                 </div>
 
-                {/* Like Badge if liked */}
-                {likedUsers.includes(traveler.id) && (
-                  <div className="absolute top-3 left-3 bg-pink-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                    <Heart className="w-3 h-3 fill-white" />
-                    Connected
-                  </div>
-                )}
+               
               </div>
             </div>
           ))}

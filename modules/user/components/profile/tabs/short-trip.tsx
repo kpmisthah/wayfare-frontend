@@ -133,10 +133,6 @@ const ShortTrip = () => {
                   <Share2 className="w-4 h-4" />
                   Share
                 </button>
-                <button className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5">
-                  <Edit className="w-4 h-4" />
-                  Edit
-                </button>
                 <button
                   onClick={() => setSelectedTrip(trip)}
                   className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover: to-cyan-700 rounded-lg transition-colors flex items-center gap-1.5"
