@@ -8,12 +8,14 @@ export interface Agency {
   websiteUrl: string;
   description: string;
   reason:string
+  status:AgencyStatus
   user: {
     id:string
     name: string;
     email: string;
     isVerified: boolean;
     image: string;
+    phone:string
     isBlock:boolean
   };
 }
