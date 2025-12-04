@@ -13,6 +13,7 @@ import { useState } from "react";
 import { AgencyDetailModal } from "./Agency-details-modal";
 import debounce from "lodash.debounce";
 import { useMemo } from "react";
+import BlockAgencyModal from "./Blcok-agency-modal";
 const AgencyManagement = () => {
   const {
     filteredAgencies,
@@ -28,10 +29,13 @@ const AgencyManagement = () => {
     setEditAgencyOpen,
     handleBlockAgency,
     handleApprovalAgency,
-      blockModalOpen,
+    blockModalOpen,
     setBlockModalOpen,
     agencyToBlock,
-    setAgencyToBlock
+    setAgencyToBlock,
+    currentPage,
+    setCurrentPage,
+    totalPages,
   } = agencyActions();
   const debouncedSearch = useMemo(
     () =>
@@ -276,7 +280,7 @@ const AgencyManagement = () => {
                         variant={
                           agency.user.isBlock ? "default" : "destructive"
                         }
-                        onClick={() =>{
+                        onClick={() => {
                           // handleBlockAgency({
                           //   ...agency,
                           //   user: {
@@ -285,10 +289,10 @@ const AgencyManagement = () => {
                           //   },
                           // })
                           setAgencyToBlock(agency);
-                          setBlockModalOpen(true)
+                          setBlockModalOpen(true);
                         }}
                       >
-                        {loading === agency.id
+                        {loading
                           ? "Updating..."
                           : agency.user.isBlock
                           ? "Activate"
@@ -302,6 +306,27 @@ const AgencyManagement = () => {
           )}
         </CardContent>
       </Card>
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          variant="outline"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          Previous
+        </Button>
+
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <Button
+          variant="outline"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          Next
+        </Button>
+      </div>
 
       {/* Modal */}
       <AgencyDetailModal
@@ -312,60 +337,20 @@ const AgencyManagement = () => {
       />
       {/*Block/Unblock Confirmation Modal */}
       {blockModalOpen && agencyToBlock && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {agencyToBlock.user.isBlock
-                ? "Activate Agency"
-                : "Deactivate Agency"}
-            </h3>
-            <p className="mt-2 text-sm text-gray-600">
-              Are you sure you want to{" "}
-              <span className="font-medium">
-                {agencyToBlock.user.isBlock ? "activate" : "deactivate"}
-              </span>{" "}
-              this agency?
-            </p>
-            <div className="mt-4 flex items-center gap-3">
-              <strong className="text-sm">{agencyToBlock.user.name}</strong>
-              <span className="text-xs text-gray-500">
-                ({agencyToBlock.user.email})
-              </span>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setBlockModalOpen(false);
-                  setAgencyToBlock(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant={agencyToBlock.user.isBlock ? "default" : "destructive"}
-                size="sm"
-                onClick={() => {
-                  handleBlockAgency({
-                    ...agencyToBlock,
-                    user: {
-                      ...agencyToBlock.user,
-                      isBlock: !agencyToBlock.user.isBlock,
-                    },
-                  });
-                  setBlockModalOpen(false);
-                  setAgencyToBlock(null);
-                }}
-              >
-                {loading === agencyToBlock.id
-                  ? "Processing..."
-                  : "Yes, Confirm"}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <BlockAgencyModal
+          isOpen={blockModalOpen}
+          agency={agencyToBlock}
+          loading={loading}
+          onClose={() => {
+            setBlockModalOpen(false);
+            setAgencyToBlock(null);
+          }}
+          onConfirm={(updatedAgency) => {
+            handleBlockAgency(updatedAgency);
+            setBlockModalOpen(false);
+            setAgencyToBlock(null);
+          }}
+        />
       )}
     </div>
   );
