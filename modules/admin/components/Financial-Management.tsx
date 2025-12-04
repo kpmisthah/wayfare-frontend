@@ -61,7 +61,7 @@ const FinancialManagement = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm font-semibold text-gray-900">
-          ₹{agency.platfromEarning.toLocaleString()}
+          ₹{agency.platformEarning?.toLocaleString() ?? 0}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
