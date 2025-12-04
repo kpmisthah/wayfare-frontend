@@ -1,27 +1,46 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Agency, AgencyRequest } from "../../types/agency.type";
-// import { useAgencies } from "./use-agency-management";
+import {
+  approvalAgencies,
+  getAgencies,
+  updateAgencies,
+} from "../../services/agency.service";
+import debounce from "lodash.debounce";
 import { AgencyStatus } from "../../types/agency.status.enum";
-import {approvalAgencies,getAgencies,updateAgencies} from "../../services/agency.service";
 
 export const agencyActions = () => {
   // const { agencies, setAgencies, updateStatus,approvalAgent } = useAgencies();
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
-  const [agencyToBlock, setAgencyToBlock] = useState<Agency|null>(null);
+  const [agencyToBlock, setAgencyToBlock] = useState<Agency | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const fetchAgencies = async (page = 1, search = "") => {
+    try {
+      setLoading(true);
+      const response = await getAgencies({ page, limit, search });
+      if (response) {
+        setAgencies(response.data || []);
+        setTotalPages(Math.ceil(response.total / limit));
+        setCurrentPage(page);
+      } else {
+        setAgencies([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchUser = async () => {
-      const data = await getAgencies();
-      console.log(data,'in fetchUser');
-      
-      setAgencies(data);
-    };
-    fetchUser();
-  }, []);
-  useEffect(()=>{
-    console.log(agencies,'agencies in useEffect')
-  },[agencies])
+    fetchAgencies(currentPage, searchTerm);
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    console.log(agencies, "agencies in useEffect");
+  }, [agencies]);
 
   // const updateStatus = async (
   //   id: string,
@@ -42,7 +61,7 @@ export const agencyActions = () => {
   //     throw error;
   //   }
   // };
-  const [searchTerm, setSearchTerm] = useState("");
+
   // const [requests, setRequests] = useState<AgencyRequest[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<AgencyRequest | null>(
@@ -53,7 +72,7 @@ export const agencyActions = () => {
   );
   const [editAgencyOpen, setEditAgencyOpen] = useState(false);
   const [deleteAgencyOpen, setDeleteAgencyOpen] = useState(false);
-  const [loading, setLoading] = useState<string | null>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [editRequestOpen, setEditRequestOpen] = useState(false);
   const [editSaveLoadingId, setEditSaveLoadingId] = useState(false);
   const handleDeleteAgency = () => {
@@ -64,13 +83,22 @@ export const agencyActions = () => {
     }
   };
 
-  const handleApprovalAgency = async (updateAgency: Agency,action:"accept"|"reject",reason?:string) => {
+  const handleApprovalAgency = async (
+    updateAgency: Agency,
+    action?: "accept" | "reject",
+    reason?: string
+  ) => {
     try {
-      // let verified = updateAgency.user.verified = true
-      console.log(updateAgency,'updateagenyc wehecn click accept button');
-      
-      const newAGencies = await approvalAgencies(updateAgency.id,action,reason);
-      console.log(newAGencies, "newAgencies");
+      const finalAction =
+        action ??
+        (updateAgency.status === AgencyStatus.ACTIVE ? "accept" : "reject");
+
+      const newAGencies = await approvalAgencies(
+        updateAgency.id,
+        finalAction,
+        reason
+      );
+
       setAgencies((prev) =>
         prev.map((agency) =>
           agency.id === updateAgency.id ? newAGencies : agency
@@ -84,44 +112,34 @@ export const agencyActions = () => {
     }
   };
 
-  // const handleSaveAgency = async (updatedAgency: Agency) => {
-  //   try {
-  //     setEditSaveLoadingId(true);
-  //     const newAGencies = await updateAgencies(
-  //       updatedAgency.id,
-  //       updatedAgency.user.isBlock,
-  //       updatedAgency.user.email,
-  //       updatedAgency.user.name
-  //     );
-  //     setAgencies((prev) =>
-  //       prev.map((agency) =>
-  //         agency.id === updatedAgency.id ? newAGencies : agency
-  //       )
-  //     );
-  //     setEditAgencyOpen(false);
-  //   } catch (error) {
-  //     setEditSaveLoadingId(false);
-  //   } finally {
-  //     setEditSaveLoadingId(false);
-  //   }
-  // };
-
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setCurrentPage(1); 
+        setSearchTerm(value);
+      }, 500),
+    []
+  );
   const handleBlockAgency = async (updateAgency: Agency) => {
-    console.log(updateAgency,'updateAGency');
-    
+    console.log(updateAgency, "updateAGency");
+
     try {
-      setLoading(updateAgency.id);
-     let agencyStatus = await updateAgencies(
-        updateAgency.id
+      setLoading(true);
+      let agencyStatus = await updateAgencies(updateAgency.id);
+      setAgencies((prev) =>
+        prev.map((agency) =>
+          agency.id == updateAgency.id
+            ? {
+                ...agency,
+                user: { ...agency.user, isBlock: agencyStatus.isBlock },
+              }
+            : agency
+        )
       );
-      setAgencies((prev)=>
-      prev.map((agency)=>
-      agency.id == updateAgency.id?{...agency,user:{...agency.user,isBlock:agencyStatus.isBlock}}:agency
-      ))
     } catch (error) {
-      setLoading(null);
+      setLoading(false);
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
     //  setEditAgencyOpen(false);
   };
@@ -130,7 +148,6 @@ export const agencyActions = () => {
     setAgencies((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
     setEditRequestOpen(false);
   };
-
 
   const filteredAgencies = agencies.filter(
     (agency) =>
@@ -178,7 +195,13 @@ export const agencyActions = () => {
     blockModalOpen,
     setBlockModalOpen,
     agencyToBlock,
-    setAgencyToBlock
+    setAgencyToBlock,
+    agencies,
+    fetchAgencies,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    debouncedSearch,
     // handleApproveRequest,
   };
 };
