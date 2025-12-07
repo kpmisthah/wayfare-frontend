@@ -36,9 +36,9 @@ export const signup = async (data: {
   }
 };
 
-export const verifyOtp = async (otp: string) => {
+export const verifyOtp = async (data:{otpCode:string,email:string}) => {
   try {
-    const response = await api.post("/auth/verify-otp", { otp });
+    const response = await api.post("/auth/verify-otp", data);
     return response.data;
   } catch (error) {
     console.log(error,'verify otp')
@@ -72,9 +72,9 @@ export const forgotPassword = async (email: string) => {
   }
 };
 
-export const verifyForgotPassword = async (otp: string) => {
+export const verifyForgotPassword = async (data:{otp:string,email:string}) => {
   try {
-    const response = await api.post("/auth/verify-forgotPassword", { otp });
+    const response = await api.post("/auth/verify-forgotPassword",data);
     return response.data;
   } catch (error) {
     console.log(error);

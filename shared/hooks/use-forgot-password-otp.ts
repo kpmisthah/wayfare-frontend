@@ -75,7 +75,7 @@ export const useForgotPasswordOtp = (userEmail:string,redirectUrl:string) => {
       setError("");
 
       try {
-        let result = await verifyForgotPassword(otpCode);
+        let result = await verifyForgotPassword({otp:otpCode,email:userEmail});
         // const user = await fetchUser()
         // setAuthUser(user)
         console.log(result, "otp");

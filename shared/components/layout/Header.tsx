@@ -1,66 +1,97 @@
-"use client"
-import React, { useState } from "react";
-import {
-  Plane,
-  Search,
-  Menu,
-  X,
-  User,
-  ChevronDown,
-  Settings,
-  LogOut,
-  UserCircle,
-  Bell,
-} from "lucide-react";
+
+"use client";
+import React, { useEffect, useState } from "react";
+import { Plane, Menu, X, User, ChevronDown, Bell, Check } from "lucide-react";
 import { useAuthStore } from "@/store/Auth";
 import { useLogout } from "@/shared/hooks/use-logout";
 import { useRouter } from "next/navigation";
+import { getSocket } from "@/lib/socket";
+import { useNotificationStore } from "@/store/useNotificationStore";
+import api from "@/lib/api";
+
+type ConnectionRequest = {
+  id: string;
+  name: string;
+  profileImage: string;
+};
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const {
+    unreadCount,
+    notifications,
+    connectionRequests,
+    addNotification,
+    addConnectionRequest,
+  } = useNotificationStore();
+
+  const [loading, setLoading] = useState(true);
 
   const { user, isAuthenticated } = useAuthStore();
-  console.log(user, 'in header');
   const { handleLogin, handleSignUp, handleLogout } = useLogout();
-  const router = useRouter()
-  // Mock notifications - replace with real data
-  const notifications = [
-    {
-      id: 1,
-      title: "Trip Approved",
-      message: "Your trip to Paris has been approved!",
-      time: "2 hours ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "New Message",
-      message: "You have a new message from your travel agency",
-      time: "5 hours ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      title: "Payment Confirmed",
-      message: "Your payment has been successfully processed",
-      time: "1 day ago",
-      unread: false,
-    },
-  ];
+  const router = useRouter();
 
-  const unreadCount = notifications.filter(n => n.unread).length;
-    const handleViewAllNotifications = () => {
-    setIsNotificationOpen(false); // 
-    router.push('/notifications'); 
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const loadInitial = async () => {
+        try {
+          const [n, c] = await Promise.all([
+            api.get("/notifications?limit=10&offset=0"),
+            api.get("/connections"),
+          ]);
+          useNotificationStore
+            .getState()
+            .setNotifications(n.data.mappedList || []);
+          useNotificationStore.getState().setConnectionRequests(c.data || []);
+        } catch (e) {}
+      };
+      loadInitial();
+      const socket = getSocket();
+
+      socket.on("newNotification", (notif: any) => {
+        addNotification({ ...notif, unread: true });
+      });
+
+      socket.on(
+        "connectionRequest",
+        (payload: { senderId: string; senderName: string }) => {
+          addConnectionRequest({
+            id: payload.senderId,
+            name: payload.senderName,
+            profileImage: `https://i.pravatar.cc/150?u=${payload.senderId}`,
+          });
+        }
+      );
+
+      return () => {
+        socket.off("newNotification");
+        socket.off("connectionRequest");
+      };
+    }
+  }, [isAuthenticated, addNotification, addConnectionRequest]);
+
+  const handleViewAll = () => {
+    setIsNotificationOpen(false);
+    router.push("/notifications");
   };
+
+  const formatTime = (date: string) => {
+    const d = new Date(date);
+    const diff = Date.now() - d.getTime();
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return `${Math.floor(diff / 86400000)}d ago`;
+  };
+
   return (
     <>
-      {/* Header */}
       <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
+            {/* Logo */}
             <a href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                 <Plane className="w-6 h-6 text-white" />
@@ -73,102 +104,134 @@ export const Header = () => {
               </div>
             </a>
 
+            {/* Desktop Nav */}
             <nav className="hidden md:flex space-x-8">
               <a
                 href="/agencies"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-gray-700 hover:text-blue-600 font-medium"
               >
                 Agencies
               </a>
               <a
                 href="/connection"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-gray-700 hover:text-blue-600 font-medium"
               >
                 Connect
               </a>
               <a
                 href="/plan-trip"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-gray-700 hover:text-blue-600 font-medium"
               >
                 Plan Trip
               </a>
               <a
                 href="/chat"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-gray-700 hover:text-blue-600 font-medium"
               >
-                chat
-              </a>              
+                Chat
+              </a>
             </nav>
 
+            {/* Right Side */}
             <div className="flex items-center space-x-4">
-              
-
-              {/* Notification Icon */}
+              {/* Notification Bell with Badge */}
+              {/* {children} */}
+              {/* children thaazhe aan undayirunne */}
               {isAuthenticated && (
                 <div className="relative">
                   <button
                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                    className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors focus:outline-none"
+                    className="relative p-2 text-gray-700 hover:text-blue-600 transition rounded-lg hover:bg-gray-100"
                   >
-                    <Bell className="w-5 h-5" />
+                    <Bell className="w-6 h-6" />
                     {unreadCount > 0 && (
-                      <span>
-                        {/* {unreadCount} */}
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                        {unreadCount > 99 ? "99+" : unreadCount}
                       </span>
                     )}
                   </button>
 
-                  {/* Notification Dropdown */}
+                  {/* Dropdown */}
                   {isNotificationOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                      <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-                        <h3 className="text-sm font-semibold text-gray-900">
-                          View All
+                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                      <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 className="font-semibold text-gray-900">
+                          Notifications
                         </h3>
                         {unreadCount > 0 && (
-                          <span className="text-xs text-blue-600 font-medium">
-                            {/* {unreadCount} new */}
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                            {unreadCount} new
                           </span>
                         )}
                       </div>
-                      {/* <div className="max-h-96 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                          notifications.map((notification) => (
+
+                      <div className="max-h-96 overflow-y-auto">
+                        {connectionRequests.length > 0 && (
+                          <div className="px-4 py-2 bg-indigo-50 border-b">
+                            <p className="text-xs font-medium text-indigo-700">
+                              Connection Requests
+                            </p>
+                          </div>
+                        )}
+                        {connectionRequests.map((req) => (
+                          <div
+                            key={req.id}
+                            className="px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b"
+                          >
+                            <img
+                              src={req.profileImage}
+                              alt={req.name}
+                              className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{req.name}</p>
+                              <p className="text-xs text-gray-500">
+                                wants to connect
+                              </p>
+                            </div>
+                            <Check className="w-4 h-4 text-green-600" />
+                          </div>
+                        ))}
+
+                        {notifications.length === 0 &&
+                        connectionRequests.length === 0 ? (
+                          <div className="py-12 text-center text-gray-500">
+                            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                            <p>No notifications</p>
+                          </div>
+                        ) : (
+                          notifications.slice(0, 5).map((notif) => (
                             <div
-                              key={notification.id}
-                              className={`px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${
-                                notification.unread ? "bg-blue-50" : ""
+                              key={notif.id}
+                              className={`px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 ${
+                                notif.unread ? "bg-blue-50" : ""
                               }`}
                             >
-                              <div className="flex justify-between items-start mb-1">
+                              <div className="flex justify-between">
                                 <h4 className="text-sm font-medium text-gray-900">
-                                  {notification.title}
+                                  {notif.title}
                                 </h4>
-                                {notification.unread && (
+                                {notif.unread && (
                                   <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 mb-1">
-                                {notification.message}
+                              <p className="text-xs text-gray-600 mt-1">
+                                {notif.message}
                               </p>
                               <span className="text-xs text-gray-400">
-                                {notification.time}
+                                {formatTime(notif.date)}
                               </span>
                             </div>
                           ))
-                        ) : (
-                          <div className="px-4 py-8 text-center text-gray-500">
-                            <Bell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                            <p className="text-sm">No notifications</p>
-                          </div>
                         )}
-                      </div> */}
-                      <div className="px-4 py-3 border-t border-gray-200">
-                        <button 
-                        className="text-xs text-blue-600 hover:text-blue-700 font-medium w-full text-center"
-                        onClick={handleViewAllNotifications}
+                      </div>
+
+                      <div className="px-4 py-3 bg-gray-50 border-t">
+                        <button
+                          onClick={handleViewAll}
+                          className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700"
                         >
-                          Click here
+                          View all notifications →
                         </button>
                       </div>
                     </div>
@@ -176,78 +239,76 @@ export const Header = () => {
                 </div>
               )}
 
-              {/* Authentication Section */}
+              {/* Profile Dropdown */}
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() =>
                       setIsProfileDropdownOpen(!isProfileDropdownOpen)
                     }
-                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors focus:outline-none"
+                    className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-gray-200">
                       {user?.profileImage ? (
                         <img
-                          src={user?.profileImage}
+                          src={user.profileImage}
                           alt={user.name}
-                          className="w-8 h-8 rounded-full object-cover"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-4 h-4 text-white" />
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
                       )}
                     </div>
-                    <span className="text-sm font-medium hidden sm:block">
+                    <span className="hidden sm:block font-medium">
                       {user?.name}
                     </span>
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-4 h-4 text-gray-600" />
                   </button>
 
-                  {/* Profile Dropdown */}
                   {isProfileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">
-                          {user?.name}
-                        </p>
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1 z-50">
+                      <div className="px-4 py-2 border-b">
+                        <p className="text-sm font-medium">{user?.name}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
                       <a
                         href="/profile"
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="block px-4 py-2 text-sm hover:bg-gray-100"
                       >
-                        <UserCircle className="w-4 h-4" />
-                        <span>View Profile</span>
+                        Profile
                       </a>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full text-left"
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
                       >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
+                        Logout
                       </button>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleSignUp}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                  >
-                    Sign Up
-                  </button>
+                <div className="flex items-center gap-3">
                   <button
                     onClick={handleLogin}
-                    className="text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
+                    className="text-blue-600 font-medium"
                   >
                     Log In
+                  </button>
+                  <button
+                    onClick={handleSignUp}
+                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
+                  >
+                    Sign Up
                   </button>
                 </div>
               )}
 
+              {/* Mobile Menu Toggle */}
               <button
-                className="md:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden"
               >
                 {isMenuOpen ? (
                   <X className="w-6 h-6" />
@@ -258,99 +319,32 @@ export const Header = () => {
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 sticky top-16 z-40">
-          <div className="px-4 py-4 space-y-3">
-            <a
-              href="/agencies"
-              className="block py-2 text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Agencies
-            </a>
-            <a
-              href="/connection"
-              className="block py-2 text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Connect
-            </a>
-            <a
-              href="/plan-trip"
-              className="block py-2 text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Plan Trip
-            </a>
-            <a
-              href="/chat"
-              className="block py-2 text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Chat
-            </a>
-            {/* Mobile Authentication Section */}
-            {isAuthenticated ? (
-              <div className="pt-2 border-t border-gray-200">
-                <div className="flex items-center space-x-3 py-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    {user?.profileImage ? (
-                      <img
-                        src={user.profileImage}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {user?.name}
-                    </p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
-                  </div>
-                </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-4 py-4 space-y-3">
+              {["Agencies", "Connect", "Plan Trip", "Chat"].map((item) => (
                 <a
-                  href="#"
-                  className="flex items-center space-x-2 py-2 text-gray-700 hover:text-blue-600 font-medium"
+                  key={item}
+                  href={`/${item.toLowerCase().replace(" ", "-")}`}
+                  className="block py-2 text-gray-700 hover:text-blue-600 font-medium"
                 >
-                  <UserCircle className="w-4 h-4" />
-                  <span>View Profile</span>
+                  {item}
                 </a>
-                <a
-                  href="#"
-                  className="flex items-center space-x-2 py-2 text-gray-700 hover:text-blue-600 font-medium"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>Settings</span>
-                </a>
+              ))}
+              {!isAuthenticated && (
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 py-2 text-gray-700 hover:text-blue-600 font-medium w-full text-left"
+                  className="w-full text-left py-2 text-red-600 font-medium"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  Logout
                 </button>
-              </div>
-            ) : (
-              <div className="pt-2 border-t border-gray-200 space-y-2">
-                <button
-                  onClick={handleSignUp}
-                  className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                >
-                  Sign Up
-                </button>
-                <button
-                  onClick={handleLogin}
-                  className="w-full text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium py-2"
-                >
-                  Log In
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </header>
     </>
   );
 };
