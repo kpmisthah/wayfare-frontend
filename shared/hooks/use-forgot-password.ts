@@ -29,7 +29,7 @@ export const useForgotPassword = (redirectUrl:string) => {
     try {
       await forgotPassword(forgotEmail);
       localStorage.setItem('resetEmail',forgotEmail)
-      router.push(redirectUrl);
+      router.push(`${redirectUrl}?email=${encodeURIComponent(forgotEmail)}`);
       setForgotPasswordSuccess(true);
     } catch (error: any) {
       const message =

@@ -65,13 +65,13 @@ export function useOtp(data:{userEmail:string,redirectUrl:string}) {
     setOtp(newOtp);
   };
 
-  const handleVerify = async () => {
+  const handleVerify = async (email:string) => {
     const otpCode = otp.join('');
     if (otpCode.length === 6) {
       setIsLoading(true);
       setError('');
       try {
-        const result = await verifyOtp(otpCode);
+        const result = await verifyOtp({otpCode,email});
         console.log(result,'from verifyOtp front end');
         if(result.message == 'Agency created successfully waiting admin approval'){
           setError('You account is pending admin approval')
@@ -122,11 +122,19 @@ export function useOtp(data:{userEmail:string,redirectUrl:string}) {
       let result = await resendOtp(data.userEmail)
       console.log(result,'result from backend')
       if (result.message == 'otp send successfully') {
+        setError("");
         setTimeLeft(60);
         setCanResend(false);
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
-      } else {
+      }else if(result.message == 'New OTP sent successfully'){
+        setError("");
+        setTimeLeft(60);
+        setCanResend(false);
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();        
+      } 
+      else {
         setError(result.message|| 'Failed to resend OTP. Please try again.');
       }
     } catch (err) {

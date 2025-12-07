@@ -7,7 +7,6 @@ interface CallState {
   conversationId: string | null;
   callType: 'video' | 'audio' | null;
   callerSignalData:any|null
-  // Functions to manage the global state
   setIncomingCall: (data: { callerId: string, conversationId: string, callType: 'video' | 'audio',signalData:any }) => void;
   acceptCallUI: (conversationId: string, callerId: string, callType: 'video' | 'audio') => void;
   endCallUI: () => void;
@@ -47,7 +46,7 @@ startCallUI: (conversationId, callerId,recipientId, callType) =>
       recipientId,
       conversationId,
       callType,
-      callerSignalData: null, // no signal yet, will come from peer
+      callerSignalData: null, 
     }),
   endCallUI: () => set({
     isCallActive: false,

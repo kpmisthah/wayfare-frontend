@@ -29,101 +29,6 @@ export const useSocket = (
   };
   const socketRef = useRef<any>(null); // ✅ store socket globally for this hook
   const joinedRoomsRef = useRef<Set<string>>(new Set());
-  // 🔹 Fetch old messages and join the room
-  // useEffect(() => {
-  //   const socket = getSocket();
-  //   socketRef.current = socket; // ✅ assign it here
-
-  //   if (!conversationId) {
-  //     console.log("conversation id is not created yet");
-  //     return;
-  //   }
-
-  //   const fetchMessages = async () => {
-  //     try {
-  //       const res = await api.get(`/messages/${conversationId}`);
-  //         setMessages(res.data || []);
-  //         scrollToBottom();
-  //     } catch (err) {
-  //       console.error("Failed to fetch messages:", err);
-  //     }
-  //   };
-
-  //   fetchMessages();
-
-  //   // 🔹 Join the specific chat room
-  //   socket.emit("joinRoom", { conversationId });
-  //   console.log(`[Socket] Joined room: ${conversationId}`);
-
-  //   // 🔹 Define the message listener
-  //   const onNewMessage = (msg: Message) => {
-  //     if (msg.conversationId === conversationId) {
-  //       setMessages((prev) =>
-  //         prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
-  //       );
-  //       scrollToBottom();
-  //     }
-  //   };
-
-  //   socket.off("receiveMessage", onNewMessage);
-  //   socket.on("receiveMessage", onNewMessage);
-
-  //   console.log("Listeners count:", socket.listeners("receiveMessage").length);
-
-  //   return () => {
-  //     socket.emit("leaveRoom", { conversationId });
-  //     socket.off("receiveMessage", onNewMessage);
-  //     console.log(`[Socket] Left room: ${conversationId}`);
-  //   };
-  // }, [conversationId]);
-  //..........................useEffect.......
-  // useEffect(() => {
-  //   console.log("useeffect ethre");
-
-  //   const socket = getSocket();
-  //   if (!socketRef.current) {
-  //     socketRef.current = socket;
-  //   }
-
-  //   if (!conversationId) return;
-
-  //   // Avoid duplicate listener setup
-  //   const onNewMessage = (msg: Message) => {
-  //     console.log('[Socket] onNewMessage received:', msg);
-  //     if (msg.conversationId === conversationId) {
-  //       setMessages((prev) =>
-  //         prev.find((m) => m.id === msg.id) ? prev : [...prev, msg]
-  //       );
-  //       scrollToBottom();
-  //     }
-  //   };
-  //   socket.on("receiveMessage", onNewMessage);
-  //   const fetchMessages = async () => {
-  //     try {
-  //       const res = await api.get(`/messages/${conversationId}`);
-  //       setMessages(res.data || []);
-  //       scrollToBottom();
-  //       socket.emit("joinRoom", { conversationId });
-  //       console.log(`[Socket] Joined room: ${conversationId}`)
-  //     } catch (err) {
-  //       console.error("Failed to fetch messages:", err);
-  //     }
-  //   };
-
-  //   fetchMessages();
-
-  //   // ✅ Join room only once
-
-  //   console.log("Listeners count:", socket.listeners("receiveMessage").length);
-
-  //   return () => {
-  //     socket.off("receiveMessage",onNewMessage);
-  //     socket.emit("leaveRoom", { conversationId });
-  //     socket.off("receiveMessage", onNewMessage);
-  //     console.log(`[Socket] Left room: ${conversationId}`);
-  //   };
-  // }, [conversationId]);
-  //.............................
   useEffect(() => {
     const socket = getSocket();
     socketRef.current = socket;
@@ -174,29 +79,11 @@ export const useSocket = (
     }
     };
   }, [chatId]);
-  // 🔹 Scroll helper
   const scrollToBottom = () => {
     setTimeout(() => {
       scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, 50);
   };
-
-  // 🔹 Send message safely
-  // const sendMessage = () => {
-  //   if (!text.trim()) return;
-
-  //   // const socket = socketRef.current; // ✅ use socket from ref
-
-  //   // if (!socket) {
-  //   //   console.error("Socket not connected yet");
-  //   //   return;
-  //   // }
-  //   if (!socketRef.current?.connected) return;
-  //   console.log(`[Socket] Sending message:`, text);
-  //   // socket.emit("sendMessage", { conversationId, content: text });
-  //   socketRef.current.emit("sendMessage", { conversationId, content: text });
-  //   setText("");
-  // };
   const sendMessage = () => {
     if (!text.trim() || !socketRef.current?.connected) return;
 

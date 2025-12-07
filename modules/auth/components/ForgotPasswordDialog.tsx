@@ -1,7 +1,7 @@
 import ForgotPasswordOtp from "@/shared/components/common/Frogot-password-otp"
 
-export const UserForgotPassword = ()=>{
+export const UserForgotPassword = ({ email }: { email: string })=>{
     return(
-        <ForgotPasswordOtp redirectUrl="/reset-password"/>
+        <ForgotPasswordOtp userEmail={email} redirectUrl="/reset-password"/>
     )
 }

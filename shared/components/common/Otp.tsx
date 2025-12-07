@@ -151,7 +151,7 @@ const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
 
             {/* Verify Button */}
             <button
-              onClick={handleVerify}
+              onClick={()=>handleVerify(userEmail)}
               disabled={!isComplete || isLoading}
               className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${
                 isComplete && !isLoading
