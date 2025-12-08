@@ -77,7 +77,32 @@ const UserManagement = () => {
                 <Filter className="w-4 h-4" />
                 <span className="hidden sm:inline">Filter</span>
               </Button>
-              <Button className="flex items-center gap-2 flex-1 sm:flex-none">
+              <Button
+                className="flex items-center gap-2 flex-1 sm:flex-none"
+                onClick={() => {
+                  const headers = ["Name", "Email", "Status"];
+                  const csvContent = [
+                    headers.join(","),
+                    ...users.map(user => [
+                      `"${user.name}"`,
+                      `"${user.email}"`,
+                      user.isBlock ? "Inactive" : "Active"
+                    ].join(","))
+                  ].join("\n");
+
+                  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                  const link = document.createElement("a");
+                  if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "users_export.csv");
+                    link.style.visibility = "hidden";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
+                }}
+              >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Export</span>
               </Button>
@@ -281,7 +306,7 @@ const UserManagement = () => {
                 variant={userToBlock.isBlock ? "default" : "destructive"}
                 size="sm"
                 onClick={() => {
-                  handleToggleBlockUser(userToBlock); 
+                  handleToggleBlockUser(userToBlock);
                   setBlockModalOpen(false);
                   setUserToBlock(null);
                 }}

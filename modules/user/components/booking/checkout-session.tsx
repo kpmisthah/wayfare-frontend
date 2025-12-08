@@ -3,11 +3,13 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-function CheckoutForm({ clientSecret }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CheckoutForm({ clientSecret }: any) {
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit = async (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 

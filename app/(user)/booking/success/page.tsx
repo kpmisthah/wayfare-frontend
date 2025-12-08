@@ -115,7 +115,7 @@ import { cookies } from "next/headers";
 
 //     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
 //       {showConfetti && <Confetti />}
-      
+
 //       {/* Demo Toggle */}
 //       <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-3 z-10">
 //         <div className="text-xs text-slate-600 mb-2">Demo Mode:</div>
@@ -185,19 +185,19 @@ import { cookies } from "next/headers";
 //                   </button>
 //                 </div>
 //               </div>
-              
+
 //               <div className="h-px bg-slate-200" />
-              
+
 //               <div className="flex justify-between">
 //                 <span className="text-slate-600 text-sm">Amount Paid</span>
 //                 <span className="font-semibold text-slate-900 text-lg">{successData.amount}</span>
 //               </div>
-              
+
 //               <div className="flex justify-between">
 //                 <span className="text-slate-600 text-sm">Payment Method</span>
 //                 <span className="text-slate-900">{successData.paymentMethod}</span>
 //               </div>
-              
+
 //               <div className="flex justify-between">
 //                 <span className="text-slate-600 text-sm">Date & Time</span>
 //                 <span className="text-slate-900 text-sm">{successData.date}</span>
@@ -221,12 +221,12 @@ import { cookies } from "next/headers";
 //                 View Order Details
 //                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
 //               </button>
-              
+
 //               <button className="w-full bg-white hover:bg-slate-50 text-slate-900 font-semibold py-3 px-4 rounded-lg border-2 border-slate-200 transition-colors flex items-center justify-center gap-2">
 //                 <Download className="w-5 h-5" />
 //                 Download Receipt
 //               </button>
-              
+
 //               <button className="w-full text-slate-600 hover:text-slate-900 font-medium py-2 transition-colors text-sm">
 //                 Continue Shopping
 //               </button>
@@ -267,19 +267,19 @@ import { cookies } from "next/headers";
 //                 <span className="text-slate-600 text-sm">Transaction ID</span>
 //                 <span className="font-mono text-sm text-slate-900">{failureData.transactionId}</span>
 //               </div>
-              
+
 //               <div className="h-px bg-red-200" />
-              
+
 //               <div className="flex justify-between">
 //                 <span className="text-slate-600 text-sm">Attempted Amount</span>
 //                 <span className="font-semibold text-slate-900">{failureData.amount}</span>
 //               </div>
-              
+
 //               <div className="flex justify-between items-start">
 //                 <span className="text-slate-600 text-sm">Reason</span>
 //                 <span className="text-red-700 font-medium text-sm text-right">{failureData.reason}</span>
 //               </div>
-              
+
 //               <div className="flex justify-between">
 //                 <span className="text-slate-600 text-sm">Error Code</span>
 //                 <span className="font-mono text-xs text-slate-500">{failureData.errorCode}</span>
@@ -303,11 +303,11 @@ import { cookies } from "next/headers";
 //                 <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
 //                 Try Again
 //               </button>
-              
+
 //               <button className="w-full bg-white hover:bg-slate-50 text-slate-900 font-semibold py-3 px-4 rounded-lg border-2 border-slate-200 transition-colors">
 //                 Use Different Payment Method
 //               </button>
-              
+
 //               <button className="w-full text-slate-600 hover:text-slate-900 font-medium py-2 transition-colors text-sm">
 //                 Contact Support
 //               </button>
@@ -357,29 +357,23 @@ import { cookies } from "next/headers";
 // }
 
 //..........................
-interface SuccessPageProps {
-  searchParams: {
-    booking_id: string;
-    payment_method: 'card' | 'wallet';
-  };
-}
-export default async function Success({searchParams}:SuccessPageProps){
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function Success({ searchParams }: any) {
   const cookieStore = await cookies()
-  const cookieString = cookieStore.getAll().map((cookie)=>`${cookie.name}=${cookie.value}`).join(';')
-  let bookingId = searchParams.booking_id
-  let payment_method = searchParams.payment_method
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking/${bookingId}/my-booking`,{
-    headers:{
-      Cookie:cookieString
+  const cookieString = cookieStore.getAll().map((cookie) => `${cookie.name}=${cookie.value}`).join(';')
+  const { booking_id: bookingId, payment_method } = await searchParams
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/booking/${bookingId}/my-booking`, {
+    headers: {
+      Cookie: cookieString
     },
-    cache:'no-store',
-    credentials:'include'
+    cache: 'no-store',
+    credentials: 'include'
   })
   const booking = await res.json()
-  console.log(booking,'fetch from server side componenttttttt')
-  return(
+  console.log(booking, 'fetch from server side componenttttttt')
+  return (
     <>
-    <PaymentSuccessPage booking={booking} paymentMethod={payment_method}/>
+      <PaymentSuccessPage booking={booking} paymentMethod={payment_method} />
     </>
   )
 }

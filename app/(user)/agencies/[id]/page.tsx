@@ -1,9 +1,10 @@
 import AgencyProfile from "@/modules/user/components/agency/AgencyProfile";
 
-export default async function ProductDetails({ params }:any) {
-  const { id } = params; 
-  console.log(id,'from id');
-  
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function ProductDetails({ params }: any) {
+  const { id } = await params;
+  console.log(id, 'from id');
+
   return (
     <AgencyProfile id={id} />
   );

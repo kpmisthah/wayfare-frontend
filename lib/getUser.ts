@@ -17,7 +17,7 @@ export async function getUserFromServer() {
       cache: "no-store",
       credentials: "include",
     });
-    console.log(userRes, "usersRes");
+ 
 
     if (!userRes.ok) {
       console.log(`Core user fetch failed with status: ${userRes.status}`);

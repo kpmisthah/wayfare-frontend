@@ -11,6 +11,7 @@ type Message = {
   groupId: string | null;
   senderId: string;
   createdAt: string;
+  status?: 'sent' | 'delivered' | 'read';
 };
 
 export const useSocket = (
@@ -20,7 +21,9 @@ export const useSocket = (
 ) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const formatTime = (date: any) => {
     const hours = date.getHours().toString().padStart(2, "0");
@@ -47,6 +50,14 @@ export const useSocket = (
     } else {
       console.log(`[Client] Group chat ${chatId} → already joined server-side`);
     }
+    // Mark as read via API (persistence)
+    api.post(`/messages/${chatId}/read`).catch(() => { });
+
+    // Also tell the socket (for real-time UI update on the other side)
+    // We don't have specific message IDs here, but we can signal "all read" differently or
+    // just rely on the other user seeing us online?
+    // For now, we will mark NEW incoming messages as read.
+
     const fetchMessages = async () => {
       try {
         // This endpoint works for both! (you already have it)
@@ -67,18 +78,72 @@ export const useSocket = (
           prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
         );
         scrollToBottom();
+
+        // If I am the receiver and I'm looking at this chat, mark it as read immediately
+        if (msg.senderId !== currentUserId) {
+          socket.emit('markRead', {
+            conversationId: msg.conversationId,
+            groupId: msg.groupId,
+            messageIds: [msg.id]
+          });
+        }
       }
     };
+
+    const onMessagesRead = (data: { messageIds: string[], conversationId: string, readerId: string }) => {
+      if (data.conversationId === chatId || (selectedUser?.type === 'group' && data.conversationId /* misnamed in event? */ === chatId)) { // actually we used groupId in event too
+        setMessages(prev => prev.map(m => {
+          if (data.messageIds.includes(m.id)) {
+            return { ...m, status: 'read' };
+          }
+          return m;
+        }));
+      }
+    };
+
+    const handleTyping = (data: { userId: string; isTyping: boolean }) => {
+      setTypingUsers((prev) => {
+        if (data.isTyping && data.userId !== currentUserId) {
+          return [...new Set([...prev, data.userId])];
+        }
+        return prev.filter((id) => id !== data.userId);
+      });
+    };
     // socket.off("receiveMessage", onNewMessage);
+    socket.on("userTyping", handleTyping);
     socket.on("receiveMessage", onNewMessage);
+    socket.on("messagesRead", onMessagesRead);
 
     return () => {
-       socket.off("receiveMessage", onNewMessage);
+      socket.off("receiveMessage", onNewMessage);
+      socket.off("userTyping", handleTyping);
+      socket.off("messagesRead", onMessagesRead);
       if (!selectedUser?.type || selectedUser.type !== "group") {
-      socket.emit("leaveRoom", { conversationId: chatId });
-    }
+        socket.emit("leaveRoom", { conversationId: chatId });
+      }
     };
-  }, [chatId]);
+  }, [chatId, currentUserId, selectedUser]);
+  const handleTyping = (value: string) => {
+    setText(value);
+
+    if (!socketRef.current?.connected) return;
+
+    const payload: any = { isTyping: value.length > 0 };
+    if (selectedUser?.type === "group") {
+      payload.groupId = chatId;
+    } else {
+      payload.conversationId = chatId;
+    }
+
+    socketRef.current.emit("typing", payload);
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    if (value.length > 0) {
+      typingTimeoutRef.current = setTimeout(() => {
+        socketRef.current.emit("typing", { ...payload, isTyping: false });
+      }, 2000);
+    }
+  };
   const scrollToBottom = () => {
     setTimeout(() => {
       scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -96,9 +161,19 @@ export const useSocket = (
       payload.conversationId = chatId;
     }
 
+    // Optimistically add message? No, wait for server ack usually, but for speed we can.
+    // However, existing logic waits for 'receiveMessage' from server (via broadcast or direct emit).
     socketRef.current.emit("sendMessage", payload);
     setText("");
   };
 
-  return { messages, text, setText, sendMessage, scrollRef };
+  return {
+    messages,
+    text,
+    setText,
+    sendMessage,
+    scrollRef,
+    typingUsers,
+    handleTyping,
+  };
 };

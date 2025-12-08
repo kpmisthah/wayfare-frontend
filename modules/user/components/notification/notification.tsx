@@ -25,8 +25,6 @@ type Connection = {
   profileImage: string;
 };
 export const Notification = () => {
-  // const [notifications, setNotifications] = useState<notifcations[]>([]);
-  // const [requests, setRequests] = useState<Connection[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -59,39 +57,6 @@ export const Notification = () => {
   useEffect(() => {
     fetchData();
     const socket = getSocket();
-
-    //   "connectionRequest",
-    //   (payload: { senderId: string; senderName: string }) => {
-    //     setRequests((prev) => [
-    //       ...prev.filter((r) => r.id !== payload.senderId),
-    //       {
-    //         id: payload.senderId,
-    //         name: payload.senderName,
-    //         type: NotificationStatus.CONNECTION_REQUEST,
-    //         status: "PENDING",
-    //         profileImage: `https://i.pravatar.cc/150?u=${payload.senderId}`,
-    //       },
-    //     ]);
-    //   }
-    // );
-
-    // socket.on("connectionAccepted", (payload: { accepterName: string }) => {
-    //   const newNotif:notifcations = {
-    //     id: `acc-${Date.now()}`,
-    //     title: "Connection Accepted",
-    //     message: `${payload.accepterName} accepted your request`,
-    //     unread: true,
-    //     date: new Date().toISOString(),
-    //   };
-    //   setNotifications((p) => [newNotif, ...p]);
-    // });
-
-    // socket.on("newNotification", (notif: any) => {
-    //   setNotifications((prev) => [
-    //     { ...notif, unread: true },
-    //     ...prev.filter((n) => n.id !== notif.id),
-    //   ]);
-    // });
     socket.on("newNotification", (notif: any) => {
       useNotificationStore
         .getState()
@@ -124,7 +89,7 @@ export const Notification = () => {
   const handleReject = async (connectionId: string) => {
     try {
       await api.patch(`/connections/${connectionId}/reject`);
-      removeConnectionRequest(connectionId); // Badge -1 automatically!
+      removeConnectionRequest(connectionId); 
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to reject");
     }
@@ -179,7 +144,7 @@ export const Notification = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="sticky top-0 bg-white border-b z-20 shadow-sm">
+      <div className="sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">

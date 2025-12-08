@@ -4,10 +4,12 @@ import { BookingData } from "../../types/booking.type";
 import { useUpdateBookingStatus, useViewBookings } from "../../hooks/use-booking";
 import { BookingStatus } from "../../types/booking.enum";
 
-export const BookingsView = ({ pkg, onClose }) => {
-  const { booking,setBooking } = useViewBookings(pkg.id);
-  const {changeStatus} = useUpdateBookingStatus(setBooking);
-  const [selectedBooking, setSelectedBooking] = useState<string|null>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const BookingsView = ({ pkg, onClose }: any) => {
+  const { booking, setBooking } = useViewBookings(pkg.id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { changeStatus } = useUpdateBookingStatus(setBooking as any);
+  const [selectedBooking, setSelectedBooking] = useState<string | null>(null);
 
   // const totalRevenue = (pkg.bookings || []).reduce(
   //   (sum, b) => sum + b.numberOfPeople * pkg.pricePerPerson,
@@ -18,7 +20,8 @@ export const BookingsView = ({ pkg, onClose }) => {
   //   0
   // );
 
-  const getStatusColor = (status) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getStatusColor = (status: any) => {
     switch (status) {
       case "confirmed":
         return "bg-green-100 text-green-700";
@@ -31,7 +34,8 @@ export const BookingsView = ({ pkg, onClose }) => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getStatusIcon = (status: any) => {
     switch (status) {
       case "confirmed":
         return <Check className="w-3 h-3" />;
@@ -44,7 +48,7 @@ export const BookingsView = ({ pkg, onClose }) => {
     }
   };
 
-  const handleStatusChange = async (bookingId:string, newStatus:BookingStatus) => {
+  const handleStatusChange = async (bookingId: string, newStatus: BookingStatus) => {
     await changeStatus(bookingId, newStatus);
     console.log(`Update booking ${bookingId} to status: ${newStatus}`);
     setSelectedBooking(null);
@@ -82,7 +86,7 @@ export const BookingsView = ({ pkg, onClose }) => {
           <p className="text-2xl font-bold text-green-600">${totalRevenue}</p>
         </div>
       </div> */}
-      
+
       <div className="space-y-4">
         {booking && booking.length > 0 ? (
           booking.map((booking: BookingData) => (
@@ -115,7 +119,7 @@ export const BookingsView = ({ pkg, onClose }) => {
                       <p className="text-sm text-gray-500">Phone</p>
                       <p className="text-gray-800">{booking.phone}</p>
                     </div>
-                         <div>
+                    <div>
                       <p className="text-sm text-gray-500">Destination</p>
                       <p className="text-gray-800">{booking.destination}</p>
                     </div>
@@ -175,7 +179,7 @@ export const BookingsView = ({ pkg, onClose }) => {
                         </button>
                         <button
                           onClick={() =>
-                            handleStatusChange(booking.id,BookingStatus.PENDING)
+                            handleStatusChange(booking.id, BookingStatus.PENDING)
                           }
                           className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
                         >
@@ -184,16 +188,16 @@ export const BookingsView = ({ pkg, onClose }) => {
                         </button>
                         <button
                           onClick={() =>
-                            handleStatusChange(booking.id,BookingStatus.CANCELLED)
+                            handleStatusChange(booking.id, BookingStatus.CANCELLED)
                           }
                           className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
                         >
                           <XCircle className="w-4 h-4 text-red-600" />
                           <span>Cancel Booking</span>
                         </button>
-                                  <button
+                        <button
                           onClick={() =>
-                            handleStatusChange(booking.id,BookingStatus.COMPLETED)
+                            handleStatusChange(booking.id, BookingStatus.COMPLETED)
                           }
                           className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
                         >

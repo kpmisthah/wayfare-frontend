@@ -39,18 +39,18 @@ export const useUserProfile = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const[page,setPage] = useState(1)
-  const[totalPages,setTotalPages] = useState(1)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const limit = 1
-  const[refreshWallet,setRefereshWallet] = useState(false)
+  const [refreshWallet, setRefereshWallet] = useState(false)
   const { setUpdateUser, user, setAuthUser } = useAuthStore();
 
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const response = await getUserBooking(page,limit);
+        const response = await getUserBooking(page, limit);
         console.log(response, "response in loadUserProfile");
-        setTrips((prev)=>[...prev,...response.data]);
+        setTrips((prev) => [...prev, ...response.data]);
         setTotalPages(response.totalPages)
       } catch (error) {
         console.log(error);
@@ -202,14 +202,14 @@ export const useUserProfile = () => {
 
     try {
       bookingCancel(id);
-      setTrips((prev)=>
-        prev.map((trip)=>
-          trip.id == id?{...trip,bookingStatus:BookingStatus.CANCELLED}:trip
+      setTrips((prev) =>
+        prev.map((trip) =>
+          trip.id == id ? { ...trip, bookingStatus: BookingStatus.CANCELLED } : trip
         )
       )
       setCancelDialogOpen(false)
       setSelectedTripForCancel(null)
-      setRefereshWallet(prev=>!prev)
+      setRefereshWallet(prev => !prev)
     } catch (error) {
       console.log(error);
     }
@@ -219,8 +219,8 @@ export const useUserProfile = () => {
     setCancelDialogOpen(true);
   };
 
-  const loadMore = ()=>{
-    if(page<totalPages) setPage(prev=>prev+1)
+  const loadMore = () => {
+    if (page < totalPages) setPage(prev => prev + 1)
   }
   return {
     isEditingProfile,
@@ -263,6 +263,7 @@ export const useUserProfile = () => {
     loadMore,
     page,
     totalPages,
-    refreshWallet
+    refreshWallet,
+    userProfile: user,
   };
 };

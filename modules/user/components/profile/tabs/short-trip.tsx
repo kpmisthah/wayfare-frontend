@@ -28,7 +28,7 @@ import { TravelItineraryProps } from "@/modules/user/types/Ai-trip-plan.type";
 const ShortTrip = () => {
   const [activeTab, setActiveTab] = useState("trips");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [selectedTrip, setSelectedTrip] = useState<TravelItineraryProps | null>(null);
   const { shortTrip } = usefetchAiTripPlan();
   const router = useRouter();
   const getActivityIcon = (iconName: any) => {
@@ -38,7 +38,8 @@ const ShortTrip = () => {
       utensils: <Utensils className="w-4 h-4" />,
       map: <Map className="w-4 h-4" />,
     };
-    return icons[iconName] || <MapPin className="w-4 h-4" />;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (icons as any)[iconName] || <MapPin className="w-4 h-4" />;
   };
 
   const ShortTripCard = ({ trip }: { trip: TravelItineraryProps }) => {
@@ -336,7 +337,7 @@ const ShortTrip = () => {
               Generate your first AI-powered short trip itinerary
             </p>
             <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
-            onClick={()=>router.push('/plan-trip')}
+              onClick={() => router.push('/plan-trip')}
             >
               Create Itinerary
             </button>

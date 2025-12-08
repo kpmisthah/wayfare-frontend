@@ -11,7 +11,7 @@ interface Place {
     latitude: string;
     longitude: string;
   };
-  ticketPrice: string;
+  ticketPricing: string;
   rating: string;
   timeToTravel: string;
   bestTimeToVisit: string;
@@ -22,8 +22,8 @@ interface PlaceCardProps {
 }
 
 export function PlaceCard({ place }: PlaceCardProps) {
-  const isFree = (place.ticketPrice || "").toLowerCase().includes("free");
-  
+  const isFree = (place.ticketPricing || "").toLowerCase().includes("free");
+
   return (
     <Card className="travel-shadow hover:travel-shadow-hover transition-all duration-300 overflow-hidden group">
       <div className="aspect-[4/3] overflow-hidden bg-muted relative">
@@ -44,15 +44,15 @@ export function PlaceCard({ place }: PlaceCardProps) {
         </div>
         <div className="absolute top-4 right-4">
           <Badge variant={isFree ? "secondary" : "default"} className={isFree ? "bg-success text-success-foreground" : ""}>
-            {place.ticketPrice||"N/A"}
+            {place.ticketPricing || "N/A"}
           </Badge>
         </div>
       </div>
-      
+
       <div className="p-6">
         <h4 className="text-lg font-semibold mb-2 text-card-foreground">{place.placeName}</h4>
         <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{place.placeDetails}</p>
-        
+
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Clock className="w-4 h-4" />

@@ -50,17 +50,13 @@ export function TablePagination({
         {/* Previous Button */}
         <PaginationItem>
           <PaginationPrevious
-            asChild
             className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-          >
-            <button
-              onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </button>
-          </PaginationPrevious>
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage > 1) onPageChange(currentPage - 1);
+            }}
+            href="#"
+          />
         </PaginationItem>
 
         {/* Page Numbers */}
@@ -70,13 +66,15 @@ export function TablePagination({
               <PaginationEllipsis />
             ) : (
               <PaginationLink
-                asChild
                 isActive={page === currentPage}
                 className="cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(page as number);
+                }}
+                href="#"
               >
-                <button onClick={() => onPageChange(page as number)}>
-                  {page}
-                </button>
+                {page}
               </PaginationLink>
             )}
           </PaginationItem>
@@ -85,17 +83,13 @@ export function TablePagination({
         {/* Next Button */}
         <PaginationItem>
           <PaginationNext
-            asChild
             className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-          >
-            <button
-              onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </PaginationNext>
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage < totalPages) onPageChange(currentPage + 1);
+            }}
+            href="#"
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

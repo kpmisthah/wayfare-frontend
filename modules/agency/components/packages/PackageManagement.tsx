@@ -145,7 +145,7 @@ export const PackageManagement = () => {
     totalPage,
     loading,
   } = useFetchPackages();
-  console.log(packages,'packagess')
+  console.log(packages, 'packagess')
   const {
     showForm,
     setShowForm,
@@ -231,14 +231,14 @@ export const PackageManagement = () => {
         {!showForm && !viewingPackage && !showBookings && (
           <div className="min-h-screen">
             {loading ? (
-        
+
               <div className="col-span-full flex items-center justify-center py-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
               </div>
             ) : (
-           
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
                 {packages.length === 0 ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-600">
                     <img
@@ -266,7 +266,7 @@ export const PackageManagement = () => {
                     </button>
                   </div>
                 ) : (
-              
+
                   packages.map((pkg) => (
                     <div
                       key={pkg.id}
@@ -322,7 +322,8 @@ export const PackageManagement = () => {
                           </Button>
 
                           <Button
-                            onClick={() => setShowBookings(pkg)}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onClick={() => setShowBookings(pkg as any)}
                             className="flex-1"
                             variant="secondary"
                             size="sm"
@@ -394,11 +395,10 @@ export const PackageManagement = () => {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`w-10 h-10 rounded-full transition ${
-                      page === p
-                        ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                    }`}
+                    className={`w-10 h-10 rounded-full transition ${page === p
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                      }`}
                   >
                     {p}
                   </button>
@@ -475,7 +475,8 @@ export const PackageManagement = () => {
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Total Bookings</p>
                   <p className="text-xl font-semibold">
-                    {viewingPackage.bookings?.length || 0}
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {(viewingPackage as any).bookings?.length || 0}
                   </p>
                 </div>
               </div>
@@ -530,11 +531,10 @@ export const PackageManagement = () => {
                   ].map(({ value, icon, desc }) => (
                     <label
                       key={value}
-                      className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                        viewingPackage.vehicle === value
-                          ? "border-indigo-500 bg-indigo-50"
-                          : "border-gray-200 hover:bg-indigo-50 hover:border-indigo-300"
-                      }`}
+                      className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${viewingPackage.vehicle === value
+                        ? "border-indigo-500 bg-indigo-50"
+                        : "border-gray-200 hover:bg-indigo-50 hover:border-indigo-300"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -601,7 +601,8 @@ export const PackageManagement = () => {
                     <h3 className="text-xl font-semibold mb-2">Gallery</h3>
                     <div className="grid grid-cols-3 gap-4">
                       {viewingPackage.picture
-                        .filter((url): url is string => !!url) // TypeScript-friendly filter
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        .filter((url): url is any => !!url) // TypeScript-friendly filter
                         .map((url, index) => (
                           <div
                             key={index}
@@ -631,8 +632,8 @@ export const PackageManagement = () => {
           <BookingsView
             pkg={showBookings}
             onClose={() => setShowBookings(null)}
-            // onAddBooking={addBooking}
-            // onDeleteBooking={deleteBooking}
+          // onAddBooking={addBooking}
+          // onDeleteBooking={deleteBooking}
           />
         )}
       </div>

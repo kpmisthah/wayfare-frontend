@@ -26,14 +26,14 @@ const Agencies = () => {
     nextPage,
     prevPage,
   } = useAgencies();
-  console.log(agencies,'agencieeeessssss in agenciesss.tsx')
+  console.log(agencies, 'agencieeeessssss in agenciesss.tsx')
   // const filteredAgencies = agencies.filter((agency: Agency) =>
   //   agency.user.name.toLowerCase().includes(searchTerm.toLowerCase())
   // );
 
   return (
     <div className="min-h-screen bg-background">
-      
+
       <Header />
 
       {/* Hero Section */}
@@ -95,7 +95,7 @@ const Agencies = () => {
                     id={agency.id}
                     name={agency.user.name}
                     description={agency.description}
-                    image={agency.user.image}
+                    image={agency.user.profileImage}
                   />
                 ))}
               </div>

@@ -3,12 +3,12 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-export default async function RetryPaymentPage({
-  params,
-}: {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function RetryPaymentPage({ params }: {
   params: { bookingId: string };
-}) {
-  const { bookingId } = params;
+})  {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { bookingId } = await params;
 
   const cookieStore = await cookies();
   const cookieString = cookieStore
@@ -25,7 +25,7 @@ export default async function RetryPaymentPage({
         Cookie: cookieString,
       },
       credentials: "include",
-      body: JSON.stringify({bookingId}),
+      body: JSON.stringify({ bookingId }),
     }
   );
 
@@ -35,7 +35,7 @@ export default async function RetryPaymentPage({
 
   const data = await res.json();
   if (data.url) {
-    redirect(data.url); 
+    redirect(data.url);
   }
 
   redirect(`/booking/failure?booking_id=${bookingId}&reason=no_checkout_url`);

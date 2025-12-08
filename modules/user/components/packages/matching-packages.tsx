@@ -61,7 +61,7 @@ const TravelPackages = () => {
   const [selectedPackage, setSelectedPackage] = useState<TravelPackage | null>(null);
   const [packages, setPackages] = useState<TravelPackage[]>([]);
   const [showDetails, setShowDetails] = useState(false);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const packagesPerPage = 9;
@@ -95,12 +95,14 @@ const TravelPackages = () => {
     setFavorites(newFavorites);
   };
 
-  const handleDetailsClick = (pkg) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDetailsClick = (pkg: any) => {
     setSelectedPackage(pkg);
     setShowDetails(true);
   };
 
-  const getVehicleIcon = (vehicle) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getVehicleIcon = (vehicle: any) => {
     switch (vehicle?.toLowerCase()) {
       case "train":
         return <Train className="w-5 h-5" />;
@@ -145,11 +147,10 @@ const TravelPackages = () => {
                   />
                   <div className="absolute top-4 left-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        selectedPackage.status === "ACTIVE"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-500 text-white"
-                      }`}
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${selectedPackage.status === "ACTIVE"
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-500 text-white"
+                        }`}
                     >
                       {selectedPackage.status}
                     </span>
@@ -385,20 +386,18 @@ const TravelPackages = () => {
                   className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                 >
                   <Heart
-                    className={`w-5 h-5 ${
-                      favorites.has(pkg.id)
-                        ? "text-red-500 fill-current"
-                        : "text-gray-600"
-                    }`}
+                    className={`w-5 h-5 ${favorites.has(pkg.id)
+                      ? "text-red-500 fill-current"
+                      : "text-gray-600"
+                      }`}
                   />
                 </button>
                 <div className="absolute top-3 left-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      pkg.status === "ACTIVE"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-500 text-white"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${pkg.status === "ACTIVE"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                      }`}
                   >
                     {pkg.status}
                   </span>
@@ -486,11 +485,10 @@ const TravelPackages = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`p-2 rounded-lg ${
-                currentPage === 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-              }`}
+              className={`p-2 rounded-lg ${currentPage === 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                }`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -499,11 +497,10 @@ const TravelPackages = () => {
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
-                className={`px-4 py-2 rounded-lg ${
-                  currentPage === page
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-                }`}
+                className={`px-4 py-2 rounded-lg ${currentPage === page
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                  }`}
               >
                 {page}
               </button>
@@ -512,11 +509,10 @@ const TravelPackages = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`p-2 rounded-lg ${
-                currentPage === totalPages
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-              }`}
+              className={`p-2 rounded-lg ${currentPage === totalPages
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                }`}
             >
               <ChevronRight className="w-5 h-5" />
             </button>

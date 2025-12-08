@@ -9,11 +9,11 @@ export const useCall = (
   partnerUserId: string | undefined,
   conversationId: string
 ) => {
-  console.log('-----------------------<>',currentUserId,'currentuserId in uswe-call','partnerUserId',partnerUserId,conversationId,'conversationId------------------------------------------->')
+  console.log('-----------------------<>', currentUserId, 'currentuserId in uswe-call', 'partnerUserId', partnerUserId, conversationId, 'conversationId------------------------------------------->')
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
-  const [localCallAccepted, setLocalCallAccepted] = useState(false); 
+  const [localCallAccepted, setLocalCallAccepted] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const myVideo = useRef<HTMLVideoElement>(null);
@@ -103,48 +103,48 @@ export const useCall = (
   // }, [stream,partnerUserId, socket]);
   // use-call.ts (inside hook)
   const endCall = useCallback(() => {
-  console.log("Ending call locally...");
-  // const {callerId,recipientId} = useCallStore()
-  const callerId = useCallStore.getState().callerId;
-  const recipientId = useCallStore.getState().recipientId;
-  const partnerId = currentUserId === callerId ? recipientId : callerId;
-  // const partnerId = currentUserId === callerId ? recipientId : callerId;
-  // Determine who the other person is
-  // let recipientId: string | undefined;
+    console.log("Ending call locally...");
+    // const {callerId,recipientId} = useCallStore()
+    const callerId = useCallStore.getState().callerId;
+    const recipientId = useCallStore.getState().recipientId;
+    const partnerId = currentUserId === callerId ? recipientId : callerId;
+    // const partnerId = currentUserId === callerId ? recipientId : callerId;
+    // Determine who the other person is
+    // let recipientId: string | undefined;
 
-  // if (currentUserId && partnerUserId) {
-  //   // Simple: the other person is the partnerUserId passed to this hook
-  //   recipientId = partnerUserId;
-  // }
+    // if (currentUserId && partnerUserId) {
+    //   // Simple: the other person is the partnerUserId passed to this hook
+    //   recipientId = partnerUserId;
+    // }
 
-  // // Signal end to the other user
-  // if (recipientId) {
-  //   socket.emit("endCall", { toUserId: recipientId });
-  // }
-  if (partnerId) {
-    socket.emit("endCall", { toUserId: partnerId });
-  }
-  // Cleanup peer and streams
-  if (peerRef.current) {
-    peerRef.current.destroy();
-    peerRef.current = null;
-  }
+    // // Signal end to the other user
+    // if (recipientId) {
+    //   socket.emit("endCall", { toUserId: recipientId });
+    // }
+    if (partnerId) {
+      socket.emit("endCall", { toUserId: partnerId });
+    }
+    // Cleanup peer and streams
+    if (peerRef.current) {
+      peerRef.current.destroy();
+      peerRef.current = null;
+    }
 
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-    setStream(null);
-  }
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
 
-  if (myVideo.current) myVideo.current.srcObject = null;
-  if (partnerVideo.current) partnerVideo.current.srcObject = null;
+    if (myVideo.current) myVideo.current.srcObject = null;
+    if (partnerVideo.current) partnerVideo.current.srcObject = null;
 
-  setCallAccepted(false)
-  setCallEnded(true);
-  setLocalCallAccepted(false);
+    setCallAccepted(false)
+    setCallEnded(true);
+    setLocalCallAccepted(false);
 
-  // Reset global UI
-  useCallStore.getState().endCallUI();
-}, [currentUserId,socket, stream]);
+    // Reset global UI
+    useCallStore.getState().endCallUI();
+  }, [currentUserId, socket, stream]);
   // END useCallback(endCall)
   // =========================================================================
   // NEW: Dedicated Effect for Local Video Display
@@ -162,18 +162,32 @@ export const useCall = (
 
   // Start Call
   const startCall = async (callType: "video" | "audio") => {
-    console.log(partnerUserId,'.........parntnerUserId.........',currentUserId,'....currentUserIddddddd in use-call.ts......')
+    console.log(partnerUserId, '.........parntnerUserId.........', currentUserId, '....currentUserIddddddd in use-call.ts......')
     if (!partnerUserId || !currentUserId) {
       console.warn("Missing user IDs for call initiation.");
       return;
     }
 
     try {
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: callType === "video",
-        audio: true,
-      });
-      console.log(userStream,'==============userStreaammmmmm=====');
+      let userStream;
+      try {
+        userStream = await navigator.mediaDevices.getUserMedia({
+          video: callType === "video",
+          audio: true,
+        });
+      } catch (videoError) {
+        console.warn("Failed to get video/audio stream, trying audio only", videoError);
+        if (callType === "video") {
+          userStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true
+          });
+          alert("Video access failed. Switching to audio-only call.");
+        } else {
+          throw videoError;
+        }
+      }
+      console.log(userStream, '==============userStreaammmmmm=====');
       setStream(userStream);
       // setLocalCallAccepted(true)
       // useCallStore.getState().acceptCallUI(conversationId, currentUserId, callType);
@@ -229,15 +243,15 @@ export const useCall = (
   }
   // Accept Call
   const acceptCall = async () => {
-    const { callerId, callType, conversationId: storeConvoId,callerSignalData:currentSignalData } = useCallStore.getState();
+    const { callerId, callType, conversationId: storeConvoId, callerSignalData: currentSignalData } = useCallStore.getState();
     // const currentSignal = localCallerSignal;
     // if (!callerSignal) {
     //   alert("Call data missing!");
     //   return;
     // }
     if (!currentSignalData || !callerId || !callType || !storeConvoId) {
-        alert("Call data missing from store or signal!");
-        return;
+      alert("Call data missing from store or signal!");
+      return;
     }
     setLocalCallAccepted(true);
 
@@ -245,10 +259,40 @@ export const useCall = (
       const hasVideo = callType === "video";
       console.log("Accepting call with video:", hasVideo);
 
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: hasVideo,
-        audio: true,
-      });
+      let userStream;
+      try {
+        userStream = await navigator.mediaDevices.getUserMedia({
+          video: hasVideo,
+          audio: true,
+        });
+      } catch (videoError: any) {
+        console.warn("Failed to get video/audio stream", videoError);
+
+        // Handle specific errors
+        if (videoError.name === 'NotReadableError') {
+          alert("Camera/Mic is already in use by another application (or this one). Please close other apps and try again.");
+        } else if (videoError.name === 'NotAllowedError') {
+          alert("Camera/Mic permission denied. Please allow access in browser settings.");
+        } else if (videoError.name === 'NotFoundError') {
+          alert("No camera/mic found on this device.");
+        }
+
+        if (hasVideo) {
+          try {
+            // Fallback to audio only
+            userStream = await navigator.mediaDevices.getUserMedia({
+              video: false,
+              audio: true
+            });
+            alert(`Video access failed (${videoError.name}). Switching to audio-only call.`);
+          } catch (audioError: any) {
+            console.error("Audio fallback also failed", audioError);
+            throw videoError; // Throw original error if fallback fails
+          }
+        } else {
+          throw videoError;
+        }
+      }
 
       setStream(userStream);
       if (myVideo.current) {
@@ -293,48 +337,58 @@ export const useCall = (
   // =========================================================================
   // Socket Listeners (Using stable endCall)
   // =========================================================================
-// useEffect(() => {
-//     const handleIncomingCall = (data: any) => {
-//       console.log("Incoming call from:", data);
-      
-//       // 🚨 NEW: Store signal data locally for 'acceptCall' reference
-//       // setLocalCaller(data.from);
-//       // setLocalCallerSignal(data);
-//       if (data.from === currentUserId) {
-//       console.log("Ignoring my own incoming call event");
-//       return;
-//     }
-//       // 🚨 NEW: Update global store (triggers CallNotificationManager UI)
-//       useCallStore.getState().setIncomingCall({
-//         callerId: data.from,
-//         conversationId: data.conversationId,
-//         callType: data.callType,
-//         signalData: data.signalData,
-//       });
-//     };
+  // useEffect(() => {
+  //     const handleIncomingCall = (data: any) => {
+  //       console.log("Incoming call from:", data);
 
-//     socket.on("incomingCall", handleIncomingCall);
-//     socket.on("callEnded", endCall);
+  //       // 🚨 NEW: Store signal data locally for 'acceptCall' reference
+  //       // setLocalCaller(data.from);
+  //       // setLocalCallerSignal(data);
+  //       if (data.from === currentUserId) {
+  //       console.log("Ignoring my own incoming call event");
+  //       return;
+  //     }
+  //       // 🚨 NEW: Update global store (triggers CallNotificationManager UI)
+  //       useCallStore.getState().setIncomingCall({
+  //         callerId: data.from,
+  //         conversationId: data.conversationId,
+  //         callType: data.callType,
+  //         signalData: data.signalData,
+  //       });
+  //     };
 
-//     return () => {
-//       socket.off("incomingCall", handleIncomingCall);
-//       socket.off("callAccepted");
-//       socket.off("callEnded", endCall);
-//     };
-//   }, [socket, endCall]);
-// ADD THIS INSIDE useCall hook — this is the ONLY thing that was missing
-useEffect(() => {
-  const handleRemoteEnd = () => {
-    console.log("Partner ended the call → FULL CLEANUP on MY side");
-    endCall(); // ← This stops camera, destroys peer, clears video
-  };
+  //     socket.on("incomingCall", handleIncomingCall);
+  //     socket.on("callEnded", endCall);
 
-  socket.on("callEnded", handleRemoteEnd);
+  //     return () => {
+  //       socket.off("incomingCall", handleIncomingCall);
+  //       socket.off("callAccepted");
+  //       socket.off("callEnded", endCall);
+  //     };
+  //   }, [socket, endCall]);
+  // ADD THIS INSIDE useCall hook — this is the ONLY thing that was missing
+  useEffect(() => {
+    const handleRemoteEnd = () => {
+      console.log("Partner ended the call → FULL CLEANUP on MY side");
+      endCall(); // ← This stops camera, destroys peer, clears video
+    };
 
-  return () => {
-    socket.off("callEnded", handleRemoteEnd);
-  };
-}, [socket, endCall]);
+    socket.on("callEnded", handleRemoteEnd);
+
+    return () => {
+      socket.off("callEnded", handleRemoteEnd);
+    };
+  }, [socket, endCall]);
+
+  // Cleanup media on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        console.log("Hook unmounting, stopping tracks");
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
   return {
     myVideo,
     partnerVideo,
@@ -343,7 +397,7 @@ useEffect(() => {
     endCall,
     // receivingCall,
     // caller,
-    callAccepted:localCallAccepted,
+    callAccepted: localCallAccepted,
     callEnded,
     // callerSignal,
     isMicMuted,

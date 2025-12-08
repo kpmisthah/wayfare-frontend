@@ -10,17 +10,17 @@ import { ProfileModal, TravelCompanionProfile } from "./mathing-profile";
 import { useRouter } from "next/navigation";
 
 type Traveler = {
-    id: string,
-    destination: string,
-    startDate: string,
-    name: string,
-    profileImage: string,
-    location: string
+  id: string,
+  destination: string,
+  startDate: string,
+  name: string,
+  profileImage: string,
+  location: string
 };
 
-export function TravelItinerary({ id,destination }: { id: string,destination:string }) {
-  const{travellersData} = useFetchtravellers(destination)
-  const { tripPlan } = useAiTripPlan(id,destination);
+export function TravelItinerary({ id, destination }: { id: string, destination: string }) {
+  const { travellersData } = useFetchtravellers(destination)
+  const { tripPlan } = useAiTripPlan(id, destination);
   const router = useRouter()
   const [selectedTraveler, setSelectedTraveler] = useState<Traveler | null>(
     null
@@ -123,14 +123,14 @@ export function TravelItinerary({ id,destination }: { id: string,destination:str
               />
             ))}
           </div>
-            <div className="text-center">
-              <button
-                onClick={()=>router.push('/connection')}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-              >
-                View All
-              </button>
-            </div>
+          <div className="text-center">
+            <button
+              onClick={() => router.push('/connection')}
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+            >
+              View All
+            </button>
+          </div>
         </div>
       </div>
       {/* Profile Modal */}
@@ -139,7 +139,8 @@ export function TravelItinerary({ id,destination }: { id: string,destination:str
           traveler={selectedTraveler}
           onClose={() => setSelectedTraveler(null)}
           onConnect={handleConnect}
-          connectionStatus={getConnectionStatus(selectedTraveler.id)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          connectionStatus={getConnectionStatus(selectedTraveler.id) as any}
         />
       )}
     </div>

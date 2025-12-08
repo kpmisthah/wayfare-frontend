@@ -4,7 +4,7 @@ import { User } from "../../types/user.type";
 export const useEditForm = (user?: User) => {
   const [formData, setFormData] = useState<Partial<User>>({
     name: user?.name || "",
-    profile: user?.profile || "",
+    profileImage: user?.profileImage || "",
     email: user?.email || "",
     isBlock: user?.isBlock || false,
   });
@@ -20,7 +20,7 @@ export const useEditForm = (user?: User) => {
     if (user) {
       setFormData({
         name: user.name,
-        profile: user.profile,
+        profileImage: user.profileImage,
         email: user.email,
         isBlock: user.isBlock,
       });

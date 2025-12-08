@@ -4,68 +4,68 @@ import { Check, Heart, Plane, Plus, Star, TrendingUp, UserPlus } from "lucide-re
 import { useAuthStore } from "@/store/Auth";
 import { Button } from "@/shared/components/ui/button";
 
-export const TravelPreferences = ()=>{
-  const {user} = useAuthStore()
-    return(
-        <>
-            <div className="space-y-6">
-                <Card className="hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">
-                        Travel Preferences
-                      </CardTitle>
-                      {(user?.preferences?.length ?? 0) === 0 &&
-                      <p className="mb-2 italic">
-                            No Preferences
-                            </p>
-                      }
-                        
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {(user?.preferences?.length ?? 0) != 0 &&
-                    (
-                      <div className="space-y-3">
-                        <div className="flex flex-wrap gap-2">
-                          {user?.preferences.map((preference) => {
-                            return (
-                            <span key={preference.id} className="text-sm px-3 py-1">
-                              {preference.name}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+export const TravelPreferences = () => {
+  const { user } = useAuthStore()
+  return (
+    <>
+      <div className="space-y-6">
+        <Card className="hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">
+                Travel Preferences
+              </CardTitle>
+              {((user as any)?.preference?.length ?? 0) === 0 &&
+                <p className="mb-2 italic">
+                  No Preferences
+                </p>
+              }
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-lg">
-                      <TrendingUp className="w-5 h-5 mr-2" />
-                      Recent Activity
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center text-sm">
-                        <Plane className="w-4 h-4 text-blue-600 mr-2" />
-                        <span>Booked trip to Bali</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <UserPlus className="w-4 h-4 text-green-600 mr-2" />
-                        <span>Connected with Sarah Johnson</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <Star className="w-4 h-4 text-yellow-600 mr-2" />
-                        <span>Rated Swiss Alps trip</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {((user as any)?.preference?.length ?? 0) != 0 &&
+              (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {(user as any)?.preference.map((preference: any) => {
+                      return (
+                        <span key={preference.id} className="text-sm px-3 py-1">
+                          {preference.name}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center text-sm">
+                <Plane className="w-4 h-4 text-blue-600 mr-2" />
+                <span>Booked trip to Bali</span>
               </div>
-        </>
-    )
+              <div className="flex items-center text-sm">
+                <UserPlus className="w-4 h-4 text-green-600 mr-2" />
+                <span>Connected with Sarah Johnson</span>
+              </div>
+              <div className="flex items-center text-sm">
+                <Star className="w-4 h-4 text-yellow-600 mr-2" />
+                <span>Rated Swiss Alps trip</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  )
 }

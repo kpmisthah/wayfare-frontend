@@ -237,8 +237,8 @@ export const useAddPackage = (
         } else {
           console.log("videe else case work aavndooo");
           let updatePackage = await updatedPackage(packageData, editingPackage.id);
-          setPackages && setPackages((prev)=>
-          prev.map((pkg)=>pkg.id == editingPackage.id?updatePackage:pkg)
+          setPackages && setPackages((prev) =>
+            prev.map((pkg) => pkg.id == editingPackage.id ? updatePackage : pkg)
           )
           setShowForm(false)
         }
@@ -266,14 +266,18 @@ export const useAddPackage = (
   //   }
   // };
 
-  const addArrayField = (field) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addArrayField = (field: any) => {
     setPackageData({
       ...packageData,
-      [field]: [...packageData[field], ""],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [field]: [...(packageData as any)[field], ""],
     });
   };
-  const updateArrayField = (field, index, value) => {
-    const newArray = [...formData[field]];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateArrayField = (field: any, index: any, value: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newArray = [...(formData as any)[field]];
     newArray[index] = value;
     setFormData({
       ...formData,
@@ -281,15 +285,17 @@ export const useAddPackage = (
     });
   };
 
-  const removeArrayField = (field, index) => {
-    const newArray = formData[field].filter((_, i) => i !== index);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const removeArrayField = (field: any, index: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newArray = (formData as any)[field].filter((_: any, i: any) => i !== index);
     setFormData({
       ...formData,
       [field]: newArray,
     });
   };
 
-  
+
   return {
     packageData,
     setPackageData,

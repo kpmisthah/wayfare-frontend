@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Heart, MapPin, Sparkles, User } from "lucide-react";
 import { useUserProfile } from "../../hooks/use-userprofile";
 export const ProfileCompletionCard = () => {
-  const { userProfile } = useUserProfile();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { userProfile } = useUserProfile() as any;
 
   return (
     <Card className="border-2 border-dashed border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 mb-6">
