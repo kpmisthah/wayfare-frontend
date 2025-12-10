@@ -1,226 +1,244 @@
-import { Plus, Trash2, Users, X, Check, Clock, XCircle } from "lucide-react";
 import { useState } from "react";
+import { Check, Clock, XCircle, AlertCircle, X } from "lucide-react";
 import { BookingData } from "../../types/booking.type";
-import { useUpdateBookingStatus, useViewBookings } from "../../hooks/use-booking";
+import {
+  useUpdateBookingStatus,
+  useViewBookings,
+} from "../../hooks/use-booking";
 import { BookingStatus } from "../../types/booking.enum";
+import Modal from "@/shared/components/common/Modal";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const BookingsView = ({ pkg, onClose }: any) => {
+export const BookingsView = ({
+  pkg,
+  onClose,
+}: {
+  pkg: any;
+  onClose: () => void;
+}) => {
   const { booking, setBooking } = useViewBookings(pkg.id);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { changeStatus } = useUpdateBookingStatus(setBooking as any);
-  const [selectedBooking, setSelectedBooking] = useState<string | null>(null);
+  const {
+    openConfirmModal,
+    modal,
+    confirmStatusChange,
+    closeModal,
+    loading,
+    errorModal,
+    closeErrorModal,
+  } = useUpdateBookingStatus(setBooking);
 
-  // const totalRevenue = (pkg.bookings || []).reduce(
-  //   (sum, b) => sum + b.numberOfPeople * pkg.pricePerPerson,
-  //   0
-  // );
-  // const totalGuests = (pkg.bookings || []).reduce(
-  //   (sum, b) => sum + parseInt(b.numberOfPeople),
-  //   0
-  // );
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getStatusColor = (status: any) => {
+  const getStatusConfig = (status: BookingStatus) => {
     switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-700";
-      case "pending":
-        return "bg-yellow-100 text-yellow-700";
-      case "cancelled":
-        return "bg-red-100 text-red-700";
+      case BookingStatus.CONFIRMED:
+        return { color: "green", icon: Check, label: "Confirm Booking" };
+      case BookingStatus.PENDING:
+        return { color: "yellow", icon: Clock, label: "Mark as Pending" };
+      case BookingStatus.CANCELLED:
+        return { color: "red", icon: XCircle, label: "Cancel Booking" };
+      case BookingStatus.COMPLETED:
+        return { color: "blue", icon: Check, label: "Mark as Completed" };
       default:
-        return "bg-gray-100 text-gray-700";
+        return { color: "gray", icon: AlertCircle, label: "Unknown" };
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getStatusIcon = (status: any) => {
-    switch (status) {
-      case "confirmed":
-        return <Check className="w-3 h-3" />;
-      case "pending":
-        return <Clock className="w-3 h-3" />;
-      case "cancelled":
-        return <XCircle className="w-3 h-3" />;
-      default:
-        return null;
-    }
-  };
-
-  const handleStatusChange = async (bookingId: string, newStatus: BookingStatus) => {
-    await changeStatus(bookingId, newStatus);
-    console.log(`Update booking ${bookingId} to status: ${newStatus}`);
-    setSelectedBooking(null);
+  const getStatusBadge = (status: BookingStatus) => {
+    const config = getStatusConfig(status);
+    const Icon = config.icon;
+    return (
+      <span
+        className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 bg-${config.color}-100 text-${config.color}-700`}
+      >
+        <Icon className="w-3 h-3" />
+        {status.charAt(0) + status.slice(1).toLowerCase()}
+      </span>
+    );
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-800">
-            {pkg.title} - Bookings
-          </h2>
-          <p className="text-gray-600 mt-1">
-            {pkg.destination} • {pkg.totalDays} days
-          </p>
+    <>
+      <div className="bg-white rounded-xl shadow-lg p-8 max-w-6xl mx-auto">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              {pkg.title} - Bookings
+            </h2>
+            <p className="text-gray-600 mt-1">
+              {pkg.destination} • {pkg.totalDays} days
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X size={24} />
+          </button>
         </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          <X size={24} />
-        </button>
-      </div>
 
-      {/* <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total Bookings</p>
-          <p className="text-2xl font-bold text-purple-600">
-            {pkg.bookings?.length || 0}
-          </p>
-        </div>
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total Guests</p>
-          <p className="text-2xl font-bold text-blue-600">{totalGuests}</p>
-        </div>
-        <div className="bg-green-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600">${totalRevenue}</p>
-        </div>
-      </div> */}
+        <div className="space-y-4">
+          {booking && booking.length > 0 ? (
+            booking.map((bookingItem: BookingData) => (
+              <div
+                key={bookingItem.id}
+                className="bg-white border-2 border-gray-200 p-6 rounded-lg hover:shadow-md transition"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h4 className="text-xl font-semibold text-gray-800">
+                        {bookingItem.customerName}
+                      </h4>
+                      {getStatusBadge(bookingItem.status)}
+                    </div>
 
-      <div className="space-y-4">
-        {booking && booking.length > 0 ? (
-          booking.map((booking: BookingData) => (
-            <div
-              key={booking.id}
-              className="bg-white border-2 border-gray-200 p-6 rounded-lg hover:shadow-md transition"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      {booking.customerName}
-                    </h4>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(
-                        booking.status || "confirmed"
-                      )}`}
-                    >
-                      {getStatusIcon(booking.status || "confirmed")}
-                      {(booking.status || "confirmed").charAt(0).toUpperCase() +
-                        (booking.status || "confirmed").slice(1)}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="text-gray-800">{booking.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Phone</p>
-                      <p className="text-gray-800">{booking.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Destination</p>
-                      <p className="text-gray-800">{booking.destination}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Guests</p>
-                      <p className="text-gray-800 font-semibold">
-                        {booking.totalPeople}{" "}
-                        {booking.totalPeople > 1 ? "people" : "person"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Travel Date</p>
-                      <p className="text-gray-800">
-                        {booking.travelDate}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Total Amount</p>
-                      <p className="text-gray-800 font-bold text-green-600">
-                        ${booking.totalAmount}
-                      </p>
-                    </div>
-                    <div>
-                      {/* <p className="text-sm text-gray-500">Booked On</p> */}
-                      {/* <p className="text-gray-800">
-                        {booking.bookedAt
-                          ? new Date(booking.bookedAt).toLocaleDateString()
-                          : "-"}
-                      </p> */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-500">Email</p>
+                        <p className="text-gray-800">{bookingItem.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Phone</p>
+                        <p className="text-gray-800">{bookingItem.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Guests</p>
+                        <p className="font-semibold">
+                          {bookingItem.totalPeople}{" "}
+                          {bookingItem.totalPeople > 1 ? "people" : "person"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Amount</p>
+                        <p className="font-bold text-green-600">
+                          ${bookingItem.totalAmount}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="ml-4 flex items-center gap-2">
-                  <div className="relative">
+                  {/* Change Status Button + Dropdown */}
+                  <div className="relative ml-4">
                     <button
                       onClick={() =>
-                        setSelectedBooking(
-                          selectedBooking === booking.id ? null : booking.id
+                        setDropdownOpen(
+                          dropdownOpen === bookingItem.id
+                            ? null
+                            : bookingItem.id
                         )
                       }
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                      className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition"
                     >
                       Change Status
                     </button>
 
-                    {selectedBooking === booking.id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                        <button
-                          onClick={() =>
-                            handleStatusChange(booking.id, BookingStatus.CONFIRMED)
-                          }
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm"
-                        >
-                          <Check className="w-4 h-4 text-green-600" />
-                          <span>Confirm Booking</span>
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleStatusChange(booking.id, BookingStatus.PENDING)
-                          }
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
-                        >
-                          <Clock className="w-4 h-4 text-yellow-600" />
-                          <span>Mark as Pending</span>
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleStatusChange(booking.id, BookingStatus.CANCELLED)
-                          }
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
-                        >
-                          <XCircle className="w-4 h-4 text-red-600" />
-                          <span>Cancel Booking</span>
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleStatusChange(booking.id, BookingStatus.COMPLETED)
-                          }
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-sm border-t"
-                        >
-                          <XCircle className="w-4 h-4 text-red-600" />
-                          <span>Completed Booking</span>
-                        </button>
+                    {/* Dropdown Menu */}
+                    {dropdownOpen === bookingItem.id && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
+                        {Object.values(BookingStatus).map((status) => {
+                          const config = getStatusConfig(status);
+                          const Icon = config.icon;
+
+                          return (
+                            <button
+                              key={status}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openConfirmModal(bookingItem, status); // correct variable!
+                                setDropdownOpen(null); // close dropdown
+                              }}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-sm transition"
+                            >
+                              <Icon
+                                className={`w-4 h-4 text-${config.color}-600`}
+                              />
+                              <span>{config.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-16 bg-gray-50 rounded-xl">
+              <p className="text-xl text-gray-600">No bookings yet</p>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <Users size={48} className="mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-600 text-lg">No bookings yet</p>
-            <p className="text-gray-500 text-sm mt-1">
-              Add your first booking to get started
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Confirm Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        title="Confirm Status Change"
+        subtitle={`Booked by ${modal.booking?.customerName}`}
+        size="md"
+      >
+        <div className="space-y-6 py-4">
+          <div className="text-center">
+            <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-orange-600" />
+            </div>
+            <h3 className="text-xl font-semibold mt-4">Are you sure?</h3>
+            <p className="text-gray-600 mt-2">
+              You want to change this booking to
+              <strong className="mx-1">
+                {modal.newStatus && getStatusConfig(modal.newStatus).label}
+              </strong>
+            </p>
+            {modal.newStatus === BookingStatus.CANCELLED && (
+              <p className="text-red-600 font-medium mt-3">
+                This action cannot be undone.
+              </p>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={closeModal}
+              disabled={loading}
+              className="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmStatusChange}
+              disabled={loading}
+              className={`px-6 py-2.5 rounded-lg text-white font-medium flex items-center gap-2 ${
+                modal.newStatus === BookingStatus.CANCELLED
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Updating..." : "Yes, Confirm"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={errorModal.isOpen}
+        onClose={closeErrorModal}
+        title="Cannot Change Status"
+        size="sm"
+      >
+        <div className="text-center py-6">
+          <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <XCircle className="w-8 h-8 text-red-600" />
+          </div>
+          <p className="text-gray-700 max-w-xs mx-auto">{errorModal.message}</p>
+          <button
+            onClick={closeErrorModal}
+            className="mt-6 px-6 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition"
+          >
+            Got it
+          </button>
+        </div>
+      </Modal>
+    </>
   );
 };

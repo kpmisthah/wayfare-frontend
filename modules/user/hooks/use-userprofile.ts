@@ -214,6 +214,7 @@ export const useUserProfile = () => {
       console.log(error);
     }
   };
+  
   const handleCancelClick = (trip: Trip) => {
     setSelectedTripForCancel(trip);
     setCancelDialogOpen(true);

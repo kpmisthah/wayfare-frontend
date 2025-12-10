@@ -2,6 +2,7 @@
 import { BookingStatus } from "@/modules/agency/types/booking.enum";
 import { useUserProfile } from "@/modules/user/hooks/use-userprofile";
 import { Trip } from "@/modules/user/types/profile.type";
+import Modal from "@/shared/components/common/Modal";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -63,36 +64,40 @@ export const Trips = () => {
   return (
     <>
       {cancelDialogOpen && selectedTripForCancel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-md w-96">
-            <h3 className="text-lg font-bold mb-4">Cancellation Policy</h3>
-            <p className="mb-4">
-              You are cancelling{" "}
-              <strong>{selectedTripForCancel.destination}</strong> trip.
-              <br />
-              100% refund if cancelled more than 7 days before the trip. 50%
-              refund if cancelled between 4 to 7 days before the trip. No refund
-              if cancelled less than 4 days before the trip.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setCancelDialogOpen(false)}
-              >
-                Close
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={async () => {
-                  await cancelBooking(selectedTripForCancel.id);
-                  setCancelDialogOpen(false);
-                }}
-              >
-                Confirm
-              </Button>
-            </div>
+        <Modal
+          isOpen={cancelDialogOpen}
+          onClose={() => setCancelDialogOpen(false)}
+          title="Cancellation Policy"
+          size="md"
+        >
+          <p className="mb-4">
+            You are cancelling{" "}
+            <strong>{selectedTripForCancel?.destination}</strong> trip.
+            <br />
+            100% refund if cancelled more than 7 days before the trip. 50%
+            refund if cancelled between 4 to 7 days before the trip. No refund
+            if cancelled less than 4 days before the trip.
+          </p>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+            >
+              Close
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                await cancelBooking(selectedTripForCancel?.id);
+                setCancelDialogOpen(false);
+              }}
+            >
+              Confirm
+            </Button>
           </div>
-        </div>
+        </Modal>
       )}
 
       <TabsContent value="trips" className="space-y-6">
@@ -192,7 +197,6 @@ export const Trips = () => {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{trip.destination}</h3>
-                  <span className="text-xs text-gray-500">#{trip.id}</span>
                 </div>
 
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
@@ -214,9 +218,7 @@ export const Trips = () => {
                   </div>
                   <div className="flex items-center">
                     <Plane className="w-4 h-4 mr-2" />
-                    <span>
-                      Planned Date:x{trip.travelDate}
-                    </span>
+                    <span>Planned Date:{trip.travelDate}</span>
                   </div>
                   {/* <div className="flex items-center justify-between">
                         <span className="font-semibold text-lg text-blue-600">${trip.price}</span>
@@ -252,17 +254,17 @@ export const Trips = () => {
 
                   {/* {trip.bookingStatus === BookingStatus.PENDING && ( */}
                   {trip.bookingStatus == BookingStatus.CONFIRMED && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleCancelClick(trip)}
-                    >
-                      <RefreshCw className="w-4 h-4 mr-1" />
-                      Cancel
-                    </Button>
-                  </>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleCancelClick(trip)}
+                      >
+                        <RefreshCw className="w-4 h-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </>
                   )}
 
                   {trip.bookingStatus === BookingStatus.CANCELLED && (

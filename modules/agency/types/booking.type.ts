@@ -6,7 +6,8 @@ export interface Booking {
   destination: string;
   date: string;
   budget: number;
-  status:BookingStatus
+  status:BookingStatus;
+  bookingCode:string
 }
 
 export interface BookingData {
@@ -19,4 +20,5 @@ export interface BookingData {
   totalAmount:number;
   destination:string;
   travelDate:string
+  bookingCode:string
 }

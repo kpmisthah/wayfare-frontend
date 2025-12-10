@@ -74,7 +74,7 @@ export const getUserBooking = async(page=1,limit=1)=>{
 
 export const bookingCancel= async(id:string)=>{
   try {
-    console.log(id,'iddddddd in userProfile api booking id')
+
     const response = await api.post(`/booking/cancel/${id}`)
     console.log(response.data,'in CancelBooking');
     return response.data

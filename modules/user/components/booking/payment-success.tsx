@@ -30,7 +30,8 @@ interface PaymentSuccessProps {
   destination:string,
   travelers: number,
   totalAmount: number,
-  email: string
+  email: string,
+  bookingCode:string
   };
   paymentMethod:string
 }
@@ -117,7 +118,7 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({booking,paymentMetho
         >
           <p className="text-sm text-black/60">Booking ID</p>
           <p className="text-xl sm:text-2xl font-bold tracking-wider text-black">
-            {booking.id}
+            {booking.bookingCode}
           </p>
         </motion.div>
       </div>

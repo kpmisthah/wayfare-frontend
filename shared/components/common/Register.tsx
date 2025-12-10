@@ -20,13 +20,17 @@ import { useSignup } from "../../hooks/use-signup-form";
 import { UseSignupProps } from "@/shared/types/auth.type";
 import { useAuthStore } from "@/store/Auth";
 
-export const Signup = ({ role = "USER",redirectLogin,onSubmit }: UseSignupProps) => {
+export const Signup = ({
+  role = "USER",
+  redirectLogin,
+  onSubmit,
+}: UseSignupProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const {setAuthUser} = useAuthStore()
+  const { setAuthUser } = useAuthStore();
   const router = useRouter();
-  console.log(redirectLogin,'redirectLogin from signup agency');
-  
+  console.log(redirectLogin, "redirectLogin from signup agency");
+
   const {
     signupData,
     setSignupData,
@@ -34,8 +38,8 @@ export const Signup = ({ role = "USER",redirectLogin,onSubmit }: UseSignupProps)
     setErrors,
     isLoading,
     handleSignupSubmit,
-  } = useSignup({ role,redirectLogin,onSubmit });
-   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  } = useSignup({ role, redirectLogin, onSubmit });
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/");
@@ -283,7 +287,13 @@ export const Signup = ({ role = "USER",redirectLogin,onSubmit }: UseSignupProps)
               className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
               disabled={isLoading}
             >
-              Create Account
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
+                </div>
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </div>
         </CardContent>
@@ -298,28 +308,27 @@ export const Signup = ({ role = "USER",redirectLogin,onSubmit }: UseSignupProps)
               </span>
             </div>
           </div>
-          {
-            role == 'AGENCY'?
-              <p className="text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              className="text-blue-600 hover:text-blue-800 font-medium"
-              onClick={() => router.push("/agency/login")}
-            >
-              Sign in here
-            </button>
-          </p>:
+          {role == "AGENCY" ? (
             <p className="text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              className="text-blue-600 hover:text-blue-800 font-medium"
-              onClick={() => router.push("/login")}
-            >
-              Sign in here
-            </button>
-          </p>
-          }
-
+              Already have an account?{" "}
+              <button
+                className="text-blue-600 hover:text-blue-800 font-medium"
+                onClick={() => router.push("/agency/login")}
+              >
+                Sign in here
+              </button>
+            </p>
+          ) : (
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <button
+                className="text-blue-600 hover:text-blue-800 font-medium"
+                onClick={() => router.push("/login")}
+              >
+                Sign in here
+              </button>
+            </p>
+          )}
         </CardFooter>
       </Card>
     </AuthLayout>

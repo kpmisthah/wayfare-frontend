@@ -24,12 +24,11 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
       startDate,
       travelers,
       clientSecret,
-      bookingId
+      bookingId,
+      paymentStatus
     } = useBooking(id);
     const{wallet,isProcessing,payWithWallet} = useWallet() 
-    const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
-    const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-    
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');    
     const getNumericPrice = (priceString: string) => {
   
       return parseInt('0');
