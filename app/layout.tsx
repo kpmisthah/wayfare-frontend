@@ -11,7 +11,6 @@ export default async function RootLayout({
 }) {
 
   const user = await getUserFromServer();
-  console.log("get user from server", user);
   return (
     <html lang="en">
       <head>
