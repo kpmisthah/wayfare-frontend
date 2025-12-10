@@ -2,10 +2,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Helper function to check if a JWT token is expired
 function isTokenExpired(token: string): boolean {
   try {
-    // Decode the JWT without verification to check expiry
     const parts = token.split(".");
     if (parts.length !== 3) return true;
 
@@ -15,11 +13,9 @@ function isTokenExpired(token: string): boolean {
 
     if (!payload.exp) return true;
 
-    // Check if token is expired (with 30 second buffer for clock skew)
     const currentTime = Math.floor(Date.now() / 1000);
     return payload.exp < currentTime + 30;
   } catch {
-    // If we can't decode/parse the token, consider it expired
     return true;
   }
 }
@@ -31,11 +27,10 @@ export async function middleware(request: NextRequest) {
   console.log(refreshToken, 'refreshTokennn');
   const { pathname } = request.nextUrl;
 
-  // Check if access token is missing OR expired, and refresh token exists
   const accessTokenExpired = accessToken ? isTokenExpired(accessToken) : true;
   const needsRefresh = (!accessToken || accessTokenExpired) && refreshToken;
 
-  // Track if we have a valid access token (either original or refreshed)
+
   let hasValidAccessToken = accessToken && !accessTokenExpired;
 
   if (needsRefresh) {
@@ -56,9 +51,6 @@ export async function middleware(request: NextRequest) {
         credentials: "include",
       }
     );
-    console.log(result, 'resultttttt in fetchhh');
-
-    console.log("middleware working →", pathname);
 
     if (result.ok) {
       const response = NextResponse.next();
@@ -76,7 +68,6 @@ export async function middleware(request: NextRequest) {
         }
       });
 
-      // Also inject Authorization header so Server Components see the new token
       const newAccessToken = response.cookies.get("accessToken")?.value;
       if (newAccessToken) {
         response.headers.set("Authorization", `Bearer ${newAccessToken}`);
@@ -84,12 +75,13 @@ export async function middleware(request: NextRequest) {
 
       return response;
     } else {
-      // Refresh failed - clear tokens and redirect to login for protected routes
+      
       const protectedUserPaths = [
         "/plan-trip",
         "/booking",
         "/connection",
         "/profile",
+        "/notifications"
       ];
       const isProtectedPath = protectedUserPaths.some((path) => pathname.startsWith(path));
 
@@ -100,7 +92,6 @@ export async function middleware(request: NextRequest) {
         return response;
       }
 
-      // For non-protected paths, just continue without tokens
       hasValidAccessToken = false;
     }
   }
@@ -155,23 +146,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // const agencyProtectedPaths = ['/agency']
-  // if(agencyProtectedPaths.some((path)=>url.pathname.startsWith(path)) && !token
-  // ){
-  //   return NextResponse.redirect(new URL('/agency/login',request.url))
-  // }
-
   return NextResponse.next();
 }
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files (images, etc.)
-     */
+
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
