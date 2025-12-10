@@ -17,6 +17,7 @@ export async function getUserFromServer() {
       cache: "no-store",
       credentials: "include",
     });
+    
  
 
     if (!userRes.ok) {
@@ -26,7 +27,7 @@ export async function getUserFromServer() {
     let userData = {};
     try {
       userData = await userRes.json();
-      console.log(userData, "in lib");
+      console.log(userData, "in lib===");
     } catch (parseError) {
       console.error("Error parsing userRes JSON:", parseError);
       return null;
@@ -42,7 +43,6 @@ export async function getUserFromServer() {
         credentials: "include",
       }
     );
-    console.log(profileRes, "profileRes");
 
     let profileData = {};
     if (profileRes.ok) {
@@ -51,7 +51,6 @@ export async function getUserFromServer() {
 
         if (text) {
           profileData = JSON.parse(text);
-          console.log(profileData, "profileData");
         } else {
           console.log("Profile response body is empty");
         }
@@ -68,12 +67,7 @@ export async function getUserFromServer() {
       ...profileData,
       ...userData,
     } as User;
-    console.log(completeUser, "completedUser");
 
-    console.log(
-      "Successfully fetched and merged complete user data:",
-      completeUser
-    );
 
     return completeUser;
   } catch (error) {
