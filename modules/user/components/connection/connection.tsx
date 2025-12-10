@@ -77,22 +77,20 @@ const CardSkeleton = () => (
 const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => (
   <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 text-center">
     <div className="relative mb-8">
-      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
         <Users className="w-14 h-14 text-purple-400" />
-      </div>
-      <div className="absolute -top-2 -right-2 w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center animate-bounce">
-        <Sparkles className="w-6 h-6 text-white" />
       </div>
     </div>
     <h2 className="text-2xl font-bold text-gray-800 mb-3">
       No Travelers Found
     </h2>
     <p className="text-gray-500 mb-6 max-w-sm">
-      Create a trip plan to find travelers heading to the same destination as you!
+      Create a trip plan to find travelers heading to the same destination.
+      If you planned a trip already there is no travellers currently available
     </p>
     <button
       onClick={onRefresh}
-      className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
+      className="text-blue-600 text-black px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
     >
       <RefreshCw className="w-5 h-5" />
       Refresh
@@ -137,14 +135,14 @@ const AllDoneState = ({
           <Heart className="w-18 h-18 text-white fill-white animate-pulse" style={{ width: '72px', height: '72px' }} />
         </div>
         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white px-4 py-1 rounded-full shadow-lg">
-          <span className="text-lg font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-            {connectionsCount} {connectionsCount === 1 ? 'Connection' : 'Connections'}! 🎉
+          <span className="text-lg font-bold bg-gradient-to-r bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+            {connectionsCount} {connectionsCount === 1 ? 'Connection request send' : 'Connections request send'}
           </span>
         </div>
       </div>
 
       <h2 className="text-3xl font-bold text-gray-800 mb-4">
-        You're All Caught Up!
+        You're All Caught Up
       </h2>
       <p className="text-gray-500 mb-8 text-lg">
         You've seen all available travel buddies heading to your destinations.
@@ -152,7 +150,7 @@ const AllDoneState = ({
 
       <button
         onClick={onReset}
-        className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 text-white px-8 py-4 rounded-full font-semibold transition-all flex items-center gap-3 mx-auto shadow-xl hover:shadow-2xl hover:scale-105"
+        className="bg-gradient-to-r bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-pink-600 hover:to-indigo-700 text-white px-8 py-4 rounded-full font-semibold transition-all flex items-center gap-3 mx-auto shadow-xl hover:shadow-2xl hover:scale-105"
       >
         <RefreshCw className="w-5 h-5" />
         Start Over
@@ -250,7 +248,7 @@ const TravelerCard = ({
           )}
 
           {/* Destination Badge */}
-          <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-2xl p-4 backdrop-blur-sm shadow-xl">
+          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-4 backdrop-blur-sm shadow-xl">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4" />
               <span className="font-semibold text-lg">
