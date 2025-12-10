@@ -31,7 +31,7 @@ export interface DayPlan {
 }
 
 export interface TravelItineraryProps {
-  id?:string
+  id?: string
   destination: string;
   duration: string;
   budget: string;
@@ -40,11 +40,14 @@ export interface TravelItineraryProps {
   itinerary: DayPlan[];
 }
 
+export type ConnectionStatus = 'NONE' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
 export interface Travellers {
-  id:string,
-  destination:string,
-  startDate:string,
-  name:string,
-  profileImage:string,
-  location:string
+  id: string,
+  destination: string,
+  startDate: string,
+  name: string,
+  profileImage: string,
+  location: string,
+  connectionStatus?: ConnectionStatus
 }
