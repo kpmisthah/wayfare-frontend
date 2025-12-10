@@ -1,6 +1,10 @@
+"use client"
+
 import React from "react";
 import { MapPin,Clock,Calendar,Award } from "lucide-react";
+import { useRouter } from "next/navigation";
 export const AiPlanner = () => {
+  const router = useRouter()
   return (
     <>
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -97,12 +101,12 @@ export const AiPlanner = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-colors font-medium flex items-center space-x-2">
+                <button 
+                className="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-colors font-medium flex items-center space-x-2"
+                onClick={()=>router.push('/plan-trip')}
+                >
                   <Calendar className="w-5 h-5" />
                   <span>Try AI Planner</span>
-                </button>
-                <button className="border border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors font-medium">
-                  Learn More
                 </button>
               </div>
             </div>
