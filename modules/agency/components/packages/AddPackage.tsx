@@ -32,7 +32,7 @@ export const AgencyWallet = () => {
 
   const openPayoutModal = () => {
     setShowPayoutModal(true);
-    setActiveTab("payout"); // always start here
+    setActiveTab("payout");
   };
   const [hasBankDetails, setHasBankDetails] = useState(true);
   const [bankDetails, setBankDetails] = useState<Bank>(emptyBankData);
@@ -72,10 +72,8 @@ const handleSaveBankDetails = async () => {
       alert("Bank details saved successfully!");
     }
 
-    // Refresh data from server
     await fetchBankDetails();
 
-    // Go back to payout tab
     setActiveTab("payout");
   } catch (err: any) {
     console.error("Bank save error:", err);
@@ -163,7 +161,7 @@ const handleSaveBankDetails = async () => {
             </div>
             <p className="text-sm opacity-90 mb-1">Current Balance</p>
             <h2 className="text-3xl font-bold">
-              ₹{walletData?.walletAmount.toLocaleString()}
+              ₹{(walletData?.walletAmount ?? 0).toLocaleString()}
             </h2>
           </div>
 
@@ -176,7 +174,7 @@ const handleSaveBankDetails = async () => {
             </div>
             <p className="text-sm text-slate-600 mb-1">Pending Amount</p>
             <h2 className="text-3xl font-bold text-slate-800">
-              ₹{walletData?.pendingWalletAmount.toLocaleString()}
+              ₹{(walletData?.pendingWalletAmount ?? 0).toLocaleString()}
             </h2>
           </div>
 
