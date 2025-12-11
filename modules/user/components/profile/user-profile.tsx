@@ -21,13 +21,15 @@ const UserProfilePage: React.FC = () => {
     bannerUpload,
     setIsEditingBanner,
     // handleSaveBanner,
-    setBannerUpload
+    setBannerUpload,
+    isUploadingBanner,
+    isUploadingAvatar
   } = useUserProfile();
-  const {user} = useAuthStore()
-  console.log(user,'in store');
-  
+  const { user } = useAuthStore()
+  console.log(user, 'in store');
+
   const isProfileIncomplete =
-    !user?.location 
+    !user?.location
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -36,14 +38,15 @@ const UserProfilePage: React.FC = () => {
         {isProfileIncomplete && <ProfileCompletionCard />}
 
         {/* Profile Header */}
-        <ProfileHeader 
-        isEditingBanner = {isEditingBanner}
-        bannerUpload = {bannerUpload}
-        // handleSaveBanner = {handleSaveBanner}
-        setIsEditingBanner = {setIsEditingBanner}
-        setBannerUpload = {setBannerUpload}
-        fileInputRef = {fileInputRef}
-        avatarInputRef = {avatarInputRef}
+        <ProfileHeader
+          isEditingBanner={isEditingBanner}
+          bannerUpload={bannerUpload}
+          setIsEditingBanner={setIsEditingBanner}
+          setBannerUpload={setBannerUpload}
+          fileInputRef={fileInputRef}
+          avatarInputRef={avatarInputRef}
+          isUploadingBanner={isUploadingBanner}
+          isUploadingAvatar={isUploadingAvatar}
         />
         <UserProfileTabs />
 

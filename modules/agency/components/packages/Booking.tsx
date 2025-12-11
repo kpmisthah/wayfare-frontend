@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Clock, XCircle, AlertCircle, X } from "lucide-react";
+import { Check, Clock, XCircle, AlertCircle, X, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { BookingData } from "../../types/booking.type";
 import {
   useUpdateBookingStatus,
@@ -7,15 +7,28 @@ import {
 } from "../../hooks/use-booking";
 import { BookingStatus } from "../../types/booking.enum";
 import Modal from "@/shared/components/common/Modal";
+import { packageList } from "../../types/package.type";
+import { Button } from "@/shared/components/ui/button";
 
 export const BookingsView = ({
   pkg,
   onClose,
 }: {
-  pkg: any;
+  pkg: packageList;
   onClose: () => void;
 }) => {
-  const { booking, setBooking } = useViewBookings(pkg.id);
+  const {
+    booking,
+    setBooking,
+    loading: bookingsLoading,
+    page,
+    setPage,
+    totalPages,
+    search,
+    setSearch,
+    nextPage,
+    prevPage,
+  } = useViewBookings(pkg.id);
   const {
     openConfirmModal,
     modal,
@@ -65,7 +78,7 @@ export const BookingsView = ({
               {pkg.title} - Bookings
             </h2>
             <p className="text-gray-600 mt-1">
-              {pkg.destination} • {pkg.totalDays} days
+              {pkg.destination} • {pkg.duration} days
             </p>
           </div>
           <button
@@ -76,98 +89,147 @@ export const BookingsView = ({
           </button>
         </div>
 
-        <div className="space-y-4">
-          {booking && booking.length > 0 ? (
-            booking.map((bookingItem: BookingData) => (
-              <div
-                key={bookingItem.id}
-                className="bg-white border-2 border-gray-200 p-6 rounded-lg hover:shadow-md transition"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h4 className="text-xl font-semibold text-gray-800">
-                        {bookingItem.customerName}
-                      </h4>
-                      {getStatusBadge(bookingItem.status)}
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by customer name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            />
+          </div>
+        </div>
+
+        {bookingsLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {booking && booking.length > 0 ? (
+              booking.map((bookingItem: BookingData) => (
+                <div
+                  key={bookingItem.id}
+                  className="bg-white border-2 border-gray-200 p-6 rounded-lg hover:shadow-md transition"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h4 className="text-xl font-semibold text-gray-800">
+                          {bookingItem.customerName}
+                        </h4>
+                        {getStatusBadge(bookingItem.status)}
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-500">Email</p>
+                          <p className="text-gray-800">{bookingItem.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Phone</p>
+                          <p className="text-gray-800">{bookingItem.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Guests</p>
+                          <p className="font-semibold">
+                            {bookingItem.totalPeople}{" "}
+                            {bookingItem.totalPeople > 1 ? "people" : "person"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Amount</p>
+                          <p className="font-bold text-green-600">
+                            ${bookingItem.totalAmount}
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500">Email</p>
-                        <p className="text-gray-800">{bookingItem.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Phone</p>
-                        <p className="text-gray-800">{bookingItem.phone}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Guests</p>
-                        <p className="font-semibold">
-                          {bookingItem.totalPeople}{" "}
-                          {bookingItem.totalPeople > 1 ? "people" : "person"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Amount</p>
-                        <p className="font-bold text-green-600">
-                          ${bookingItem.totalAmount}
-                        </p>
-                      </div>
+                    {/* Change Status Button + Dropdown */}
+                    <div className="relative ml-4">
+                      <button
+                        onClick={() =>
+                          setDropdownOpen(
+                            dropdownOpen === bookingItem.id
+                              ? null
+                              : bookingItem.id
+                          )
+                        }
+                        className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition"
+                      >
+                        Change Status
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {dropdownOpen === bookingItem.id && (
+                        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
+                          {Object.values(BookingStatus).map((status) => {
+                            const config = getStatusConfig(status);
+                            const Icon = config.icon;
+
+                            return (
+                              <button
+                                key={status}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openConfirmModal(bookingItem, status); // correct variable!
+                                  setDropdownOpen(null); // close dropdown
+                                }}
+                                className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-sm transition"
+                              >
+                                <Icon
+                                  className={`w-4 h-4 text-${config.color}-600`}
+                                />
+                                <span>{config.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  {/* Change Status Button + Dropdown */}
-                  <div className="relative ml-4">
-                    <button
-                      onClick={() =>
-                        setDropdownOpen(
-                          dropdownOpen === bookingItem.id
-                            ? null
-                            : bookingItem.id
-                        )
-                      }
-                      className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition"
-                    >
-                      Change Status
-                    </button>
-
-                    {/* Dropdown Menu */}
-                    {dropdownOpen === bookingItem.id && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
-                        {Object.values(BookingStatus).map((status) => {
-                          const config = getStatusConfig(status);
-                          const Icon = config.icon;
-
-                          return (
-                            <button
-                              key={status}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openConfirmModal(bookingItem, status); // correct variable!
-                                setDropdownOpen(null); // close dropdown
-                              }}
-                              className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-sm transition"
-                            >
-                              <Icon
-                                className={`w-4 h-4 text-${config.color}-600`}
-                              />
-                              <span>{config.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-16 bg-gray-50 rounded-xl">
+                <p className="text-xl text-gray-600">No bookings yet</p>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-16 bg-gray-50 rounded-xl">
-              <p className="text-xl text-gray-600">No bookings yet</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!bookingsLoading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={prevPage}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+
+            <span className="text-sm text-gray-600">
+              Page {page} of {totalPages}
+            </span>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === totalPages}
+              onClick={nextPage}
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Confirm Modal */}
@@ -208,11 +270,10 @@ export const BookingsView = ({
             <button
               onClick={confirmStatusChange}
               disabled={loading}
-              className={`px-6 py-2.5 rounded-lg text-white font-medium flex items-center gap-2 ${
-                modal.newStatus === BookingStatus.CANCELLED
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
+              className={`px-6 py-2.5 rounded-lg text-white font-medium flex items-center gap-2 ${modal.newStatus === BookingStatus.CANCELLED
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
               {loading ? "Updating..." : "Yes, Confirm"}
             </button>

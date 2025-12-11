@@ -1,7 +1,6 @@
 import AgencyProfile from "@/modules/user/components/agency/AgencyProfile";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function ProductDetails({ params }: any) {
+export default async function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   console.log(id, 'from id');
 

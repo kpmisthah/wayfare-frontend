@@ -118,28 +118,51 @@ export const useUpdateBookingStatus = (
   const closeModal = () => setModal({ isOpen: false });
   const closeErrorModal = () => setErrorModal({ isOpen: false });
 
-  return { openConfirmModal, modal, confirmStatusChange, closeModal, loading,closeErrorModal,errorModal };
+  return { openConfirmModal, modal, confirmStatusChange, closeModal, loading, closeErrorModal, errorModal };
 };
 
 export const useViewBookings = (pkgId: string) => {
   const [booking, setBooking] = useState<BookingData[]>([]);
-  try {
-    useEffect(() => {
-      const loadBookingDetails = async () => {
-        const data = await fetchBookingsByPackage(pkgId);
-        setBooking(data);
-      };
-      console.log(DataTransfer, "data");
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
+  const limit = 10;
+
+  useEffect(() => {
+    const loadBookingDetails = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchBookingsByPackage(pkgId, page, limit, search);
+        setBooking(data?.data || []);
+        setTotalPages(data?.totalPages || 1);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
       loadBookingDetails();
-    }, [pkgId]);
-    useEffect(() => {
-      console.log(booking, "booking inuseEffect");
-    }, []);
-  } catch (error) {
-    console.log(error);
-  }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [pkgId, page, search]);
+
+  const nextPage = () => page < totalPages && setPage((prev) => prev + 1);
+  const prevPage = () => page > 1 && setPage((prev) => prev - 1);
+
   return {
     booking,
     setBooking,
+    loading,
+    page,
+    setPage,
+    totalPages,
+    search,
+    setSearch,
+    nextPage,
+    prevPage,
   };
 };

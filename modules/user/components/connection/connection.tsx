@@ -196,12 +196,12 @@ const TravelerCard = ({
       <div
         className={`absolute top-8 right-8 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-2xl font-bold text-2xl rotate-12 z-30 border-4 border-white shadow-xl transition-opacity duration-200 ${dragOffset.x > 50 ? 'opacity-100' : 'opacity-0'}`}
       >
-        LIKE 
+        LIKE
       </div>
       <div
         className={`absolute top-8 left-8 bg-gradient-to-r from-red-400 to-rose-500 text-white px-6 py-3 rounded-2xl font-bold text-2xl -rotate-12 z-30 border-4 border-white shadow-xl transition-opacity duration-200 ${dragOffset.x < -50 ? 'opacity-100' : 'opacity-0'}`}
       >
-        NOPE 
+        NOPE
       </div>
 
       {/* Card Image */}
@@ -334,8 +334,9 @@ export default function TravelConnections() {
         showToast(`Connection request sent to ${currentTraveler.name}! 🎉`, 'success');
         animateCardOut("right");
       }
-    } catch (err: any) {
-      showToast(err.message || 'Failed to send connection request', 'error');
+    } catch (err) {
+      const error = err as Error;
+      showToast(error.message || 'Failed to send connection request', 'error');
       setDragOffset({ x: 0, y: 0 });
     } finally {
       setIsConnecting(false);

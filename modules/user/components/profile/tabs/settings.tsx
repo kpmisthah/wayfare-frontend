@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AxiosError } from "axios";
 import { changePassword } from "@/modules/user/services/userProfile.api";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -89,9 +90,10 @@ export const Settings = () => {
         setConfirmPassword("");
         setTimeout(() => setIsModalOpen(false), 2000);
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Old password is incorrect ";
-      console.log(msg,'in mesgg cahrchhcccee nlock')
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      const msg = err.response?.data?.message || "Old password is incorrect ";
+      console.log(msg, 'in mesgg cahrchhcccee nlock')
       setErrors(prev => ({ ...prev, currentPassword: msg }));
     } finally {
       setIsLoading(false);
@@ -186,9 +188,8 @@ export const Settings = () => {
                         value={oldPassword}
                         onChange={e => setOldPassword(e.target.value)}
                         placeholder="Enter current password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                          errors.currentPassword ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.currentPassword ? "border-red-500" : "border-gray-300"
+                          }`}
                       />
                       <button
                         type="button"
@@ -214,9 +215,8 @@ export const Settings = () => {
                         value={newPassword}
                         onChange={e => setNewPassword(e.target.value)}
                         placeholder="Enter new password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                          errors.newPassword ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.newPassword ? "border-red-500" : "border-gray-300"
+                          }`}
                       />
                       <button
                         type="button"
@@ -231,13 +231,12 @@ export const Settings = () => {
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-gray-600">Password strength:</span>
                           <span
-                            className={`font-medium ${
-                              strength.label === "Strong"
-                                ? "text-green-600"
-                                : strength.label === "Medium"
+                            className={`font-medium ${strength.label === "Strong"
+                              ? "text-green-600"
+                              : strength.label === "Medium"
                                 ? "text-yellow-600"
                                 : "text-red-600"
-                            }`}
+                              }`}
                           >
                             {strength.label}
                           </span>
@@ -266,9 +265,8 @@ export const Settings = () => {
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
                         placeholder="Confirm new password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                          errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                          }`}
                       />
                       <button
                         type="button"

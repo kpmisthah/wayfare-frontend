@@ -1,4 +1,3 @@
-"use client";
 import {
   Edit,
   Save,
@@ -13,13 +12,22 @@ import {
   Building,
   CreditCard,
   UserCheck,
+  ArrowRight,
+  Camera,
 } from "lucide-react";
 
 import { useAgencyProfile } from "../../hooks/use-agency-profile";
 import { useUserProfile } from "@/modules/user/hooks/use-userprofile";
 import { useAuthStore } from "@/store/Auth";
+import { LucideIcon } from "lucide-react";
+interface ReadOnlyFieldProps {
+  label: string;
+  icon: LucideIcon;
+  value: string | undefined;
+  note?: string;
+}
 
-const ReadOnlyField = ({ label, icon: Icon, value, note }: any) => (
+const ReadOnlyField = ({ label, icon: Icon, value, note }: ReadOnlyFieldProps) => (
   <div className="group">
     <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
       <Icon className="w-4 h-4 mr-2 text-blue-600" />
@@ -34,6 +42,17 @@ const ReadOnlyField = ({ label, icon: Icon, value, note }: any) => (
   </div>
 );
 
+interface EditableInputProps {
+  label: string;
+  icon: LucideIcon;
+  name: string;
+  value: string | undefined;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  required?: boolean;
+  placeholder?: string;
+  type?: string;
+}
+
 const EditableInput = ({
   label,
   icon: Icon,
@@ -43,7 +62,7 @@ const EditableInput = ({
   required,
   placeholder,
   type = "text",
-}: any) => (
+}: EditableInputProps) => (
   <div className="group">
     <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
       <Icon className="w-4 h-4 mr-2 text-blue-600" />
@@ -61,6 +80,17 @@ const EditableInput = ({
   </div>
 );
 
+interface EditableTextareaProps {
+  label: string;
+  icon: LucideIcon;
+  name: string;
+  value: string | undefined;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  required?: boolean;
+  placeholder?: string;
+  rows?: number;
+}
+
 const EditableTextarea = ({
   label,
   icon: Icon,
@@ -70,7 +100,7 @@ const EditableTextarea = ({
   required,
   placeholder,
   rows = 3,
-}: any) => (
+}: EditableTextareaProps) => (
   <div className="group">
     <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
       <Icon className="w-4 h-4 mr-2 text-purple-600" />
@@ -107,6 +137,8 @@ export default function AgencyProfile() {
     avatarInputRef,
     handleBannerUpload,
     handleAvatarUpload,
+    isUploadingAvatar,
+    isUploadingBanner,
   } = useUserProfile();
   const { user } = useAuthStore();
 
@@ -216,48 +248,84 @@ export default function AgencyProfile() {
         {/* Banner section*/}
         {/* Banner section */}
         <div
-          className="relative px-8 py-12 text-white flex items-center space-x-6 rounded-2xl overflow-hidden"
+          className="relative h-64 md:h-80 w-full overflow-hidden"
           style={{
-            backgroundImage: user?.bannerImage
-              ? `url(${user.bannerImage})`
-              : "linear-gradient(to right, #2563EB, #7C3AED)", 
+            backgroundImage: user?.bannerImage || profileData?.bannerImage
+              ? `url(${user?.bannerImage || profileData?.bannerImage})`
+              : "linear-gradient(to right, #2563EB, #7C3AED)",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <div className="relative w-24 h-24 bg-white/20 rounded-2xl flex items-center justify-center overflow-hidden">
-            {user?.profileImage ? (
-              <img
-                src={user.profileImage}
-                alt="Avatar"
-                className="w-full h-full object-cover rounded-2xl"
-              />
-            ) : (
-              <User className="w-12 h-12 text-white" />
-            )}
-            {/* Avatar Upload Button */}
-            <button
-              className="absolute bottom-0 right-0 bg-blue-600 text-white px-2 py-1 rounded"
-              onClick={() => avatarInputRef.current?.click()}
-            >
-              Change Avatar
-            </button>
-          </div>
+          {/* Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
-          <div>
-            <h2 className="text-3xl font-bold">
-              {profileData?.name || "Agency Name"}
-            </h2>
-            <p className="text-blue-100 mt-2">Travel Agency</p>
-          </div>
+          {/* Banner Upload Loader */}
+          {isUploadingBanner && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+            </div>
+          )}
 
-          {/* Banner Upload Button */}
+          {/* Banner Upload Button - Top Right */}
           <button
-            className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded"
+            className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border border-white/30 flex items-center space-x-2 group"
             onClick={() => fileInputRef.current?.click()}
+            disabled={isUploadingBanner}
           >
-            Change Banner
+            <Edit className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <span>{isUploadingBanner ? "Uploading..." : "Change Cover"}</span>
           </button>
+
+          {/* Profile Info Container - Bottom Left */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col md:flex-row items-end md:items-center space-y-4 md:space-y-0 md:space-x-6">
+
+            {/* Avatar Section */}
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white relative">
+                {user?.profileImage || profileData?.profileImage ? (
+                  <img
+                    src={user?.profileImage || profileData?.profileImage}
+                    alt="Agency Logo"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                    <User className="w-16 h-16" />
+                  </div>
+                )}
+
+                {/* Avatar Loader */}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                  </div>
+                )}
+
+                {/* Avatar Upload Hover Overlay */}
+                <div
+                  className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer z-10"
+                  onClick={() => !isUploadingAvatar && avatarInputRef.current?.click()}
+                >
+                  <div className="text-white flex flex-col items-center">
+                    <Camera className="w-6 h-6 mb-1" />
+                    <span className="text-xs font-medium">Edit</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Name and Tagline */}
+            <div className="mb-2 text-white drop-shadow-md">
+              <h2 className="text-3xl font-bold tracking-tight">
+                {profileData?.name || user?.name || "Agency Name"}
+              </h2>
+              <p className="text-blue-100 text-lg opacity-90 font-medium flex items-center mt-1">
+                <Building className="w-4 h-4 mr-2" />
+                Trusted Travel Partner
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Content */}
@@ -303,16 +371,32 @@ export default function AgencyProfile() {
               </>
             ) : (
               <>
-                <div>{profileData?.address}</div>
-                {profileData?.websiteUrl && (
-                  <a
-                    href={profileData.websiteUrl}
-                    target="_blank"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {profileData.websiteUrl}
-                  </a>
-                )}
+                <ReadOnlyField
+                  label="Address"
+                  icon={MapPin}
+                  value={profileData?.address}
+                />
+                <div className="group">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
+                    <Globe className="w-4 h-4 mr-2 text-blue-600" />
+                    Website
+                  </label>
+                  <div className="bg-gray-50 px-4 py-3 rounded-xl text-gray-800">
+                    {profileData?.websiteUrl ? (
+                      <a
+                        href={profileData.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline flex items-center"
+                      >
+                        {profileData.websiteUrl}
+                        <ArrowRight className="w-3 h-3 ml-1" />
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">Not provided</span>
+                    )}
+                  </div>
+                </div>
               </>
             )}
           </div>
@@ -355,9 +439,25 @@ export default function AgencyProfile() {
               </>
             ) : (
               <>
-                <div>{profileData?.ownerName}</div>
-                <div>{profileData?.licenseNumber}</div>
-                <p>{profileData?.description}</p>
+                <ReadOnlyField
+                  label="Owner Name"
+                  icon={UserCheck}
+                  value={profileData?.ownerName}
+                />
+                <ReadOnlyField
+                  label="License Number"
+                  icon={CreditCard}
+                  value={profileData?.licenseNumber}
+                />
+                <div className="group">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
+                    <FileText className="w-4 h-4 mr-2 text-purple-600" />
+                    Description
+                  </label>
+                  <div className="bg-gray-50 px-4 py-3 rounded-xl text-gray-800 leading-relaxed whitespace-pre-wrap min-h-[100px]">
+                    {profileData?.description}
+                  </div>
+                </div>
               </>
             )}
           </div>

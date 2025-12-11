@@ -15,6 +15,9 @@ import {
   Utensils,
   Bed,
   Activity,
+  Search,
+  X,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Header } from "@/shared/components/layout/Header";
 import { useGenerateTrip } from "../../hooks/use-ai-trip-plan";
@@ -61,29 +64,49 @@ const TravelPackages = () => {
   const [selectedPackage, setSelectedPackage] = useState<TravelPackage | null>(null);
   const [packages, setPackages] = useState<TravelPackage[]>([]);
   const [showDetails, setShowDetails] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+  const [durationFilter, setDurationFilter] = useState<string>("all");
+  const [vehicleFilter, setVehicleFilter] = useState<string>("all");
+
+  // Pagination state
+  const [loading, setLoading] = useState(false);
+  const [totalPackages, setTotalPackages] = useState(0);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const packagesPerPage = 9;
 
+  const fetchTravel = async () => {
+    setLoading(true);
+    try {
+      let result = await generateTravel({
+        destination: destination ?? "",
+        startDate: startDate ?? "",
+        endDate: endDate ?? "",
+        minBudget: minBudget ?? 0,
+        maxBudget: maxBudget ?? 0,
+        travelers: travelers ?? 0,
+        search: searchTerm,
+        vehicle: vehicleFilter === "all" ? undefined : vehicleFilter,
+        durationFilter: durationFilter === "all" ? undefined : durationFilter,
+        page: currentPage,
+        limit: packagesPerPage,
+      });
+      setPackages(result?.data || []);
+      setTotalPackages(result?.total || 0);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTravel = async () => {
-      try {
-        let result = await generateTravel({
-          destination: destination ?? "",
-          startDate: startDate ?? "",
-          endDate: endDate ?? "",
-          minBudget: minBudget ?? 0,
-          maxBudget: maxBudget ?? 0,
-          travelers: travelers ?? 0,
-        });
-        setPackages(result || []);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchTravel();
-  }, []);
+  }, [searchTerm, priceRange, durationFilter, vehicleFilter, currentPage]);
 
   const toggleFavorite = (packageId: string) => {
     const newFavorites = new Set(favorites);
@@ -95,14 +118,12 @@ const TravelPackages = () => {
     setFavorites(newFavorites);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDetailsClick = (pkg: any) => {
+  const handleDetailsClick = (pkg: TravelPackage) => {
     setSelectedPackage(pkg);
     setShowDetails(true);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getVehicleIcon = (vehicle: any) => {
+  const getVehicleIcon = (vehicle: string) => {
     switch (vehicle?.toLowerCase()) {
       case "train":
         return <Train className="w-5 h-5" />;
@@ -116,15 +137,21 @@ const TravelPackages = () => {
     }
   };
 
-  // Pagination calculations
-  const indexOfLastPackage = currentPage * packagesPerPage;
-  const indexOfFirstPackage = indexOfLastPackage - packagesPerPage;
-  const currentPackages = packages.slice(indexOfFirstPackage, indexOfLastPackage);
-  const totalPages = Math.ceil(packages.length / packagesPerPage);
+  // Pagination calculations (backend handles this now)
+  const currentPackages = packages;
+  const totalPages = Math.ceil(totalPackages / packagesPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setPriceRange([0, 100000]);
+    setDurationFilter("all");
+    setVehicleFilter("all");
+    setCurrentPage(1);
   };
 
   if (showDetails && selectedPackage) {
@@ -364,6 +391,137 @@ const TravelPackages = () => {
           </p>
         </div>
 
+        {/* Search and Filters */}
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search packages by name, destination, or agency..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter Toggle Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${showFilters
+                ? "bg-blue-500 text-white border-blue-500"
+                : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                }`}
+            >
+              <SlidersHorizontal className="h-5 w-5" />
+              Filters
+            </button>
+          </div>
+
+          {/* Filter Options */}
+          {showFilters && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Price Range - Backend filtering for price is already handled by start parameters, skipping additional UI filter for now as it duplicates logic */}
+                {/* <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Price Range
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={priceRange[0] || ""}
+                      onChange={(e) => {
+                        setPriceRange([Number(e.target.value) || 0, priceRange[1]]);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={priceRange[1] || ""}
+                      onChange={(e) => {
+                        setPriceRange([priceRange[0], Number(e.target.value) || 100000]);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div> */}
+
+                {/* Duration Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration
+                  </label>
+                  <select
+                    value={durationFilter}
+                    onChange={(e) => {
+                      setDurationFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Durations</option>
+                    <option value="short">Short (1-3 days)</option>
+                    <option value="medium">Medium (4-7 days)</option>
+                    <option value="long">Long (8+ days)</option>
+                  </select>
+                </div>
+
+                {/* Vehicle Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Transport
+                  </label>
+                  <select
+                    value={vehicleFilter}
+                    onChange={(e) => {
+                      setVehicleFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="bus">Bus</option>
+                    <option value="car">Car</option>
+                    <option value="train">Train</option>
+                    <option value="flight">Flight</option>
+                  </select>
+                </div>
+
+                {/* Clear Filters */}
+                <div className="flex items-end">
+                  <button
+                    onClick={clearFilters}
+                    className="w-full px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3 text-sm text-gray-600">
+                Showing {packages.length} of {totalPackages} packages
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Package Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {currentPackages.map((pkg) => (
@@ -480,7 +638,7 @@ const TravelPackages = () => {
         </div>
 
         {/* Pagination */}
-        {packages.length > packagesPerPage && (
+        {totalPages > 1 && (
           <div className="flex items-center justify-center space-x-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}

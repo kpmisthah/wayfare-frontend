@@ -12,6 +12,14 @@ interface BackendResponse {
     token: string;
 }
 
+interface ExtendedUser {
+    id?: string;
+    email?: string | null;
+    name?: string | null;
+    image?: string | null;
+    accessToken?: string;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         GoogleProvider({
@@ -28,8 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     googleId: account?.providerAccountId
                 })
                 if (response.status == 200) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (user as any).accessToken = response.data.token
+                    (user as ExtendedUser).accessToken = response.data.token
                     return true
                 } else {
                     console.error("Unexpected backend status:", response.status);

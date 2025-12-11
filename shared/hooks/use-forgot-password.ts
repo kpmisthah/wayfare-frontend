@@ -2,9 +2,9 @@ import { useState } from "react";
 import { forgotPassword } from "../services/auth.api";
 import { useRouter } from "next/navigation";
 
-export const useForgotPassword = (redirectUrl:string) => {
-  console.log(redirectUrl,'in userHooks');
-  
+export const useForgotPassword = (redirectUrl: string) => {
+  console.log(redirectUrl, 'in userHooks');
+
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
@@ -28,14 +28,15 @@ export const useForgotPassword = (redirectUrl:string) => {
 
     try {
       await forgotPassword(forgotEmail);
-      localStorage.setItem('resetEmail',forgotEmail)
+      localStorage.setItem('resetEmail', forgotEmail)
       router.push(`${redirectUrl}?email=${encodeURIComponent(forgotEmail)}`);
       setForgotPasswordSuccess(true);
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string }; message?: string }; message?: string };
       const message =
-        error?.response?.data.message ||
-        error?.response?.message ||
-        error?.message ||
+        err?.response?.data?.message ||
+        err?.response?.message ||
+        err?.message ||
         "The Email didnt Exist";
 
       setForgotPasswordError(message);

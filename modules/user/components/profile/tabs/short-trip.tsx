@@ -23,7 +23,7 @@ import {
   usefetchAiTripPlan,
   useAiTripPlan,
 } from "@/modules/user/hooks/use-ai-trip-plan";
-import { TravelItineraryProps } from "@/modules/user/types/Ai-trip-plan.type";
+import { TravelItineraryProps, DayPlan, Place } from "@/modules/user/types/Ai-trip-plan.type";
 
 const ShortTrip = () => {
   const [activeTab, setActiveTab] = useState("trips");
@@ -31,15 +31,14 @@ const ShortTrip = () => {
   const [selectedTrip, setSelectedTrip] = useState<TravelItineraryProps | null>(null);
   const { shortTrip } = usefetchAiTripPlan();
   const router = useRouter();
-  const getActivityIcon = (iconName: any) => {
-    const icons = {
+  const getActivityIcon = (iconName: string) => {
+    const icons: Record<string, React.ReactNode> = {
       hotel: <Hotel className="w-4 h-4" />,
       camera: <Camera className="w-4 h-4" />,
       utensils: <Utensils className="w-4 h-4" />,
       map: <Map className="w-4 h-4" />,
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (icons as any)[iconName] || <MapPin className="w-4 h-4" />;
+    return icons[iconName] || <MapPin className="w-4 h-4" />;
   };
 
   const ShortTripCard = ({ trip }: { trip: TravelItineraryProps }) => {
@@ -149,7 +148,7 @@ const ShortTrip = () => {
     );
   };
 
-  const ItineraryModal = ({ trip, onClose }: any) => {
+  const ItineraryModal = ({ trip, onClose }: { trip: TravelItineraryProps | null; onClose: () => void }) => {
     if (!trip) return null;
 
     return (
@@ -222,7 +221,7 @@ const ShortTrip = () => {
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
-              {trip.itinerary.map((day: any, index: any) => (
+              {trip.itinerary.map((day: DayPlan, index: number) => (
                 <div key={index} className="relative">
                   {/* Day Header */}
                   <div className="sticky top-0 bg-white pb-3 z-10">
@@ -241,7 +240,7 @@ const ShortTrip = () => {
                     {/* Timeline line */}
                     <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-200 to-pink-200"></div>
 
-                    {day.plan.map((activity: any, actIndex: any) => (
+                    {day.plan.map((activity: Place, actIndex: number) => (
                       <div key={actIndex} className="relative">
                         {/* Timeline dot */}
                         <div className="absolute -left-5 top-3 w-6 h-6 bg-white border-2 border-purple-600 rounded-full flex items-center justify-center">
@@ -252,7 +251,7 @@ const ShortTrip = () => {
                         <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
                           <div className="flex items-start gap-3">
                             <div className="bg-white p-2 rounded-lg text-purple-600">
-                              {getActivityIcon(activity.icon)}
+                              {getActivityIcon(activity.icon || 'map')}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">

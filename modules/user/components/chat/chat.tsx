@@ -1,198 +1,9 @@
-// import dayjs from "dayjs";
-// import { useSocket } from "../../hooks/use-socket";
-// import { Send, Phone, Video, MoreVertical, Smile, Users } from "lucide-react";
-// import { useCallStore } from "@/store/useCallStore";
-// import { Header } from "@/shared/components/layout/Header";
-
-// export default function Chat({
-//   chatId,
-//   currentUserId,
-//   selectedUser,
-// }: {
-//   chatId: string;
-//   currentUserId: string | undefined;
-//   selectedUser?: any;
-// }) {
-//   const { messages, text, setText, scrollRef, sendMessage } = useSocket(
-//     chatId,
-//     selectedUser,
-//     currentUserId,
-//   );
-//   const isGroup = selectedUser.type === "group";
-//   const { isCallActive } = useCallStore();
-
-//   const getInitials = (name: string) => {
-//     return name
-//       ?.split(" ")
-//       .map((n) => n[0])
-//       .join("")
-//       .toUpperCase()
-//       .slice(0, 2);
-//   };
-
-//   const handleStartCall = (type: "video" | "audio") => {
-//     const recipientId = selectedUser?.userId; // GET THE ACTUAL PARTNER'S USER ID
-//     console.log(recipientId, "reciepientIdd");
-//     if (!recipientId || !currentUserId) return;
-//     useCallStore
-//       .getState()
-//       .startCallUI(chatId, currentUserId, recipientId, type);
-//   };
-
-//   return (
-//     <div className="flex flex-col h-full">
-
-//       {/* Header */}
-//       <div className="bg-gray-50 p-4 border-b border-gray-200 flex items-center justify-between">
-//         <div className="flex items-center gap-3">
-//           {/* Avatar */}
-//           <div
-//             className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0
-//               ${
-//                 isGroup
-//                   ? "bg-gradient-to-br from-blue-400 to-blue-600"
-//                   : "bg-gradient-to-br from-green-400 to-green-600"
-//               }`}
-//           >
-//             {isGroup ? (
-//               <Users className="w-5 h-5" />
-//             ) : (
-//               getInitials(selectedUser?.name || "U")
-//             )}
-//           </div>
-
-//           {/* Name + Status */}
-//           <div>
-//             <h2 className="font-semibold text-gray-900">
-//               {selectedUser?.name || "Chat"}
-//             </h2>
-//             <p className="text-xs text-gray-500">
-//               {isGroup
-//                 ? `${selectedUser?.members?.length || 0} members`
-//                 : "Online"}
-//             </p>
-//           </div>
-//         </div>
-
-//         {/* Action Buttons */}
-//         <div className="flex items-center gap-2">
-//           {!isGroup && (
-//             <>
-//               <button
-//                 onClick={() => handleStartCall("video")}
-//                 disabled={isCallActive}
-//                 className="p-2 hover:bg-gray-200 rounded-full transition disabled:opacity-50"
-//                 title="Video Call"
-//               >
-//                 <Video className="w-5 h-5 text-gray-600" />
-//               </button>
-//               <button
-//                 onClick={() => handleStartCall("audio")}
-//                 disabled={isCallActive}
-//                 className="p-2 hover:bg-gray-200 rounded-full transition disabled:opacity-50"
-//                 title="Audio Call"
-//               >
-//                 <Phone className="w-5 h-5 text-gray-600" />
-//               </button>
-//             </>
-//           )}
-//           <button className="p-2 hover:bg-gray-200 rounded-full transition">
-//             <MoreVertical className="w-5 h-5 text-gray-600" />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Messages Area */}
-//       <div
-//         className="flex-1 overflow-y-auto p-4 space-y-4"
-//         style={{
-//           backgroundImage:
-//             'url(\'data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23d1d5db" fill-opacity="0.15"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')',
-//           backgroundColor: "#f0f2f5",
-//         }}
-//       >
-//         {messages.map((m) => {
-//           const mine = m.senderId === currentUserId;
-//           const showSenderName = isGroup && !mine;
-
-//           return (
-//             <div
-//               key={m.id}
-//               className={`flex ${mine ? "justify-end" : "justify-start"}`}
-//             >
-//               <div
-//                 className={`max-w-md px-4 py-2 rounded-lg relative
-//                   ${
-//                     mine
-//                       ? "bg-green-500 text-white rounded-br-none"
-//                       : "bg-white text-gray-900 rounded-bl-none shadow-sm"
-//                   }`}
-//               >
-//                 {/* Show sender name in group (not for own messages) */}
-//                 {showSenderName && (
-//                   <p className="text-xs font-semibold text-blue-600 mb-1 opacity-80">
-//                     ~ {m.senderId || "User"}
-//                   </p>
-//                 )}
-
-//                 <p className="text-sm break-words">{m.content}</p>
-
-//                 <div
-//                   className={`text-xs mt-1 ${
-//                     mine ? "text-green-100" : "text-gray-500"
-//                   } text-right`}
-//                 >
-//                   {dayjs(m.createdAt).format("HH:mm")}
-//                 </div>
-//               </div>
-//             </div>
-//           );
-//         })}
-//         <div ref={scrollRef} />
-//       </div>
-
-//       {/* Input Bar */}
-//       <div className="bg-gray-50 p-4 border-t border-gray-200">
-//         <div className="flex items-center gap-2">
-//           <button className="p-2 hover:bg-gray-200 rounded-full transition">
-//             <Smile className="w-6 h-6 text-gray-600" />
-//           </button>
-
-//           <input
-//             type="text"
-//             value={text}
-//             onChange={(e) => setText(e.target.value)}
-//             onKeyDown={(e) => {
-//               if (e.key === "Enter" && !e.shiftKey) {
-//                 e.preventDefault();
-//                 sendMessage();
-//               }
-//             }}
-//             placeholder={isGroup ? "Message group" : "Type a message"}
-//             className="flex-1 px-4 py-3 bg-white rounded-full text-sm focus:outline-none border border-gray-200 focus:border-green-500 transition"
-//             disabled={isCallActive}
-//           />
-
-//           <button
-//             onClick={sendMessage}
-//             disabled={!text.trim() || isCallActive}
-//             className="p-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-full transition"
-//           >
-//             <Send className="w-5 h-5 text-white" />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-//..................................
-//Responsive UI
 
 "use client";
 
 import dayjs from "dayjs";
-// NOTE: Assuming the path to your hook is correct based on your previous code structure
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 import { useSocket } from "../../hooks/use-socket";
 import {
   Send,
@@ -208,6 +19,7 @@ import {
 import { useCallStore } from "@/store/useCallStore";
 import { Header } from "@/shared/components/layout/Header";
 import { useEffect, useState } from "react";
+import { ChatConnection } from "./types";
 import { getSocket } from "@/lib/socket";
 
 export default function Chat({
@@ -218,14 +30,14 @@ export default function Chat({
 }: {
   chatId: string;
   currentUserId: string | undefined;
-  selectedUser?: any;
-  onBackClick?: () => void; 
+  selectedUser?: ChatConnection;
+  onBackClick?: () => void;
 }) {
   const { messages, text, scrollRef, sendMessage, typingUsers, handleTyping } =
     useSocket(chatId, selectedUser, currentUserId);
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
-  const isGroup = selectedUser.type === "group";
+  const isGroup = selectedUser?.type === "group";
   const { isCallActive } = useCallStore();
 
   const getInitials = (name: string) => {
@@ -362,58 +174,92 @@ export default function Chat({
 
       {/* Messages Area */}
       <div
-        className="flex-1 overflow-y-auto p-4 space-y-4"
+        className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#e5ddd5]"
         style={{
           backgroundImage:
-            'url(\'data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23d1d5db" fill-opacity="0.15"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')',
-          backgroundColor: "#f0f2f5",
+            'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '400px',
         }}
       >
-        {messages.map((m) => {
+        {messages.map((m, index) => {
           const mine = m.senderId === currentUserId;
           const showSenderName = isGroup && !mine;
 
+          // Date Separator Logic
+          const currentDate = dayjs(m.createdAt);
+          const prevDate = index > 0 ? dayjs(messages[index - 1].createdAt) : null;
+          const showDateSeparator = !prevDate || !currentDate.isSame(prevDate, 'day');
+
+          let dateLabel = currentDate.format("MMMM D, YYYY");
+          if (currentDate.isSame(dayjs(), 'day')) dateLabel = "Today";
+          else if (currentDate.isSame(dayjs().subtract(1, 'day'), 'day')) dateLabel = "Yesterday";
+
           return (
-            <div
-              key={m.id}
-              className={`flex ${mine ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                // Responsive width for message bubbles
-                className={`max-w-xs sm:max-w-sm md:max-w-md px-4 py-2 rounded-lg relative
-                  ${mine
-                    ? "bg-green-500 text-white rounded-br-none"
-                    : "bg-white text-gray-900 rounded-bl-none shadow-sm"
-                  }`}
-              >
-                {/* Show sender name in group (not for own messages) */}
-                {showSenderName && (
-                  <p className="text-xs font-semibold text-blue-600 mb-1 opacity-80">
-                    ~ {m.senderId || "User"}
-                  </p>
+            <div key={m.id} className="flex flex-col">
+              {showDateSeparator && (
+                <div className="flex justify-center my-4 sticky top-2 z-10">
+                  <span className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full shadow-sm">
+                    {dateLabel}
+                  </span>
+                </div>
+              )}
+
+              <div className={`flex ${mine ? "justify-end" : "justify-start"} mb-1 group`}>
+                {!mine && (
+                  <div className="flex-shrink-0 mr-2 self-end mb-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold
+                      ${isGroup ? "bg-blue-500" : "bg-green-500"}`}>
+                      {isGroup
+                        ? (m.senderId?.slice(0, 2).toUpperCase() || "U")
+                        : getInitials(selectedUser?.name || "U")}
+                    </div>
+                  </div>
                 )}
 
-                <p className="text-sm break-words">{m.content}</p>
-
                 <div
-                  className={`text-xs mt-1 flex items-center justify-end gap-1 ${mine ? "text-green-100" : "text-gray-500"
-                    } text-right`}
+                  className={`max-w-[75%] sm:max-w-[70%] md:max-w-[60%] px-4 py-2 rounded-2xl relative shadow-sm
+                    ${mine
+                      ? "bg-[#d9fdd3] text-gray-900 rounded-tr-none"
+                      : "bg-white text-gray-900 rounded-tl-none"
+                    }`}
                 >
-                  {dayjs(m.createdAt).format("HH:mm")}
-                  {mine && (
-                    <span>
-                      {m.status === "read" ? (
-                        <CheckCheck className="w-3 h-3 text-blue-200" />
-                      ) : (
-                        <Check className="w-3 h-3 text-green-200" />
-                      )}
-                    </span>
+                  {/* Sender Name in Group */}
+                  {showSenderName && (
+                    <p className="text-xs font-bold text-orange-600 mb-1">
+                      {m.senderId || "Unknown"}
+                    </p>
                   )}
+
+                  <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">{m.content}</p>
+
+                  <div className={`text-[10px] mt-1 flex items-center justify-end gap-1 text-gray-500 select-none`}>
+                    {dayjs(m.createdAt).format("h:mm A")}
+                    {mine && (
+                      <span>
+                        {m.status === "read" ? (
+                          <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5 text-gray-400" />
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
+
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 mt-10">
+            <div className="bg-white/80 p-4 rounded-xl shadow-sm text-center">
+              <p className="text-sm">No messages yet.</p>
+              <p className="text-xs mt-1">Send a message to start the conversation!</p>
+            </div>
+          </div>
+        )}
+
         <div ref={scrollRef} />
       </div>
 

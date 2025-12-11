@@ -30,17 +30,16 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
   >({});
   const [showAll, setShowAll] = useState(false);
 
-  const handleViewProfile = (traveler: any) => {
+  const handleViewProfile = (traveler: Traveler) => {
     setSelectedTraveler(traveler);
   };
 
-  const handleConnect = (travelerId: any) => {
+  const handleConnect = (travelerId: string) => {
     setConnectionStatuses((prev) => ({
       ...prev,
       [travelerId]: "pending",
     }));
 
-    // Simulate connection acceptance after 2 seconds
     setTimeout(() => {
       setConnectionStatuses((prev) => ({
         ...prev,
@@ -139,8 +138,7 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
           traveler={selectedTraveler}
           onClose={() => setSelectedTraveler(null)}
           onConnect={handleConnect}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          connectionStatus={getConnectionStatus(selectedTraveler.id) as any}
+          connectionStatus={getConnectionStatus(selectedTraveler.id) as "none" | "pending" | "connected"}
         />
       )}
     </div>

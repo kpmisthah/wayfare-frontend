@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export default async function RetryPaymentPage({ params }: {
-  params: { bookingId: string };
-})  {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: Promise<{ bookingId: string }>;
+}) {
+
   const { bookingId } = await params;
 
   const cookieStore = await cookies();

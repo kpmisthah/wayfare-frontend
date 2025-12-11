@@ -1,5 +1,6 @@
 import { useFetchPackages } from "../../hooks/use-fetch-packages";
 import { AddPackageFormProps } from "../../types/package.type";
+import { PackageStatus } from "../../types/package.enum";
 export const AddPackageForm: React.FC<AddPackageFormProps> = ({
   showForm,
   setShowForm,
@@ -16,42 +17,6 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
   handleInputChange,
   isPublishing
 }) => {
-  // const { packages, setPackages } = useFetchPackages();
-
-  // const saveData = async (updatedPackages) => {
-  //   try {
-  //     await window.storage.set(
-  //       "travel-packages",
-  //       JSON.stringify(updatedPackages)
-  //     );
-  //     setPackages(updatedPackages);
-  //   } catch (error) {
-  //     console.error("Error saving data:", error);
-  //   }
-  // };
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const packageData = {
-  //     // ...formData,
-  //     id: editingPackage?.id || Date.now(),
-  //     createdAt: editingPackage?.createdAt || new Date().toISOString(),
-  //     updatedAt: new Date().toISOString(),
-  //   };
-
-  //   let updatedPackages;
-  //   if (editingPackage) {
-  //     updatedPackages = packages.map((pkg) =>
-  //       pkg.id === editingPackage.id ? packageData : pkg
-  //     );
-  //   } else {
-  //     updatedPackages = [...packages, packageData];
-  //   }
-
-  //   saveData(updatedPackages);
-  //   setShowForm(false);
-  //   // setEditingPackage();
-  //   setFormData(initialFormData);
-  // };
   return (
     <>
       {showForm && (
@@ -221,8 +186,7 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
                 onClick={() => {
                   setPackageData({
                     ...packageData,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    highlights: [...(packageData.highlights as any), ""] as any,
+                    highlights: Array.isArray(packageData.highlights) ? [...packageData.highlights, ""] : [packageData.highlights, ""],
                   });
                 }}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -326,7 +290,7 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
                 {packageData.picture.map((url, index) => (
                   <div key={index} className="relative">
                     <img
-                      src={url}
+                      src={typeof url === 'string' ? url : URL.createObjectURL(url)}
                       alt={`Image ${index + 1}`}
                       className="w-full h-28 object-cover rounded-lg"
                     />
@@ -344,8 +308,7 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
 
             <div className="flex gap-4">
               <button
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onClick={handlePublish as any}
+                onClick={handlePublish}
                 type="submit"
                 className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium"
               >
@@ -363,10 +326,10 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
                     description: "",
                     destination: "",
                     duration: "",
-                    highlights: "" as any,
+                    highlights: [],
                     picture: [],
                     price: "",
-                    status: "ACTIVE" as any,
+                    status: PackageStatus.ACTIVE,
                     vehicle: "",
                     pickup_point: "",
                     drop_point: "",

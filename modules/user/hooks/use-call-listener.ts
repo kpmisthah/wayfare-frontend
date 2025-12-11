@@ -7,7 +7,7 @@ import { useCallStore } from "@/store/useCallStore";
 export const useCallListeners = (currentUserId: string | undefined) => {
   const socket = getSocket();
   const endCallUI = useCallStore.getState().endCallUI;
- 
+
 
   // We need a stable function to handle call end, as it's a global socket event
   const handleCallEnded = useCallback(() => {
@@ -21,7 +21,7 @@ export const useCallListeners = (currentUserId: string | undefined) => {
     if (!currentUserId) return; // Wait for user to be authenticated
     console.log('==========================handlkngnIncoming calll nte munnye=============');
 
-    const handleIncomingCall = (data: any) => {
+    const handleIncomingCall = (data: { from: string; conversationId: string; callType: 'video' | 'audio'; signalData: unknown }) => {
       console.log("Global: Incoming call event received:", data);
       // Safety check: Don't notify if the caller is me
       if (data.from === currentUserId) {

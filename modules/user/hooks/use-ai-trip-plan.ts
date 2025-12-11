@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { fetchShortTripDetails } from "@/modules/agency/services/booking.api";
 import { fetchTravellersData } from "../services/fetchTravellers.api";
 
-export const useAiTripPlan = (id: string,destination:string) => {
+export const useAiTripPlan = (id: string, destination: string) => {
   const [tripPlan, setTripPlan] = useState<TravelItineraryProps>({
     destination: "",
     duration: "",
@@ -21,7 +21,7 @@ export const useAiTripPlan = (id: string,destination:string) => {
   });
   useEffect(() => {
     const loadTrip = async () => {
-      const result = await fetchTrip(id,destination);
+      const result = await fetchTrip(id, destination);
       setTripPlan(result);
     };
     loadTrip();
@@ -32,23 +32,23 @@ export const useAiTripPlan = (id: string,destination:string) => {
   };
 };
 
-export const usefetchAiTripPlan = () =>{
-    const [shortTrip, setShortTrip] = useState<TravelItineraryProps[]>([]);
-    useEffect(() => {
+export const usefetchAiTripPlan = () => {
+  const [shortTrip, setShortTrip] = useState<TravelItineraryProps[]>([]);
+  useEffect(() => {
     const fetchShortTrip = async () => {
       try {
         const result = await fetchShortTripDetails();
-        console.log(result,'of fetchShrotTrippppp');
+        console.log(result, 'of fetchShrotTrippppp');
         setShortTrip(result);
         return result;
       } catch (error) {
         console.log(error);
       }
     };
-      fetchShortTrip();    
+    fetchShortTrip();
   }, []);
 
-  return{
+  return {
     shortTrip
   }
 }
@@ -66,7 +66,7 @@ export const useGenerateTrip = () => {
     endDate: string;
     minBudget: number;
     maxBudget: number;
-    visibleToOthers:boolean
+    visibleToOthers: boolean
   };
   const [formData, setFormData] = useState<FormData>({
     destination: "",
@@ -78,12 +78,12 @@ export const useGenerateTrip = () => {
     endDate: "",
     minBudget: 0,
     maxBudget: 0,
-    visibleToOthers:false
+    visibleToOthers: false
   });
   useEffect(() => {
     console.log(formData, "fromDate");
   }, []);
-  const handleInputChange = (field: string, value: string | number|boolean) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -99,8 +99,8 @@ export const useGenerateTrip = () => {
         duration: formData.duration,
         travelerType: formData.travelWith,
         budget: formData.budget,
-        startDate:formData.startDate,
-        visiblity:formData.visibleToOthers
+        startDate: formData.startDate,
+        visiblity: formData.visibleToOthers
       });
       console.log(result, "result after ai model geenrate itineraries");
       router.push(`/trip/${result.id}/${result.destination}`);
@@ -118,6 +118,11 @@ export const useGenerateTrip = () => {
     minBudget: string | number;
     maxBudget: string | number;
     travelers: string | number;
+    search?: string;
+    vehicle?: string;
+    durationFilter?: string;
+    page?: number;
+    limit?: number;
   }) => {
     try {
       setLoading(true);
@@ -128,13 +133,18 @@ export const useGenerateTrip = () => {
         travelers: data.travelers,
         minBudget: data.minBudget,
         maxBudget: data.maxBudget,
+        search: data.search,
+        vehicle: data.vehicle,
+        durationFilter: data.durationFilter,
+        page: data.page,
+        limit: data.limit,
       });
       return result;
     } catch (error) {
       console.log(error);
     }
   };
-  const handleTravelersChange = (increment: any) => {
+  const handleTravelersChange = (increment: boolean) => {
     const currentTravelers = formData.travelers || 1;
     const newValue = increment
       ? currentTravelers + 1
@@ -169,20 +179,20 @@ export const useGenerateTrip = () => {
   };
 };
 
-export const useFetchtravellers = (destination:string) =>{
-  const[travellersData,setTravellersData] = useState<Travellers[]>([])
-    useEffect(()=>{
-      const fetchTravellers = async()=>{
-        const result = await fetchTravellersData(destination)
-        console.log(result,'result from fethcingTravelllerres')
-        setTravellersData(result)
-      }
-      fetchTravellers()
-    },[])
-    useEffect(()=>{
-      console.log(travellersData,'travellrssssDataa');
-    },[travellersData])
-    return {
-      travellersData
+export const useFetchtravellers = (destination: string) => {
+  const [travellersData, setTravellersData] = useState<Travellers[]>([])
+  useEffect(() => {
+    const fetchTravellers = async () => {
+      const result = await fetchTravellersData(destination)
+      console.log(result, 'result from fethcingTravelllerres')
+      setTravellersData(result)
     }
+    fetchTravellers()
+  }, [])
+  useEffect(() => {
+    console.log(travellersData, 'travellrssssDataa');
+  }, [travellersData])
+  return {
+    travellersData
+  }
 }

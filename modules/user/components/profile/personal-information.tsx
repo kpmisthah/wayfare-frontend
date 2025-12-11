@@ -23,7 +23,7 @@ export const PersonalInformation = () => {
   console.log(user, "zustand user in personal-infromation in front end");
 
   return (
-    <Card className="lg:col-span-2 hover:shadow-lg transition-shadow duration-300">
+    <Card className="hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center text-xl">
           <User className="w-5 h-5 mr-2" />

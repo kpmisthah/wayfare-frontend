@@ -57,7 +57,7 @@ export const Notification = () => {
   useEffect(() => {
     fetchData();
     const socket = getSocket();
-    socket.on("newNotification", (notif: any) => {
+    socket.on("newNotification", (notif: { id: string; title: string; message: string; date: string; unread?: boolean }) => {
       useNotificationStore
         .getState()
         .addNotification({ ...notif, unread: true });
@@ -89,9 +89,10 @@ export const Notification = () => {
   const handleReject = async (connectionId: string) => {
     try {
       await api.patch(`/connections/${connectionId}/reject`);
-      removeConnectionRequest(connectionId); 
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to reject");
+      removeConnectionRequest(connectionId);
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || "Failed to reject");
     }
   };
 
@@ -108,7 +109,7 @@ export const Notification = () => {
       await Promise.all(
         unreadIds.map((id) => api.patch(`/notifications/${id}/read`))
       );
-      markAllAsRead(); 
+      markAllAsRead();
     } catch (err) {
       console.error("Failed to mark all as read", err);
     }
@@ -176,21 +177,19 @@ export const Notification = () => {
           <div className="flex gap-6 border-b">
             <button
               onClick={() => setFilter("all")}
-              className={`pb-3 px-1 font-medium border-b-2 transition ${
-                filter === "all"
+              className={`pb-3 px-1 font-medium border-b-2 transition ${filter === "all"
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500"
-              }`}
+                }`}
             >
               All
             </button>
             <button
               onClick={() => setFilter("unread")}
-              className={`pb-3 px-1 font-medium border-b-2 transition ${
-                filter === "unread"
+              className={`pb-3 px-1 font-medium border-b-2 transition ${filter === "unread"
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-500"
-              }`}
+                }`}
             >
               Unread
               {unreadCount > 0 && (
@@ -264,11 +263,10 @@ export const Notification = () => {
                 filtered.map((notif) => (
                   <div
                     key={notif.id}
-                    className={`bg-white rounded-xl border p-5 transition-all hover:shadow-md ${
-                      notif.unread
+                    className={`bg-white rounded-xl border p-5 transition-all hover:shadow-md ${notif.unread
                         ? "border-blue-300 bg-blue-50/40"
                         : "border-gray-200"
-                    }`}
+                      }`}
                   >
                     <div className="flex gap-4">
                       <div className="w-12 h-12 bg-indigo-100 rounded-full flex-shrink-0 flex items-center justify-center">

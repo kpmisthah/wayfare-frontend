@@ -14,7 +14,7 @@ export default function ConnectionsRequest() {
   const [requests, setRequests] = useState<Connection[]>([]);
   const router = useRouter()
   const fetchRequests = async () => {
-    const res = await api.get("/connections"); 
+    const res = await api.get("/connections");
     setRequests(res.data);
   };
 
@@ -25,12 +25,13 @@ export default function ConnectionsRequest() {
   const handleAction = async (id: string, action: "accept" | "reject") => {
     try {
       const res = await api.patch(`/connections/${id}/${action}`);
-      const {conversationId} = res.data
-      if(conversationId) router.push(`/chat/${conversationId}`)
+      const { conversationId } = res.data
+      if (conversationId) router.push(`/chat/${conversationId}`)
       alert(`Request ${action}ed ✅`);
-      fetchRequests(); 
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Something went wrong");
+      fetchRequests();
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || "Something went wrong");
     }
   };
 

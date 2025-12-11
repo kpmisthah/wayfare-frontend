@@ -1,7 +1,6 @@
 "use client";
 import { BookingStatus } from "@/modules/agency/types/booking.enum";
 import { useUserProfile } from "@/modules/user/hooks/use-userprofile";
-import { Trip } from "@/modules/user/types/profile.type";
 import Modal from "@/shared/components/common/Modal";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -19,6 +18,7 @@ import {
   Star,
   Users,
   X,
+  Search,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -33,19 +33,20 @@ export const Trips = () => {
     page,
     totalPages,
     loadMore,
+    isLoadingTrips,
+    tripSearch,
+    setTripSearch,
+    tripStatus,
+    setTripStatus,
+    totalTrips,
   } = useUserProfile();
-  const [tripFilter, setTripFilter] = useState("all");
-  // const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  // const [selectedTripForCancel, setSelectedTripForCancel] =
-  //   useState<Trip | null>(null);
 
-  const filteredTrips =
-    tripFilter === "all"
-      ? trips
-      : trips.filter((trip) => trip.bookingStatus === tripFilter);
-  console.log(filteredTrips, "filtered Tripss");
+  // Trips are now filtered on the backend, so we use them directly
+  const filteredTrips = trips;
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
+      case "pending":
+        return "bg-orange-100 text-orange-800 border-orange-300";
       case "upcoming":
         return "bg-blue-100 text-blue-800";
       case "confirmed":
@@ -129,48 +130,40 @@ export const Trips = () => {
           </Card>
         </div> */}
 
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={() => setTripFilter("all")}
-            variant={tripFilter === "all" ? "default" : "outline"}
-            size="sm"
-          >
-            <Filter className="w-4 h-4 mr-2" />
-            All ({trips.length})
-          </Button>
-          {/* <Button
-            onClick={() => setTripFilter("upcoming")}
-            variant={tripFilter === "upcoming" ? "default" : "outline"}
-            size="sm"
-          >
-            <Clock className="w-4 h-4 mr-2" />
-            Upcoming ({getTripStatusCount("upcoming")})
-          </Button> */}
-          {/* <Button
-            onClick={() => setTripFilter("confirmed")}
-            variant={tripFilter === "confirmed" ? "default" : "outline"}
-            size="sm"
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Confirmed ({getTripStatusCount("confirmed")})
-          </Button> */}
-          {/* <Button
-            onClick={() => setTripFilter("completed")}
-            variant={tripFilter === "completed" ? "default" : "outline"}
-            size="sm"
-          >
-            <Star className="w-4 h-4 mr-2" />
-            Completed ({getTripStatusCount("completed")})
-          </Button> */}
-          {/* <Button
-            onClick={() => setTripFilter("cancelled")}
-            variant={tripFilter === "cancelled" ? "default" : "outline"}
-            size="sm"
-          >
-            <X className="w-4 h-4 mr-2" />
-            Cancelled ({getTripStatusCount("cancelled")})
-          </Button> */}
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Search Input */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search by destination, agency, or booking code..."
+              value={tripSearch}
+              onChange={(e) => setTripSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            {tripSearch && (
+              <button
+                onClick={() => setTripSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => setTripStatus("all")}
+              variant={tripStatus === "all" ? "default" : "outline"}
+              size="sm"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              All ({totalTrips})
+            </Button>
+           
+          </div>
         </div>
 
         {/* Trips Grid */}
@@ -252,7 +245,25 @@ export const Trips = () => {
                     </Button>
                   )}
 
-                  {/* {trip.bookingStatus === BookingStatus.PENDING && ( */}
+                  {/* Pending Payment - Retry Option */}
+                  {trip.bookingStatus === BookingStatus.PENDING && (
+                    <div className="w-full space-y-2">
+                      <div className="flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                        <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                        <span className="text-xs text-orange-700">
+                          Payment pending. Complete payment to confirm your booking.
+                        </span>
+                      </div>
+                      <a
+                        href={`/booking/retry-payment/${trip.id}`}
+                        className="flex items-center justify-center gap-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Complete Payment
+                      </a>
+                    </div>
+                  )}
+
                   {trip.bookingStatus == BookingStatus.CONFIRMED && (
                     <>
                       <Button
@@ -261,7 +272,7 @@ export const Trips = () => {
                         className="flex-1"
                         onClick={() => handleCancelClick(trip)}
                       >
-                        <RefreshCw className="w-4 h-4 mr-1" />
+                        <X className="w-4 h-4 mr-1" />
                         Cancel
                       </Button>
                     </>
@@ -270,23 +281,19 @@ export const Trips = () => {
                   {trip.bookingStatus === BookingStatus.CANCELLED && (
                     <div className="w-full text-center">
                       <span className="text-sm text-red-600">
-                        {/* Cancelled on {new Date(trip.cancellationDeadline).toLocaleDateString()} */}
-                        cancelled
+                        Booking Cancelled
                       </span>
-                      <div className="text-sm text-gray-600">Refund:</div>
                     </div>
                   )}
                 </div>
 
-                {/* Cancellation Warning for upcoming trips */}
-                {(trip.bookingStatus === BookingStatus.PENDING ||
-                  trip.bookingStatus === BookingStatus.CONFIRMED) && (
-                  <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                    {/* <div className="flex items-center text-yellow-800">
-                      <AlertCircle className="w-3 h-3 mr-1" /> */}
-                    {/* Cancel by {new Date(trip.cancellationDeadline).toLocaleDateString()} for {trip.refundPercentage}% refund */}
-                    {/* cancel by new Date and this percentage */}
-                    {/* </div> */}
+                {/* Cancellation Warning for confirmed trips only */}
+                {trip.bookingStatus === BookingStatus.CONFIRMED && (
+                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                    <div className="flex items-center text-blue-700">
+                      <Shield className="w-3 h-3 mr-1" />
+                      <span>Cancel for a refund based on our cancellation policy</span>
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -310,11 +317,11 @@ export const Trips = () => {
               No trips found
             </h3>
             <p className="text-gray-500">
-              {tripFilter === "all"
+              {tripStatus === "all"
                 ? "You haven't booked any trips yet."
-                : `No ${tripFilter} trips found.`}
+                : `No ${tripStatus} trips found.`}
             </p>
-            {tripFilter === "all" && (
+            {tripStatus === "all" && (
               <Button className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
                 Plan New Trip

@@ -209,43 +209,48 @@ export const Signup = ({
               <ul className="text-xs text-gray-600 space-y-1">
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      signupData.password.length >= 6
+                    className={`w-2 h-2 rounded-full ${signupData.password.length >= 8
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
-                  At least 6 characters
+                  At least 8 characters
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[A-Z]/.test(signupData.password)
+                    className={`w-2 h-2 rounded-full ${/[A-Z]/.test(signupData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One uppercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[a-z]/.test(signupData.password)
+                    className={`w-2 h-2 rounded-full ${/[a-z]/.test(signupData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One lowercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /\d/.test(signupData.password)
+                    className={`w-2 h-2 rounded-full ${/\d/.test(signupData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One number
+                </li>
+                <li className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${/[@$!%*?&]/.test(signupData.password)
+                        ? "bg-green-500"
+                        : "bg-gray-300"
+                      }`}
+                  ></div>
+                  One special character (@$!%*?&)
                 </li>
               </ul>
             </div>
@@ -289,7 +294,7 @@ export const Signup = ({
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
                 </div>
               ) : (
                 "Create Account"

@@ -3,34 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 import api from "@/lib/api";
 import { getSocket } from "@/lib/socket";
+import { Socket } from "socket.io-client";
 
-type Message = {
-  id: string;
-  content: string;
-  conversationId: string | null;
-  groupId: string | null;
-  senderId: string;
-  createdAt: string;
-  status?: 'sent' | 'delivered' | 'read';
-};
+import { ChatMessage, ChatConnection } from "../components/chat/types";
 
 export const useSocket = (
   chatId: string,
-  selectedUser: any,
+  selectedUser: ChatConnection | null | undefined,
   currentUserId?: string
 ) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const formatTime = (date: any) => {
+  const formatTime = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   };
-  const socketRef = useRef<any>(null); // ✅ store socket globally for this hook
+  const socketRef = useRef<Socket | null>(null); // ✅ store socket globally for this hook
   const joinedRoomsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     const socket = getSocket();
@@ -71,7 +64,7 @@ export const useSocket = (
 
     fetchMessages();
 
-    const onNewMessage = (msg: Message) => {
+    const onNewMessage = (msg: ChatMessage) => {
       // Accept message if it belongs to this chat (either conversationId or groupId matches)
       if (msg.conversationId === chatId || msg.groupId === chatId) {
         setMessages((prev) =>
@@ -128,7 +121,7 @@ export const useSocket = (
 
     if (!socketRef.current?.connected) return;
 
-    const payload: any = { isTyping: value.length > 0 };
+    const payload: { isTyping: boolean; groupId?: string; conversationId?: string } = { isTyping: value.length > 0 };
     if (selectedUser?.type === "group") {
       payload.groupId = chatId;
     } else {
@@ -140,7 +133,7 @@ export const useSocket = (
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     if (value.length > 0) {
       typingTimeoutRef.current = setTimeout(() => {
-        socketRef.current.emit("typing", { ...payload, isTyping: false });
+        socketRef.current?.emit("typing", { ...payload, isTyping: false });
       }, 2000);
     }
   };
@@ -152,7 +145,7 @@ export const useSocket = (
   const sendMessage = () => {
     if (!text.trim() || !socketRef.current?.connected) return;
 
-    const payload: any = { content: text };
+    const payload: { content: string; groupId?: string; conversationId?: string } = { content: text };
 
     // Determine if this is a group or direct message
     if (selectedUser?.type === "group") {
@@ -163,7 +156,7 @@ export const useSocket = (
 
     // Optimistically add message? No, wait for server ack usually, but for speed we can.
     // However, existing logic waits for 'receiveMessage' from server (via broadcast or direct emit).
-    socketRef.current.emit("sendMessage", payload);
+    socketRef.current?.emit("sendMessage", payload);
     setText("");
   };
 

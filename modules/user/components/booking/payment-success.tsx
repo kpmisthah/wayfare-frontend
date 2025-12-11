@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   CheckCircle,
   Calendar,
@@ -22,42 +22,96 @@ import { PAYMENTSTATUS } from "../../types/payment.type";
 import PaymentFailurePage from "./payment-cancel";
 
 interface PaymentSuccessProps {
-  booking:{
-  id: string,
-  startDate: string,
-  duration: number,
-  title: string,
-  destination:string,
-  travelers: number,
-  totalAmount: number,
-  email: string,
-  bookingCode:string
+  booking: {
+    id: string,
+    startDate: string,
+    duration: number,
+    title: string,
+    destination: string,
+    travelers: number,
+    totalAmount: number,
+    email: string,
+    bookingCode: string
   };
-  paymentMethod:string
+  paymentMethod: string
 }
 
-const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({booking,paymentMethod}) => {
+const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMethod }) => {
   const handleDownloadTicket = () => console.log("Downloading ticket...");
   const handleShareBooking = () => console.log("Sharing booking...");
-  const[status,setStatus] = useState('')
-      const pollPayment = async(interval=1000,maxAttempts=15,attempts=0)=>{
-        const data = await verifyPayment(booking.id)
-        console.log(data,'dataaaaaaaaaaa')
-        if(data.status == PAYMENTSTATUS.SUCCEEDED){
-          setStatus('success')
-        }else if(data.status == PAYMENTSTATUS.PENDING){
-          setStatus('pending')
-        }else if(data.status == PAYMENTSTATUS.FAILED){
-          setStatus('failed')
+  const [status, setStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+  const isPollingRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Prevent multiple polling loops
+    if (isPollingRef.current) return;
+    isPollingRef.current = true;
+
+    const pollPayment = async (interval = 1500, maxAttempts = 10, attempts = 0) => {
+      try {
+        console.log('Polling payment status, attempt:', attempts + 1);
+        const data = await verifyPayment(booking.id);
+        console.log('Payment verification response:', data, 'attempt:', attempts + 1);
+
+        // Handle null/undefined response
+        if (!data || !data.status) {
+          console.log('No data or status in response, retrying...');
+          if (attempts < maxAttempts) {
+            timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
+          } else {
+            setStatus('success');
+          }
+          return;
         }
-        else if(attempts<maxAttempts){
-          setTimeout(()=>pollPayment(interval,maxAttempts,attempts+1),interval)
-        }else{
-          setStatus('pending')
+
+        if (data.status === PAYMENTSTATUS.SUCCEEDED) {
+          console.log('Payment SUCCEEDED!');
+
+          return;
+        } else if (data.status === PAYMENTSTATUS.FAILED) {
+          console.log('Payment FAILED!');
+          setStatus('failed');
+
+          return;
+        } else if (data.status === PAYMENTSTATUS.PENDING) {
+          console.log('Payment still PENDING, attempt:', attempts + 1);
+          if (attempts < maxAttempts) {
+            timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
+          } else {
+            console.log('Max attempts reached, showing success as fallback');
+            setStatus('success');
+          }
+        } else {
+          console.log('Unknown status:', data.status);
+          if (attempts < maxAttempts) {
+            timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
+          } else {
+            setStatus('success');
+          }
+        }
+      } catch (error) {
+        console.error('Payment verification error:', error);
+        if (attempts < maxAttempts) {
+          timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
+        } else {
+          setStatus('success');
         }
       }
-      pollPayment()
-    if (status === "pending") {
+    };
+
+    // Start polling
+    pollPayment();
+
+    // Cleanup on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [booking.id]);
+
+  if (status === "pending") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -68,7 +122,12 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({booking,paymentMetho
       </div>
     );
   }
-  if(status == 'success'){
+
+  if (status === 'failed') {
+    return <PaymentFailurePage bookingId={booking.id} />;
+  }
+
+  // status === 'success'
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -324,8 +383,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({booking,paymentMetho
       </div>
     </div>
   );
-}
-<PaymentFailurePage bookingId={booking.id}/>
 };
 
 export default PaymentSuccessPage;

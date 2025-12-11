@@ -2,9 +2,9 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Heart, MapPin, Sparkles, User } from "lucide-react";
 import { useUserProfile } from "../../hooks/use-userprofile";
+
 export const ProfileCompletionCard = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { userProfile } = useUserProfile() as any;
+  const { userProfile } = useUserProfile();
 
   return (
     <Card className="border-2 border-dashed border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 mb-6">
@@ -38,15 +38,6 @@ export const ProfileCompletionCard = () => {
                 >
                   <User className="w-3 h-3 mr-1" />
                   Add Bio
-                </Badge>
-              )}
-              {(userProfile?.preference?.length ?? 0) === 0 && (
-                <Badge
-                  variant="outline"
-                  className="text-blue-600 border-blue-300"
-                >
-                  <Heart className="w-3 h-3 mr-1" />
-                  Add Preferences
                 </Badge>
               )}
             </div>

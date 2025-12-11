@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { Check, Heart, Plane, Plus, Star, TrendingUp, UserPlus } from "lucide-react";
 import { useAuthStore } from "@/store/Auth";
 import { Button } from "@/shared/components/ui/button";
+import { PreferenceTag } from "@/modules/admin/types/user.type";
 
 export const TravelPreferences = () => {
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
+  const preferences: PreferenceTag[] = user?.preference || [];
   return (
     <>
       <div className="space-y-6">
@@ -15,7 +17,7 @@ export const TravelPreferences = () => {
               <CardTitle className="text-lg">
                 Travel Preferences
               </CardTitle>
-              {((user as any)?.preference?.length ?? 0) === 0 &&
+              {preferences.length === 0 &&
                 <p className="mb-2 italic">
                   No Preferences
                 </p>
@@ -24,11 +26,11 @@ export const TravelPreferences = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {((user as any)?.preference?.length ?? 0) != 0 &&
+            {preferences.length !== 0 &&
               (
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
-                    {(user as any)?.preference.map((preference: any) => {
+                    {preferences.map((preference: PreferenceTag) => {
                       return (
                         <span key={preference.id} className="text-sm px-3 py-1">
                           {preference.name}

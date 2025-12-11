@@ -10,6 +10,7 @@ import {
 
 import {
   bookingCancel,
+  changePassword,
   getUserBooking,
   getUserProfile,
   updateProfile,
@@ -17,6 +18,8 @@ import {
   uploadUserProfileImage,
 } from "../services/userProfile.api";
 import { useAuthStore } from "@/store/Auth";
+import { toast } from "sonner";
+import { getPasswordError } from "@/shared/utils/password-validation";
 import { BookingStatus } from "@/modules/agency/types/booking.enum";
 
 export const useUserProfile = () => {
@@ -39,24 +42,62 @@ export const useUserProfile = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const limit = 1
-  const [refreshWallet, setRefereshWallet] = useState(false)
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTrips, setTotalTrips] = useState(0);
+  const limit = 10;
+  const [refreshWallet, setRefereshWallet] = useState(false);
+  const [isLoadingTrips, setIsLoadingTrips] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Trip search and filter states
+  const [tripSearch, setTripSearch] = useState('');
+  const [tripStatus, setTripStatus] = useState('all');
+
   const { setUpdateUser, user, setAuthUser } = useAuthStore();
 
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      try {
-        const response = await getUserBooking(page, limit);
-        console.log(response, "response in loadUserProfile");
-        setTrips((prev) => [...prev, ...response.data]);
-        setTotalPages(response.totalPages)
-      } catch (error) {
-        console.log(error);
+  // Load trips with search and filter
+  const loadUserTrips = async (resetPage = false) => {
+    setIsLoadingTrips(true);
+    try {
+      const currentPage = resetPage ? 1 : page;
+      if (resetPage) setPage(1);
+
+      const response = await getUserBooking(currentPage, limit, tripSearch, tripStatus);
+      if (response) {
+        // Replace trips when searching/filtering, append when loading more
+        if (resetPage || currentPage === 1) {
+          setTrips(response.data || []);
+        } else {
+          // Deduplicate trips by ID
+          setTrips((prev) => {
+            const existingIds = new Set(prev.map((t) => t.id));
+            const newTrips = response.data.filter((t: Trip) => !existingIds.has(t.id));
+            return [...prev, ...newTrips];
+          });
+        }
+        setTotalPages(response.totalPages);
+        setTotalTrips(response.total || 0);
       }
-    };
-    loadUserProfile();
+    } catch (error) {
+      console.error('Failed to load trips:', error);
+      toast.error('Failed to load trips');
+    } finally {
+      setIsLoadingTrips(false);
+    }
+  };
+
+  // Initial load and when filters change
+  useEffect(() => {
+    loadUserTrips(true);
+  }, [tripSearch, tripStatus]);
+
+  // Load more when page changes (but not on initial)
+  useEffect(() => {
+    if (page > 1) {
+      loadUserTrips(false);
+    }
   }, [page]);
 
 
@@ -100,52 +141,74 @@ export const useUserProfile = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
+      setIsLoadingProfile(true);
       try {
         const data = await getUserProfile();
-        console.log(data, "fetch details from backend");
         setAuthUser(data);
       } catch (error) {
-        console.log(error);
+        console.error('Failed to load profile:', error);
+      } finally {
+        setIsLoadingProfile(false);
       }
     };
     loadProfile();
-  }, []);
+  }, [setAuthUser]);
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
+    // Validate passwords match
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error('Passwords do not match');
       return;
     }
-    if (passwordForm.newPassword.length < 8) {
-      alert("Password must be at least 8 characters long");
+
+    // Validate password strength using centralized utility
+    const passwordError = getPasswordError(passwordForm.newPassword);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
-    console.log("Password change requested");
-    setShowPasswordChange(false);
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    alert("Password changed successfully!");
+
+    // Call API to change password
+    setIsChangingPassword(true);
+    try {
+      await changePassword({
+        oldPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      setShowPasswordChange(false);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      // Toast is shown by the API function
+    } catch (error) {
+      console.error('Password change failed:', error);
+      toast.error('Failed to change password. Please check your current password.');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
+
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const { bannerUrl } = await uploadUserProfileImage(file, "banner");
-      console.log(bannerUrl);
+      setIsUploadingBanner(true);
+      const { imageUrl } = await uploadUserProfileImage(file, "banner");
+      console.log(imageUrl);
 
-      const updateBanner = await updateProfileImage(bannerUrl);
-      // console.log(updateProfile,'upodate porfile from front endzl');
-
-      setUpdateUser({ bannerImage: bannerUrl });
+      setUpdateUser({ bannerImage: imageUrl });
       console.log(user, "from store");
 
       setIsEditingBanner(false);
     } catch (error) {
       console.error("Error uploading banner:", error);
+    } finally {
+      setIsUploadingBanner(false);
     }
   };
 
@@ -154,13 +217,14 @@ export const useUserProfile = () => {
     if (!file) return;
 
     try {
+      setIsUploadingAvatar(true);
       const { imageUrl } = await uploadUserProfileImage(file, "profile");
       console.log("Upload Image From URL", imageUrl);
-      let updateProfile = await updateProfileImage(imageUrl);
-      console.log(updateProfile, "inn hooks/use-userProfile");
       setUpdateUser({ profileImage: imageUrl });
     } catch (error) {
       console.error("Error uploading avatar:", error);
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -171,11 +235,15 @@ export const useUserProfile = () => {
   };
   const handleSaveProfile = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setIsEditingProfile(false);
     if (!user) return;
-    const { name, email, phone, location } = user;
-    const update = await updateProfile({ name, email, phone, location });
-    setUpdateUser(update);
+    try {
+      const { name, email, phone, location } = user;
+      const update = await updateProfile({ name, email, phone, location });
+      setUpdateUser(update);
+      setIsEditingProfile(false);
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+    }
   };
 
   const getStatusVariant = (status: string) => {
@@ -197,11 +265,11 @@ export const useUserProfile = () => {
     }
   };
 
-  const cancelBooking = (id: string) => {
+  const cancelBooking = async (id: string) => {
     console.log(id, "from use-user-profile booking id");
 
     try {
-      bookingCancel(id);
+      await bookingCancel(id);
       setTrips((prev) =>
         prev.map((trip) =>
           trip.id == id ? { ...trip, bookingStatus: BookingStatus.CANCELLED } : trip
@@ -214,7 +282,7 @@ export const useUserProfile = () => {
       console.log(error);
     }
   };
-  
+
   const handleCancelClick = (trip: Trip) => {
     setSelectedTripForCancel(trip);
     setCancelDialogOpen(true);
@@ -266,5 +334,16 @@ export const useUserProfile = () => {
     totalPages,
     refreshWallet,
     userProfile: user,
+    isUploadingAvatar,
+    isUploadingBanner,
+    isLoadingTrips,
+    isLoadingProfile,
+    isChangingPassword,
+    // Trip search/filter
+    tripSearch,
+    setTripSearch,
+    tripStatus,
+    setTripStatus,
+    totalTrips,
   };
 };

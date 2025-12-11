@@ -26,7 +26,7 @@ export const useAddPackage = (
     details: "",
     drop_point: "",
     duration: "",
-    highlights: "",
+    highlights: [],
     itinerary: [],
     pickup_point: "",
     picture: [],
@@ -73,7 +73,7 @@ export const useAddPackage = (
     description: "",
     destination: "",
     duration: "",
-    highlights: "",
+    highlights: [],
     picture: [],
     price: "",
     status: PackageStatus.ACTIVE,
@@ -209,7 +209,7 @@ export const useAddPackage = (
       setPackageData((prev) => ({ ...prev, itinerary: newItinerary }));
     }
   }, [packageData?.duration]);
-  const handlePublish = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePublish = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     try {
       console.log(packageData, "packagedata before adding");
@@ -266,33 +266,36 @@ export const useAddPackage = (
   //   }
   // };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addArrayField = (field: any) => {
-    setPackageData({
-      ...packageData,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [field]: [...(packageData as any)[field], ""],
-    });
+  const addArrayField = (field: keyof PackageData) => {
+    const currentValue = packageData[field];
+    if (Array.isArray(currentValue)) {
+      setPackageData({
+        ...packageData,
+        [field]: [...currentValue, ""],
+      });
+    }
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateArrayField = (field: any, index: any, value: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newArray = [...(formData as any)[field]];
-    newArray[index] = value;
-    setFormData({
-      ...formData,
-      [field]: newArray,
-    });
+  const updateArrayField = (field: keyof InitialFormData, index: number, value: string) => {
+    const currentValue = formData[field];
+    if (Array.isArray(currentValue)) {
+      const newArray = [...currentValue];
+      newArray[index] = value;
+      setFormData({
+        ...formData,
+        [field]: newArray,
+      });
+    }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const removeArrayField = (field: any, index: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newArray = (formData as any)[field].filter((_: any, i: any) => i !== index);
-    setFormData({
-      ...formData,
-      [field]: newArray,
-    });
+  const removeArrayField = (field: keyof InitialFormData, index: number) => {
+    const currentValue = formData[field];
+    if (Array.isArray(currentValue)) {
+      const newArray = currentValue.filter((_, i) => i !== index);
+      setFormData({
+        ...formData,
+        [field]: newArray,
+      });
+    }
   };
 
 

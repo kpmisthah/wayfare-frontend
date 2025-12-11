@@ -223,7 +223,7 @@ export const useCall = (
       peerRef.current = peer;
 
       // Listen for acceptance (This listener is tied to this specific Peer instance)
-      const handleCallAccepted = (data: { signal: any }) => {
+      const handleCallAccepted = (data: { signal: Peer.SignalData }) => {
         console.log("Call accepted, connecting peer...");
         // CallAccepted is already true from the initial setCallAccepted(true) above
         // setCallAccepted(true); // Don't need to set again
@@ -234,11 +234,12 @@ export const useCall = (
 
       // We must listen on the global socket for the response
       socket.on("callAccepted", handleCallAccepted);
-    } catch (err: any) {
-      console.error("Media error:", err);
+    } catch (err) {
+      const error = err as Error;
+      console.error("Media error:", error);
       // Reset call state if media access fails
       setCallAccepted(false);
-      alert("Camera/Mic blocked: " + err.message);
+      alert("Camera/Mic blocked: " + error.message);
     }
   }
   // Accept Call
@@ -265,15 +266,16 @@ export const useCall = (
           video: hasVideo,
           audio: true,
         });
-      } catch (videoError: any) {
-        console.warn("Failed to get video/audio stream", videoError);
+      } catch (videoError) {
+        const vErr = videoError as DOMException;
+        console.warn("Failed to get video/audio stream", vErr);
 
         // Handle specific errors
-        if (videoError.name === 'NotReadableError') {
+        if (vErr.name === 'NotReadableError') {
           alert("Camera/Mic is already in use by another application (or this one). Please close other apps and try again.");
-        } else if (videoError.name === 'NotAllowedError') {
+        } else if (vErr.name === 'NotAllowedError') {
           alert("Camera/Mic permission denied. Please allow access in browser settings.");
-        } else if (videoError.name === 'NotFoundError') {
+        } else if (vErr.name === 'NotFoundError') {
           alert("No camera/mic found on this device.");
         }
 
@@ -284,9 +286,10 @@ export const useCall = (
               video: false,
               audio: true
             });
-            alert(`Video access failed (${videoError.name}). Switching to audio-only call.`);
-          } catch (audioError: any) {
-            console.error("Audio fallback also failed", audioError);
+            alert(`Video access failed (${vErr.name}). Switching to audio-only call.`);
+          } catch (audioError) {
+            const aErr = audioError as Error;
+            console.error("Audio fallback also failed", aErr);
             throw videoError; // Throw original error if fallback fails
           }
         } else {
@@ -322,15 +325,16 @@ export const useCall = (
         }
       });
 
-      peer.signal(currentSignalData);
+      peer.signal(currentSignalData as Peer.SignalData);
 
       peerRef.current = peer;
       useCallStore.getState().acceptCallUI(storeConvoId, callerId, callType);
-    } catch (err: any) {
-      console.error("Camera/Mic Error:", err);
+    } catch (err) {
+      const error = err as Error;
+      console.error("Camera/Mic Error:", error);
       // Reset call state if media access fails
       setCallAccepted(false);
-      alert(`Please allow camera & mic: ${err.message}`);
+      alert(`Please allow camera & mic: ${error.message}`);
     }
   };
 

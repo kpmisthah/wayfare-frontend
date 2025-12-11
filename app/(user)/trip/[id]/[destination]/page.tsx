@@ -1,7 +1,6 @@
 import { TravelItinerary } from "@/modules/user/components/plan-trip/TravelItinerary"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function TripDetailsComponent({ params }: {params:{id:string,destination:string}}) {
+export default async function TripDetailsComponent({ params }: { params: Promise<{ id: string, destination: string }> }) {
     const { id, destination } = await params;
     return (
         <>

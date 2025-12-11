@@ -25,8 +25,10 @@ import {
   Globe,
   MessageCircle,
   Share2,
+  Search,
+  X,
 } from "lucide-react";
-import {useAgencyById, usePackages } from "../../hooks/use-agency";
+import { useAgencyById, usePackages } from "../../hooks/use-agency";
 import { fetchAgencyPackages } from "../../services/agency-packages.api";
 import { fetchAgencyById } from "@/modules/agency/services/agency.api";
 
@@ -65,8 +67,11 @@ const mockReviews = [
 
 const AgencyProfile = ({ id }: { id: string }) => {
   const [activeTab, setActiveTab] = useState("about");
-  const{agency,setAgency} = useAgencyById(id)
-  const { packages, setPackages,page,totalPages,loadMore} = usePackages(id);
+  const { agency, setAgency } = useAgencyById(id)
+  const { packages, /* setPackages, */ page, totalPages, loadMore, search, setSearch } = usePackages(id);
+
+  // Packages are filtered on the backend now
+  const filteredPackages = packages;
   useEffect(() => {
     async function fetchAgency() {
       let agency = await fetchAgencyById(id);
@@ -75,14 +80,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
     fetchAgency();
   }, []);
 
-  // useEffect(()=>{
-  //   async function fetchPackages(){
-  //     let packages = await fetchAgencyPackages(id)
-  //     setPackages(packages)
-  //   }
-  //   fetchPackages()
-  // },[])
-    if (!agency) return <p className="p-6">Agency not found</p>;
+  if (!agency) return <p className="p-6">Agency not found</p>;
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -90,7 +88,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
       {/* Cover Image */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img
-          src={agency?.user.profileImage}
+          src={agency?.user.image}
           alt="Cover Image"
           className="w-full h-full object-cover"
         />
@@ -101,7 +99,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
           <div className="container mx-auto">
             <div className="flex items-end gap-6">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={agency?.user.profileImage} alt={agency?.user.name} />
+                <AvatarImage src={agency?.user.image} alt={agency?.user.name} />
                 <AvatarFallback className="text-2xl">AS</AvatarFallback>
               </Avatar>
 
@@ -272,7 +270,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
           </TabsContent>
 
           {/* Packages Tab */}
-        
+
           <TabsContent value="packages">
             <div className="mb-6">
               <h3 className="text-2xl font-semibold mb-2">Active Packages</h3>
@@ -281,32 +279,52 @@ const AgencyProfile = ({ id }: { id: string }) => {
               </p>
             </div>
 
-            {packages.length > 0 ? (
+            {/* Search Input */}
+            <div className="relative max-w-md mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search packages by name or destination..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {filteredPackages.length > 0 ? (
               <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {packages.map((pkg) => (
-                  <PackageCard
-                    key={pkg.id}
-                    id={pkg.id}
-                    title={pkg.title}
-                    image={pkg.picture?.[0]||''}
-                    duration={pkg.duration}
-                    destination={pkg.destination}
-                    price={pkg.price}
-                    highlights={pkg.highlights}
-                  />
-                ))}
-              </div>
-              {page < totalPages && (
-                <div className="text-center mt-6">
-                  <button
-                  onClick={loadMore}
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    Load More
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredPackages.map((pkg) => (
+                    <PackageCard
+                      key={pkg.id}
+                      id={pkg.id}
+                      title={pkg.title}
+                      image={pkg.picture?.[0] || ''}
+                      duration={pkg.duration}
+                      destination={pkg.destination}
+                      price={pkg.price}
+                      highlights={pkg.highlights}
+                    />
+                  ))}
+                </div>
+                {page < totalPages && (
+                  <div className="text-center mt-6">
+                    <button
+                      onClick={loadMore}
+                      className="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                      Load More
                     </button>
-                    </div>
-                  )}              
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-center py-12 border rounded-lg bg-muted/30">
@@ -359,11 +377,10 @@ const AgencyProfile = ({ id }: { id: string }) => {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${
-                                i < review.rating
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-muted-foreground"
-                              }`}
+                              className={`h-4 w-4 ${i < review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                                }`}
                             />
                           ))}
                         </div>

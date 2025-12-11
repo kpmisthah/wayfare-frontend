@@ -5,13 +5,6 @@ import { fetchPackagesById } from "../services/agency-packages.api";
 import { Package } from "../types/package.type";
 import { useSearchParams } from "next/navigation";
 import { bookPackage } from "@/modules/agency/services/booking.api";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 export const useBooking = (id: string) => {
@@ -63,13 +56,13 @@ export const useBooking = (id: string) => {
           console.log("Ivide paymetType wallet kk verndooo nokaaaaanm");
           router.push(
             "/booking/success?booking_id=" +
-              result.booking.id +
-              "&payment_method=wallet"
+            result.booking.id +
+            "&payment_method=wallet"
           );
         }
         return result;
       }
-    } catch (err:unknown) {
+    } catch (err: unknown) {
       console.log("Booking failed:", err);
       const error = err as AxiosError<{ message: string }>;
       const errorMessage = error.response?.data?.message ?? "Something went wrong";

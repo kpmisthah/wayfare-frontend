@@ -1,4 +1,5 @@
 import { PackageStatus } from "./package.enum";
+import { BookingData } from "./booking.type";
 
 export interface Itinerary {
   day: number;
@@ -8,13 +9,13 @@ export interface Itinerary {
 }
 export interface PackageData {
   id: string;
-  // bookings: never[];
+  bookings?: BookingData[];
   title: string;
   destination: string;
   description: string;
-  highlights: string;
+  highlights: string | string[];
   duration: string;
-  picture: File[];
+  picture: (string | File)[];
   price: string;
   itinerary: Itinerary[];
   status?: PackageStatus;
@@ -23,6 +24,7 @@ export interface PackageData {
   drop_point: string;
   details: string;
 }
+
 export interface PackageListing {
   id: string;
   itineraryName: string;
@@ -30,20 +32,20 @@ export interface PackageListing {
   duration: string;
   status: PackageStatus;
   createdAt: string;
-  [key: string]: string;
+  [key: string]: string | PackageStatus;
 }
 export interface packageList {
   id: string;
-  bookings: never[];
+  bookings?: BookingData[];
   title: string;
   destination: string;
   description: string;
-  highlights: string;
+  highlights: string | string[];
   duration: string;
-  picture: string[];
+  picture: (string | File)[];
   price: string;
   itinerary: Itinerary[];
-  status?: "ACTIVE";
+  status?: PackageStatus;
   vehicle: string;
   pickup_point: string;
   drop_point: string;
@@ -68,7 +70,7 @@ export interface InitialFormData {
   dropPoint: string;
   transportationDetails: string;
   gallery: string[];
-  bookings: any[];
+  bookings: BookingData[];
   vehicle: string;
 }
 
@@ -79,7 +81,7 @@ export interface AddPackageFormProps {
   // setEditingPackage: React.Dispatch<React.SetStateAction<PackageData>>;
   formData: InitialFormData;
   setFormData: React.Dispatch<React.SetStateAction<InitialFormData>>;
-  handlePublish: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  handlePublish: (e: React.FormEvent | React.MouseEvent) => Promise<void>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   packageData: PackageData;
   setPackageData: React.Dispatch<React.SetStateAction<PackageData>>;
@@ -94,5 +96,5 @@ export interface AddPackageFormProps {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => void;
-  isPublishing:boolean
+  isPublishing: boolean
 }

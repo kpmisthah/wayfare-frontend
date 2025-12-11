@@ -1,7 +1,7 @@
 // hooks/useOtp.ts
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchUser,resendOtp,verifyOtp } from '../services/auth.api';
+import { fetchUser, resendOtp, verifyOtp } from '../services/auth.api';
 import { useAuthStore } from '@/store/Auth';
 import { AxiosError } from 'axios';
 import { AgencyStatus } from '@/modules/admin/types/agency.status.enum';
@@ -13,10 +13,10 @@ interface ResendOTPRequest {
 interface APIResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
-export function useOtp(data:{userEmail:string,redirectUrl:string}) {
+export function useOtp(data: { userEmail: string, redirectUrl: string }) {
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -65,48 +65,48 @@ export function useOtp(data:{userEmail:string,redirectUrl:string}) {
     setOtp(newOtp);
   };
 
-  const handleVerify = async (email:string) => {
+  const handleVerify = async (email: string) => {
     const otpCode = otp.join('');
     if (otpCode.length === 6) {
       setIsLoading(true);
       setError('');
       try {
-        const result = await verifyOtp({otpCode,email});
-        console.log(result,'from verifyOtp front end');
-        if(result.message == 'Agency created successfully waiting admin approval'){
+        const result = await verifyOtp({ otpCode, email });
+        console.log(result, 'from verifyOtp front end');
+        if (result.message == 'Agency created successfully waiting admin approval') {
           setError('You account is pending admin approval')
           return
         }
         const user = await fetchUser();
-        console.log(user,'in userOtp hook setAuth strore aavudooo');
-        
+        console.log(user, 'in userOtp hook setAuth strore aavudooo');
+
         setAuthUser(user);
         // new Promise((resolve)=>setTimeout(resolve,10000))
         // switch (user.role) {
-          // case "AGENCY":
-            router.push(data.redirectUrl)
-            // break;
-          // case "ADMIN" :
-            // router.push('/admin/dashboard') 
-            // break;
-          // de  // router.push('/')fault:
-          
+        // case "AGENCY":
+        router.push(data.redirectUrl)
+        // break;
+        // case "ADMIN" :
+        // router.push('/admin/dashboard') 
+        // break;
+        // de  // router.push('/')fault:
+
         // }
       } catch (err) {
-        if(err instanceof AxiosError){
-        let msg = err?.response?.data?.message
-        if(msg == 'User not found or Blocked'){
-          // if(role == 'AGENCY'){
-          //   setError('You account is pending admin approval')
-          // }else{
-          //   setError('You have been blocked by the admin.');
-          // }
-          
-        }else{
-        setError('Something went wrong. Please try again.');
-        console.error('OTP verification error:', err,"role");
-        }
-       
+        if (err instanceof AxiosError) {
+          let msg = err?.response?.data?.message
+          if (msg == 'User not found or Blocked') {
+            // if(role == 'AGENCY'){
+            //   setError('You account is pending admin approval')
+            // }else{
+            //   setError('You have been blocked by the admin.');
+            // }
+
+          } else {
+            setError('Something went wrong. Please try again.');
+            console.error('OTP verification error:', err, "role");
+          }
+
         }
 
       } finally {
@@ -120,22 +120,22 @@ export function useOtp(data:{userEmail:string,redirectUrl:string}) {
     setError('');
     try {
       let result = await resendOtp(data.userEmail)
-      console.log(result,'result from backend')
+      console.log(result, 'result from backend')
       if (result.message == 'otp send successfully') {
         setError("");
         setTimeLeft(60);
         setCanResend(false);
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
-      }else if(result.message == 'New OTP sent successfully'){
+      } else if (result.message == 'New OTP sent successfully') {
         setError("");
         setTimeLeft(60);
         setCanResend(false);
         setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0]?.focus();        
-      } 
+        inputRefs.current[0]?.focus();
+      }
       else {
-        setError(result.message|| 'Failed to resend OTP. Please try again.');
+        setError(result.message || 'Failed to resend OTP. Please try again.');
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');

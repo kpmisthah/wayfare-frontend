@@ -26,7 +26,7 @@ export const Login = ({
   redirectLogin,
 }: UseSignupProps) => {
   const router = useRouter();
- 
+
   const {
     loginData,
     setLoginData,
@@ -130,43 +130,48 @@ export const Login = ({
               <ul className="text-xs text-gray-600 space-y-1">
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      loginData.password.length >= 6
+                    className={`w-2 h-2 rounded-full ${loginData.password.length >= 8
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
-                  At least 6 characters
+                  At least 8 characters
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[A-Z]/.test(loginData.password)
+                    className={`w-2 h-2 rounded-full ${/[A-Z]/.test(loginData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One uppercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[a-z]/.test(loginData.password)
+                    className={`w-2 h-2 rounded-full ${/[a-z]/.test(loginData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One lowercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /\d/.test(loginData.password)
+                    className={`w-2 h-2 rounded-full ${/\d/.test(loginData.password)
                         ? "bg-green-500"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                   One number
+                </li>
+                <li className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${/[@$!%*?&]/.test(loginData.password)
+                        ? "bg-green-500"
+                        : "bg-gray-300"
+                      }`}
+                  ></div>
+                  One special character (@$!%*?&)
                 </li>
               </ul>
             </div>

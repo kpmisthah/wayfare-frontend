@@ -53,34 +53,35 @@ export const AgencyWallet = () => {
     );
   };
 
-const handleSaveBankDetails = async () => {
-  try {
-    const payload = {
-      accountHolderName: formData.accountHolderName.trim(),
-      accountNumber: formData.accountNumber.trim(),
-      ifscCode: formData.ifscCode.trim(),
-      bankName: formData.bankName.trim(),
-      branch: formData.branch?.trim() || "",
-    };
+  const handleSaveBankDetails = async () => {
+    try {
+      const payload = {
+        accountHolderName: formData.accountHolderName.trim(),
+        accountNumber: formData.accountNumber.trim(),
+        ifscCode: formData.ifscCode.trim(),
+        bankName: formData.bankName.trim(),
+        branch: formData.branch?.trim() || "",
+      };
 
-    let response;
-    if (hasBankDetails) {
-      response = await api.patch("/agency/update/bankDetails", payload);
-      alert("Bank details updated successfully!");
-    } else {
-      response = await api.post("/agency/bank-details", payload);
-      alert("Bank details saved successfully!");
+      let response;
+      if (hasBankDetails) {
+        response = await api.patch("/agency/update/bankDetails", payload);
+        alert("Bank details updated successfully!");
+      } else {
+        response = await api.post("/agency/bank-details", payload);
+        alert("Bank details saved successfully!");
+      }
+
+      await fetchBankDetails();
+
+      setActiveTab("payout");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      console.error("Bank save error:", error);
+      const message = error.response?.data?.message || "Failed to save bank details";
+      alert(message);
     }
-
-    await fetchBankDetails();
-
-    setActiveTab("payout");
-  } catch (err: any) {
-    console.error("Bank save error:", err);
-    const message = err.response?.data?.message || "Failed to save bank details";
-    alert(message);
-  }
-};
+  };
 
   //handlePayoutSubmit 
   const handlePayoutSubmit = async () => {
@@ -103,9 +104,10 @@ const handleSaveBankDetails = async () => {
       alert("Payout request sent successfully!");
       setShowPayoutModal(false);
       setPayoutAmount("");
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Payout failed");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      console.error('Payout error:', error);
+      alert(error.response?.data?.message || "Payout failed");
     }
   };
   useEffect(() => {
@@ -288,13 +290,12 @@ const handleSaveBankDetails = async () => {
                     </td>
                     <td className="py-4 px-6">
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                          transaction.status === "SUCCEEDED"
-                            ? "bg-green-100 text-green-700"
-                            : transaction.status === "PENDING"
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${transaction.status === "SUCCEEDED"
+                          ? "bg-green-100 text-green-700"
+                          : transaction.status === "PENDING"
                             ? "bg-orange-100 text-orange-700"
                             : "bg-blue-100 text-blue-700"
-                        }`}
+                          }`}
                       >
                         {transaction.status === "SUCCEEDED" ? (
                           <CheckCircle className="w-3 h-3" />
@@ -346,8 +347,8 @@ const handleSaveBankDetails = async () => {
                         ? "Withdraw your earnings to your bank account"
                         : "You need to add bank details first"
                       : hasBankDetails
-                      ? "Update your bank account details"
-                      : "Add your bank account to receive payouts"}
+                        ? "Update your bank account details"
+                        : "Add your bank account to receive payouts"}
                   </p>
                 </div>
                 <button
@@ -366,21 +367,19 @@ const handleSaveBankDetails = async () => {
                 <div className="flex gap-4 mb-6 border-b border-slate-200">
                   <button
                     onClick={() => setActiveTab("payout")}
-                    className={`pb-3 px-1 font-medium transition-colors border-b-2 ${
-                      activeTab === "payout"
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-slate-500 hover:text-slate-700"
-                    }`}
+                    className={`pb-3 px-1 font-medium transition-colors border-b-2 ${activeTab === "payout"
+                      ? "border-blue-600 text-blue-600"
+                      : "border-transparent text-slate-500 hover:text-slate-700"
+                      }`}
                   >
                     Request Payout
                   </button>
                   <button
                     onClick={() => setActiveTab("bank")}
-                    className={`pb-3 px-1 font-medium transition-colors border-b-2 ${
-                      activeTab === "bank"
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-slate-500 hover:text-slate-700"
-                    }`}
+                    className={`pb-3 px-1 font-medium transition-colors border-b-2 ${activeTab === "bank"
+                      ? "border-blue-600 text-blue-600"
+                      : "border-transparent text-slate-500 hover:text-slate-700"
+                      }`}
                   >
                     Bank Details
                   </button>

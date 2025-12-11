@@ -3,7 +3,7 @@ import React from "react";
 import { Eye, EyeOff, ArrowLeft, Plane } from "lucide-react";
 import { useResetPassword } from "@/shared/hooks/use-reset-password";
 import { ResetProps } from "@/shared/types/auth.type";
-const ResetPasswordPage:React.FC<ResetProps> = ({redirectPath}) => {
+const ResetPasswordPage: React.FC<ResetProps> = ({ redirectPath }) => {
 
   const {
     setNewPassword,
@@ -18,7 +18,7 @@ const ResetPasswordPage:React.FC<ResetProps> = ({redirectPath}) => {
     confirmPassword,
     newPassword
   } = useResetPassword(redirectPath!)
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       {/* Background Pattern */}
@@ -128,35 +128,38 @@ const ResetPasswordPage:React.FC<ResetProps> = ({redirectPath}) => {
               <ul className="text-xs text-gray-600 space-y-1">
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      newPassword.length >= 6 ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                    className={`w-2 h-2 rounded-full ${newPassword.length >= 8 ? "bg-green-500" : "bg-gray-300"
+                      }`}
                   ></div>
-                  At least 6 characters
+                  At least 8 characters
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[A-Z]/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                    className={`w-2 h-2 rounded-full ${/[A-Z]/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
+                      }`}
                   ></div>
                   One uppercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /[a-z]/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                    className={`w-2 h-2 rounded-full ${/[a-z]/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
+                      }`}
                   ></div>
                   One lowercase letter
                 </li>
                 <li className="flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      /\d/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                    className={`w-2 h-2 rounded-full ${/\d/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
+                      }`}
                   ></div>
                   One number
+                </li>
+                <li className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${/[@$!%*?&]/.test(newPassword) ? "bg-green-500" : "bg-gray-300"
+                      }`}
+                  ></div>
+                  One special character (@$!%*?&)
                 </li>
               </ul>
             </div>

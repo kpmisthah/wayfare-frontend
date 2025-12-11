@@ -1,12 +1,13 @@
-import { fetchUser, resetPassword } from "../services/auth.api";
-import { ErrorMessages, ResetProps } from "../types/auth.type";
+import { resetPassword } from "../services/auth.api";
+import { ErrorMessages } from "../types/auth.type";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/Auth";
+import { getPasswordError } from "../utils/password-validation";
 
-export const useResetPassword = (redirectPath:string) => {
-  console.log(redirectPath,'redirect path for reset password login in frontend useResetPassword Hook');
-  
+export const useResetPassword = (redirectPath: string) => {
+  console.log(redirectPath, 'redirect path for reset password');
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -19,51 +20,52 @@ export const useResetPassword = (redirectPath:string) => {
 
   const handleSubmit = async () => {
     const newErrors: ErrorMessages = {};
-    if (!newPassword) newErrors.password = "Password is required";
-    if (newPassword != confirmPassword)
-    newErrors.confirmPassword = "password is not matching";
-    if (newPassword.length < 6)
-        newErrors.password = "Password must be at least 6 characters";
-    if (!/[A-Z]/.test(newPassword))
-      newErrors.password =
-        "Password must include at least one uppercase letter";
-    if (!/[a-z]/.test(newPassword))
-      newErrors.password =
-        "Password must include at least one lowercase letter";
-    if (!/\d/.test(newPassword))
-      newErrors.password = "Password must include at least one number";
-    setIsLoading(true);
+
+    // Password validation using centralized utility
+    if (!newPassword) {
+      newErrors.password = "Password is required";
+    } else {
+      const passwordError = getPasswordError(newPassword);
+      if (passwordError) {
+        newErrors.password = passwordError;
+      }
+    }
+
+    // Confirm password validation
+    if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     setIsLoading(true);
+
     const email = localStorage.getItem("resetEmail");
-      if (!email) {
-      setErrors({session_expired:"Session expired. Please start over."});
+    if (!email) {
+      setErrors({ session_expired: "Session expired. Please start over." });
       router.push("/forgot-password");
       return;
     }
+
     try {
-      // const user = await fetchUser();
-      // console.log(user,'user fetch from reset password')
-      // if (!user?.email) throw new Error("Email not found");
       const response = await resetPassword(email, newPassword);
-      console.log(response,'response from reset password front end');
-      // const userData = await fetchUser()
-      // console.log(userData,'suerdata')
-      setAuthUser(response.user)
-      // const{user} = useAuthStore()
-      console.log('user store',response.user)
+      console.log(response, 'response from reset password');
+      setAuthUser(response.user);
+      console.log('user store', response.user);
       localStorage.removeItem("resetEmail");
-      router.push(redirectPath)
-    } catch (error: any) {
-      console.error(error);
-      setErrors({ general: error.message || "Something went wrong" });
+      router.push(redirectPath);
+    } catch (error) {
+      const err = error as Error;
+      console.error(err);
+      setErrors({ general: err.message || "Something went wrong" });
     } finally {
       setIsLoading(false);
     }
   };
+
   return {
     setNewPassword,
     setConfirmPassword,
@@ -78,3 +80,4 @@ export const useResetPassword = (redirectPath:string) => {
     newPassword,
   };
 };
+

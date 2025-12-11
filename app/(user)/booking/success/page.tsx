@@ -357,8 +357,7 @@ import { cookies } from "next/headers";
 // }
 
 //..........................
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function Success({ searchParams }: any) {
+export default async function Success({ searchParams }: { searchParams: Promise<{ booking_id: string; payment_method: string }> }) {
   const cookieStore = await cookies()
   const cookieString = cookieStore.getAll().map((cookie) => `${cookie.name}=${cookie.value}`).join(';')
   const { booking_id: bookingId, payment_method } = await searchParams

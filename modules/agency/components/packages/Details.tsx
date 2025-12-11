@@ -3,37 +3,15 @@ import { Calendar, Info, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-
 import { RenderStepProps2 } from '../../types/agency.type';
 import { Itinerary } from '../../types/package.type';
 
-export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputChange,addDay,handleTotalDaysChange,goToNextDay,goToPrevDay,goToday,currentDayIndex,handleItineraryChange}) => {
-  // const removeDay = (dayIndex: number) => {
-  //   if (packageData?.itinerary.length <= 1) return;
-    
-  //   const updatedItinerary = packageData?.itinerary.filter((_, index) => index !== dayIndex);
-  //   Re-number the days
-  //   const renumberedItinerary = updatedItinerary.map((day, index) => ({
-  //     ...day,
-  //     dayNumber: index + 1,
-  //     dayTitle: day.dayTitle.includes('Day ') ? `Day ${index + 1}` : day.dayTitle
-  //   }));
-    
-  //   setPackageData(prev => ({  
-  //     ...prev,
-  //     totalDays: prev.totalDays - 1,
-  //     itinerary: renumberedItinerary
-  //   }));
-    
-  //   Adjust current day index if necessary
-  //   if (currentDayIndex >= renumberedItinerary.length) {
-  //     setCurrentDayIndex(renumberedItinerary.length - 1);
-  //   }
-  // };
+export const RenderStep2: React.FC<RenderStepProps2> = ({ packageData, handleInputChange, addDay, handleTotalDaysChange, goToNextDay, goToPrevDay, goToday, currentDayIndex, handleItineraryChange }) => {
 
   const currentDay: Itinerary = packageData?.itinerary[currentDayIndex] ?? {
-  day: currentDayIndex+1,
-  activities: '',
-  meals: '',
-  accommodation: ''
-};
-   
+    day: currentDayIndex + 1,
+    activities: '',
+    meals: '',
+    accommodation: ''
+  };
+
   const daysWithActivities = packageData.itinerary.filter(day => day.activities.trim()).length;
   const daysWithAccommodation = packageData.itinerary.filter(day => day.accommodation.trim()).length;
 
@@ -92,18 +70,17 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
               </button>
             </div>
           </div>
-          
+
           {/* Day Pills */}
           <div className="flex flex-wrap gap-2">
             {packageData?.itinerary.map((day, index) => (
               <button
                 key={index}
                 onClick={() => goToday(index)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  index === currentDayIndex
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${index === currentDayIndex
                     ? 'bg-blue-500 text-white shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {/* Day {day.dayNumber} */}
                 {day.day}
@@ -145,8 +122,8 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
                 <input
                   type="text"
                   name='day'
-                  value={currentDay.day|| ''}
-                  onChange={(e)=>handleItineraryChange(e,currentDayIndex)}
+                  value={currentDay.day || ''}
+                  onChange={(e) => handleItineraryChange(currentDayIndex, e.target.name, e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Arrival & Beach Exploration"
                 />
@@ -158,8 +135,8 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
                 </label>
                 <textarea
                   name='activities'
-                  value={currentDay.activities|| ''}
-                  onChange={(e)=>handleItineraryChange(e,currentDayIndex)}
+                  value={currentDay.activities || ''}
+                  onChange={(e) => handleItineraryChange(currentDayIndex, e.target.name, e.target.value)}
                   rows={5}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder="9:00 AM - Arrival and hotel check-in&#10;11:00 AM - Welcome breakfast and orientation&#10;1:00 PM - Beach walk and photography session&#10;3:00 PM - Water sports activities (jet ski, parasailing)&#10;6:00 PM - Sunset viewing and beach games"
@@ -175,7 +152,7 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
                 <textarea
                   name='meals'
                   value={currentDay.meals || ''}
-                  onChange={(e)=>handleItineraryChange(e,currentDayIndex)}
+                  onChange={(e) => handleItineraryChange(currentDayIndex, e.target.name, e.target.value)}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder="Breakfast: Hotel continental buffet&#10;Lunch: Beachside seafood restaurant&#10;Dinner: Traditional Goan cuisine at local taverna"
@@ -189,7 +166,7 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
                 <textarea
                   name='accommodation'
                   value={currentDay.accommodation || ''}
-                  onChange={(e)=>handleItineraryChange(e,currentDayIndex)}
+                  onChange={(e) => handleItineraryChange(currentDayIndex, e.target.name, e.target.value)}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder="Beach Resort Goa - Deluxe Room with sea view&#10;Free WiFi, AC, mini-bar, balcony&#10;Pool access, spa services available"
@@ -224,11 +201,11 @@ export const RenderStep2:React.FC<RenderStepProps2> = ({packageData,handleInputC
               <p className="text-sm text-green-700">Total Days</p>
             </div>
             <div>
-               <p className="text-2xl font-bold text-blue-600">{daysWithActivities}</p> <p className="text-2xl font-bold text-blue-600"></p>
+              <p className="text-2xl font-bold text-blue-600">{daysWithActivities}</p> <p className="text-2xl font-bold text-blue-600"></p>
               <p className="text-sm text-blue-700">Days with Activities</p>
             </div>
             <div>
-               <p className="text-2xl font-bold text-purple-600">{daysWithAccommodation}</p> 
+              <p className="text-2xl font-bold text-purple-600">{daysWithAccommodation}</p>
               <p className="text-sm text-purple-700">Accommodation Days</p>
             </div>
           </div>

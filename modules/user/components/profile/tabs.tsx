@@ -5,7 +5,7 @@ import {
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { PersonalInformation } from "./personal-information";
-import { TravelPreferences } from "./travel-preferences";
+
 import { useUserProfile } from "../../hooks/use-userprofile";
 import { Trips } from "./tabs/trip";
 import { Wallet } from "./tabs/wallet";
@@ -51,9 +51,8 @@ export const UserProfileTabs = () => {
       </TabsList>
 
       <TabsContent value="overview" className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="max-w-2xl mx-auto">
           <PersonalInformation />
-          <TravelPreferences />
         </div>
       </TabsContent>
 
@@ -63,7 +62,7 @@ export const UserProfileTabs = () => {
       <TabsContent value="shortTrips" className="space-y-6">
         <ShortTrip />
       </TabsContent>
-      <Wallet activeTab={activeTab}/>
+      <Wallet activeTab={activeTab} />
       <Settings />
     </Tabs>
   );

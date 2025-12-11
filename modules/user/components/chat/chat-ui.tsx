@@ -33,7 +33,7 @@ export default function ChatUi() {
   const [groupName, setGroupName] = useState("");
   const { user } = useAuthStore();
 
-  // NEW STATE FOR MOBILE RESPONSIVENESS
+
   const [isChatOpenOnMobile, setIsChatOpenOnMobile] = useState(false);
   useEffect(() => {
     const socket = getSocket();

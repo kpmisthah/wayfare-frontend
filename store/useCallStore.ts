@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 
 interface CallState {
-  isCallActive: boolean; 
-  isIncomingCall: boolean; 
+  isCallActive: boolean;
+  isIncomingCall: boolean;
   callerId: string | null;
   conversationId: string | null;
   callType: 'video' | 'audio' | null;
-  callerSignalData:any|null
-  setIncomingCall: (data: { callerId: string, conversationId: string, callType: 'video' | 'audio',signalData:any }) => void;
+  callerSignalData: unknown | null;
+  setIncomingCall: (data: { callerId: string, conversationId: string, callType: 'video' | 'audio', signalData: unknown }) => void;
   acceptCallUI: (conversationId: string, callerId: string, callType: 'video' | 'audio') => void;
   endCallUI: () => void;
-  startCallUI: (conversationId: string, recipientId:string,callerId: string, callType: "video" | "audio") => void;
+  startCallUI: (conversationId: string, recipientId: string, callerId: string, callType: "video" | "audio") => void;
   resetCallState: () => void;
   recipientId: string | null;
 }
@@ -22,7 +22,7 @@ export const useCallStore = create<CallState>((set) => ({
   conversationId: null,
   callType: null,
   callerSignalData: null,
-  recipientId:  null,
+  recipientId: null,
   setIncomingCall: (data) => set({
     isIncomingCall: true,
     callerId: data.callerId,
@@ -30,7 +30,7 @@ export const useCallStore = create<CallState>((set) => ({
     callType: data.callType,
     callerSignalData: data.signalData,
   }),
-  
+
   acceptCallUI: (conversationId, callerId, callType) => set({
     isCallActive: true,
     isIncomingCall: false,
@@ -38,15 +38,15 @@ export const useCallStore = create<CallState>((set) => ({
     conversationId: conversationId,
     callType: callType,
   }),
-startCallUI: (conversationId, callerId,recipientId, callType) =>
+  startCallUI: (conversationId, callerId, recipientId, callType) =>
     set({
-      isCallActive:true,
+      isCallActive: true,
       isIncomingCall: false,
       callerId,
       recipientId,
       conversationId,
       callType,
-      callerSignalData: null, 
+      callerSignalData: null,
     }),
   endCallUI: () => set({
     isCallActive: false,
@@ -55,7 +55,7 @@ startCallUI: (conversationId, callerId,recipientId, callType) =>
     conversationId: null,
     callType: null,
   }),
-  
+
   resetCallState: () => set({
     isCallActive: false,
     isIncomingCall: false,
@@ -63,5 +63,4 @@ startCallUI: (conversationId, callerId,recipientId, callType) =>
     conversationId: null,
     callType: null,
   }),
-  
 }));

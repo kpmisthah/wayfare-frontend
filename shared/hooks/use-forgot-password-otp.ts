@@ -1,16 +1,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { verifyForgotPassword,fetchUser,verifyOtp } from "../services/auth.api";
+import { verifyForgotPassword, fetchUser, verifyOtp } from "../services/auth.api";
 interface ResendOTPRequest {
   email: string;
 }
 interface APIResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: unknown;
 }
-export const useForgotPasswordOtp = (userEmail:string,redirectUrl:string) => {
+export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [canResend, setCanResend] = useState<boolean>(false);
@@ -75,7 +75,7 @@ export const useForgotPasswordOtp = (userEmail:string,redirectUrl:string) => {
       setError("");
 
       try {
-        let result = await verifyForgotPassword({otp:otpCode,email:userEmail});
+        let result = await verifyForgotPassword({ otp: otpCode, email: userEmail });
         // const user = await fetchUser()
         // setAuthUser(user)
         console.log(result, "otp");
@@ -137,7 +137,7 @@ export const useForgotPasswordOtp = (userEmail:string,redirectUrl:string) => {
 
   // Mask email for display
   const maskedEmail = userEmail.replace(/(.{2})(.*)(@.*)/, "$1***$3");
-  return{
+  return {
     handleBack,
     maskedEmail,
     error,

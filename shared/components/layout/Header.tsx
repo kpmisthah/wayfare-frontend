@@ -46,12 +46,12 @@ export const Header = () => {
             .getState()
             .setNotifications(n.data.mappedList || []);
           useNotificationStore.getState().setConnectionRequests(c.data || []);
-        } catch (e) {}
+        } catch (e) { }
       };
       loadInitial();
       const socket = getSocket();
 
-      socket.on("newNotification", (notif: any) => {
+      socket.on("newNotification", (notif: { id: string; title: string; message: string; date: string }) => {
         addNotification({ ...notif, unread: true });
       });
 
@@ -194,7 +194,7 @@ export const Header = () => {
                         ))}
 
                         {notifications.length === 0 &&
-                        connectionRequests.length === 0 ? (
+                          connectionRequests.length === 0 ? (
                           <div className="py-12 text-center text-gray-500">
                             <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                             <p>No notifications</p>
@@ -203,9 +203,8 @@ export const Header = () => {
                           notifications.slice(0, 5).map((notif) => (
                             <div
                               key={notif.id}
-                              className={`px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 ${
-                                notif.unread ? "bg-blue-50" : ""
-                              }`}
+                              className={`px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 ${notif.unread ? "bg-blue-50" : ""
+                                }`}
                             >
                               <div className="flex justify-between">
                                 <h4 className="text-sm font-medium text-gray-900">

@@ -1,75 +1,83 @@
 import { useState } from "react";
-import { ErrorMessages, SignupForm,UseSignupProps } from "../types/auth.type";
-import { signup } from "../services/auth.api";
+import { ErrorMessages, SignupForm, UseSignupProps } from "../types/auth.type";
 import { useRouter } from "next/navigation";
+import { getPasswordError } from "../utils/password-validation";
 
-
-
-export const useSignup = ({role='USER',redirectLogin,onSubmit}:UseSignupProps) => {
-    const [signupData, setSignupData] = useState<SignupForm>({
+export const useSignup = ({ role = 'USER', redirectLogin, onSubmit }: UseSignupProps) => {
+  const [signupData, setSignupData] = useState<SignupForm>({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    mobile:'',
+    mobile: '',
     agreeToTerms: false,
   });
   const [errors, setErrors] = useState<ErrorMessages>({});
   const [isLoading, setIsLoading] = useState(false);
-   const router = useRouter()
+  const router = useRouter();
 
   const handleSignupSubmit = async () => {
     const newErrors: ErrorMessages = {};
 
-    if (!signupData.name) newErrors.name = "name is required";
-    if (!signupData.email) {
-        newErrors.email = "Email is required";
-    }else if (!/\S+@\S+\.\S+/.test(signupData.email)) {
-        newErrors.email = "Please enter a valid email address"
+    // Name validation
+    if (!signupData.name) {
+      newErrors.name = "Name is required";
     }
-    if (!signupData.password) newErrors.password = "Password is required";
-    if (signupData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
 
+    // Email validation
+    if (!signupData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(signupData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation using centralized utility
+    if (!signupData.password) {
+      newErrors.password = "Password is required";
+    } else {
+      const passwordError = getPasswordError(signupData.password);
+      if (passwordError) {
+        newErrors.password = passwordError;
+      }
+    }
+
+    // Confirm password validation
     if (signupData.password !== signupData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    if (!signupData.agreeToTerms)
+
+    // Terms validation
+    if (!signupData.agreeToTerms) {
       newErrors.terms = "You must agree to the terms";
-    if(role == 'AGENCY'){
-      if(!signupData.mobile){
-        newErrors.mobile = "Phone number is required"
+    }
+
+    // Mobile validation for Agency
+    if (role === 'AGENCY') {
+      if (!signupData.mobile) {
+        newErrors.mobile = "Phone number is required";
       }
     }
-    if (!/[A-Z]/.test(signupData.password))
-      newErrors.password =
-        "Password must include at least one uppercase letter";
-    if (!/[a-z]/.test(signupData.password))
-      newErrors.password =
-        "Password must include at least one lowercase letter";
-    if (!/\d/.test(signupData.password))
-      newErrors.password = "Password must include at least one number";
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     setIsLoading(true);
     setErrors({});
 
     try {
       console.log("Signup submitted:", signupData);
-      onSubmit({...signupData,role})
-      //&role=${role}
+      await onSubmit({ ...signupData, role });
       router.push(`/${redirectLogin}?email=${encodeURIComponent(signupData.email)}`);
-
-    } catch (error:any) {
-   
-      setErrors({general:error?.response?.data?.message});
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setErrors({ general: err?.response?.data?.message || "Signup failed" });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return {
     signupData,
     setSignupData,
@@ -77,5 +85,6 @@ export const useSignup = ({role='USER',redirectLogin,onSubmit}:UseSignupProps) =
     setErrors,
     isLoading,
     handleSignupSubmit
-  }
+  };
 };
+

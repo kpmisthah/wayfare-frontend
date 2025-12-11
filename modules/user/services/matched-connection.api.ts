@@ -5,8 +5,9 @@ export const matchedConnection = async (): Promise<Travellers[]> => {
     try {
         const response = await api.get<Travellers[]>('/travellers')
         return response.data || []
-    } catch (error: any) {
-        console.error('Error fetching matched connections:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch travelers')
+    } catch (error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        console.error('Error fetching matched connections:', err);
+        throw new Error(err.response?.data?.message || 'Failed to fetch travelers')
     }
 }
