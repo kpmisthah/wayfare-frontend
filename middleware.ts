@@ -20,6 +20,21 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
+function getRoleFromToken(token: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const payload = JSON.parse(
+      Buffer.from(parts[1], "base64").toString("utf-8")
+    );
+
+    return payload.role || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   console.log(accessToken, 'accessTokennnn');
@@ -75,7 +90,7 @@ export async function middleware(request: NextRequest) {
 
       return response;
     } else {
-      
+
       const protectedUserPaths = [
         "/plan-trip",
         "/booking",
@@ -144,6 +159,35 @@ export async function middleware(request: NextRequest) {
     !hasValidAccessToken
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const protectedAgencyPaths = ["/agency"];
+  const excludedAgencyPaths = [
+    "/agency/login",
+    "/agency/signup",
+    "/agency/forgot-password",
+    "/agency/verify-otp",
+    "/agency/otp",
+    "/agency/forgot-password-otp",
+    "/agency/reset-password",
+  ];
+
+  const isProtectedAgencyPath = protectedAgencyPaths.some((path) =>
+    pathname.startsWith(path)
+  );
+  const isExcludedAgencyPath = excludedAgencyPaths.some((path) =>
+    pathname.startsWith(path)
+  );
+
+  if (isProtectedAgencyPath && !isExcludedAgencyPath) {
+    if (!hasValidAccessToken) {
+      return NextResponse.redirect(new URL("/agency/login", request.url));
+    }
+
+    const userRole = accessToken ? getRoleFromToken(accessToken) : null;
+    if (userRole !== "AGENCY") {
+      return NextResponse.redirect(new URL("/agency/login", request.url));
+    }
   }
 
   return NextResponse.next();
