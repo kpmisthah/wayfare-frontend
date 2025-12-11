@@ -14,21 +14,15 @@ const AdminApp = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <AdminDashboard/>;
+        return <AdminDashboard />;
       case 'users':
         return <UserManagement />;
       case 'payouts':
         return <PayoutHistory />;
       case 'agencies':
-       return <AgencyManagement /> 
+        return <AgencyManagement />
       case 'financial':
         return <FinancialManagement />
-      case 'users':
-       return <UserManagement /> 
-      // case 'bookings':
-      //   return <BookingManagement />    
-      // default:
-      //   return <AdminDashboard />;
     }
   };
 
