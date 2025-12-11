@@ -5,7 +5,7 @@ export interface ChatMessage {
     conversationId?: string;
     groupId?: string;
     createdAt: string;
-    status?: string; // saw usage of status in chat.tsx line 405
+    status?: string; 
 }
 
 export interface ChatConnection {
