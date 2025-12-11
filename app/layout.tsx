@@ -4,6 +4,8 @@ import { getUserFromServer } from "@/lib/getUser";
 import "./globals.css";
 import CallNotificationManager from "@/modules/user/components/chat/call-notification";
 import ActiveCallScreen from "@/modules/user/components/chat/Active-screen";
+import { Toaster } from "sonner";
+
 export default async function RootLayout({
   children,
 }: {
@@ -25,6 +27,18 @@ export default async function RootLayout({
         {/* </SocketProvider> */}
         <CallNotificationManager />
         <ActiveCallScreen />
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={4000}
+          toastOptions={{
+            style: {
+              background: 'white',
+              border: '1px solid #e5e7eb',
+            },
+          }}
+        />
       </body>
     </html>
   );
