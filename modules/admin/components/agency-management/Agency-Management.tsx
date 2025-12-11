@@ -13,7 +13,7 @@ import { useState } from "react";
 import { AgencyDetailModal } from "./Agency-details-modal";
 import debounce from "lodash.debounce";
 import { useMemo } from "react";
-import BlockAgencyModal from "./Blcok-agency-modal";
+import BlockAgencyModal from "./Block-agency-modal";
 const AgencyManagement = () => {
   const {
     filteredAgencies,
@@ -281,13 +281,6 @@ const AgencyManagement = () => {
                           agency.user.isBlock ? "default" : "destructive"
                         }
                         onClick={() => {
-                          // handleBlockAgency({
-                          //   ...agency,
-                          //   user: {
-                          //     ...agency.user,
-                          //     isBlock: !agency.user.isBlock,
-                          //   },
-                          // })
                           setAgencyToBlock(agency);
                           setBlockModalOpen(true);
                         }}
@@ -295,8 +288,8 @@ const AgencyManagement = () => {
                         {loading
                           ? "Updating..."
                           : agency.user.isBlock
-                          ? "Activate"
-                          : "Deactivate"}
+                            ? "Activate"
+                            : "Deactivate"}
                       </Button>
                     </td>
                   </tr>
