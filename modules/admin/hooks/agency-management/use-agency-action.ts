@@ -42,27 +42,6 @@ export const agencyActions = () => {
     console.log(agencies, "agencies in useEffect");
   }, [agencies]);
 
-  // const updateStatus = async (
-  //   id: string,
-  //   isBlock: boolean,
-  //   email: string,
-  //   name: string
-  // ) => {
-  //   try {
-  //     let updatedAgency = await updateAgencies(id, isBlock, email, name);
-  //     setAgencies((prevAgency) =>
-  //       prevAgency.map((agency) =>
-  //         agency.id == id ? { ...agency, status } : agency
-  //       )
-  //     );
-  //     return updatedAgency;
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // };
-
-  // const [requests, setRequests] = useState<AgencyRequest[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<AgencyRequest | null>(
     null
@@ -115,7 +94,7 @@ export const agencyActions = () => {
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
-        setCurrentPage(1); 
+        setCurrentPage(1);
         setSearchTerm(value);
       }, 500),
     []
@@ -130,9 +109,9 @@ export const agencyActions = () => {
         prev.map((agency) =>
           agency.id == updateAgency.id
             ? {
-                ...agency,
-                user: { ...agency.user, isBlock: agencyStatus.isBlock },
-              }
+              ...agency,
+              user: { ...agency.user, isBlock: agencyStatus.isBlock },
+            }
             : agency
         )
       );
@@ -144,7 +123,7 @@ export const agencyActions = () => {
     //  setEditAgencyOpen(false);
   };
 
-  const handleSaveRequest = (updated: any) => {
+  const handleSaveRequest = (updated: Agency) => {
     setAgencies((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
     setEditRequestOpen(false);
   };
