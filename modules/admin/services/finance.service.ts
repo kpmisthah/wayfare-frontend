@@ -1,20 +1,39 @@
-import api from "@/lib/api"
-export const getFinance = async()=>{
-    try {
-        const response = await api.get('/admin/finance/dashboard')
-        return response.data
-    } catch (error) {
-        console.log(error);
-        
-    }
+import api from "@/lib/api";
+
+export interface FinanceQueryParams {
+    page?: number;
+    limit?: number;
+    search?: string;
 }
 
-export const getAgencyRevenue = async()=>{
+export const getFinance = async (params?: FinanceQueryParams) => {
     try {
-        const response = await api.get('/admin/finance/agency')
-        return response.data
+        const response = await api.get("/admin/finance/dashboard", {
+            params: {
+                page: params?.page ?? 1,
+                limit: params?.limit ?? 10,
+                search: params?.search ?? "",
+            },
+        });
+        return response.data;
     } catch (error) {
         console.log(error);
-        
+        throw error;
     }
-}
+};
+
+export const getAgencyRevenue = async (params?: FinanceQueryParams) => {
+    try {
+        const response = await api.get("/admin/finance/agency", {
+            params: {
+                page: params?.page ?? 1,
+                limit: params?.limit ?? 10,
+                search: params?.search ?? "",
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
