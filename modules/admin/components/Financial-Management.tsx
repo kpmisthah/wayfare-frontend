@@ -104,7 +104,6 @@ const FinancialManagement = () => {
     );
   };
 
-  // Export functions
   const handleExportTransactions = () => {
     exportToCSV<Transaction>(
       transactions,
