@@ -10,7 +10,6 @@ import debounce from "lodash.debounce";
 import { AgencyStatus } from "../../types/agency.status.enum";
 
 export const agencyActions = () => {
-  // const { agencies, setAgencies, updateStatus,approvalAgent } = useAgencies();
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [agencyToBlock, setAgencyToBlock] = useState<Agency | null>(null);
@@ -120,7 +119,6 @@ export const agencyActions = () => {
     } finally {
       setLoading(false);
     }
-    //  setEditAgencyOpen(false);
   };
 
   const handleSaveRequest = (updated: Agency) => {
