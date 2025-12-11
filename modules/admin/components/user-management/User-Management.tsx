@@ -17,11 +17,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-// import { userActions } from "../../hooks/user-management/use-user-actions";
 import { EditUserDialog } from "./Edit-User-Dialog";
+import Modal from "@/shared/components/common/Modal";
 import { useUsers } from "../../hooks/user-management/use-user-management";
 import debounce from "lodash.debounce";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
+import { exportToCSV } from "@/lib/export-utils";
+import { User } from "../../types/user.type";
+
 const UserManagement = () => {
   const {
     editingUser,
@@ -51,6 +54,22 @@ const UserManagement = () => {
     [setSearchTerm]
   );
 
+  const handleExportUsers = useCallback(() => {
+    exportToCSV<User>(
+      users,
+      [
+        { header: "Name", accessor: "name" },
+        { header: "Email", accessor: "email" },
+        { header: "Phone", accessor: "phone" },
+        { header: "Location", accessor: "location" },
+        { header: "Status", accessor: (u: User) => u.isBlock ? "Inactive" : "Active" },
+        { header: "Role", accessor: (u: User) => u.role ?? "USER" },
+      ],
+      "users_export"
+    );
+  }, [users]);
+
+
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <Card>
@@ -79,29 +98,7 @@ const UserManagement = () => {
               </Button>
               <Button
                 className="flex items-center gap-2 flex-1 sm:flex-none"
-                onClick={() => {
-                  const headers = ["Name", "Email", "Status"];
-                  const csvContent = [
-                    headers.join(","),
-                    ...users.map(user => [
-                      `"${user.name}"`,
-                      `"${user.email}"`,
-                      user.isBlock ? "Inactive" : "Active"
-                    ].join(","))
-                  ].join("\n");
-
-                  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-                  const link = document.createElement("a");
-                  if (link.download !== undefined) {
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", "users_export.csv");
-                    link.style.visibility = "hidden";
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }
-                }}
+                onClick={handleExportUsers}
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Export</span>
@@ -273,21 +270,27 @@ const UserManagement = () => {
         onSave={handleSaveUser}
       />
       {/* Block/Unblock Confirmation Modal */}
-      {blockModalOpen && userToBlock && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {userToBlock.isBlock ? "Unblock" : "Block"} User
-            </h3>
-            <p className="mt-2 text-sm text-gray-600">
+      <Modal
+        isOpen={blockModalOpen && userToBlock !== null}
+        onClose={() => {
+          setBlockModalOpen(false);
+          setUserToBlock(null);
+        }}
+        title={userToBlock?.isBlock ? "Unblock User" : "Block User"}
+        subtitle="This action can be reversed at any time"
+        size="sm"
+      >
+        {userToBlock && (
+          <div>
+            <p className="text-sm text-gray-600">
               Are you sure you want to{" "}
               <span className="font-medium">
                 {userToBlock.isBlock ? "unblock" : "block"}
               </span>{" "}
               this user?
             </p>
-            <div className="mt-4">
-              <p className="font-medium text-sm">{userToBlock.name}</p>
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p className="font-medium text-sm text-gray-900">{userToBlock.name}</p>
               <p className="text-xs text-gray-500">{userToBlock.email}</p>
             </div>
 
@@ -315,8 +318,8 @@ const UserManagement = () => {
               </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };
