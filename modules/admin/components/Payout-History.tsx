@@ -17,6 +17,7 @@ import Detail from "@/shared/components/common/Detail";
 import { PayoutStatus } from "../types/payout-status.enum";
 import { usePayoutReq } from "../hooks/use-payout-req";
 import { PayoutRequest } from "../types/payout-request.type";
+import { exportToCSV, formatCurrencyForExport } from "@/lib/export-utils";
 
 // Status Badge Component
 const StatusBadge = ({ status }: { status: PayoutStatus }) => {
@@ -96,7 +97,6 @@ const MobilePayoutCard = ({
         <StatusBadge status={request.status} />
       </div>
 
-      {/* Amount and Phone */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-xs text-gray-500 mb-1">Amount</p>
@@ -140,11 +140,9 @@ const MobilePayoutCard = ({
   );
 };
 
-// Main Component
+
 const PayoutHistory = () => {
-  // const [selectedTab, setSelectedTab] = useState<PayoutStatus | string>(
-  //   PayoutStatus.PENDING
-  // );
+
   const {
     payout,
     handleApprove,
@@ -172,10 +170,24 @@ const PayoutHistory = () => {
     setRejectReason,
   } = usePayoutReq();
 
-  // const getFilteredRequests = () => {
-  //   if (selectedTab === "all") return payout;
-  //   return payout?.filter((req) => req.status === selectedTab) ?? [];
-  // };
+
+  const handleExportPayouts = () => {
+    exportToCSV<PayoutRequest>(
+      payout,
+      [
+        { header: "Agency Name", accessor: (r: PayoutRequest) => r.agencyInfo.name },
+        { header: "Agency Email", accessor: (r: PayoutRequest) => r.agencyInfo.email },
+        { header: "Phone", accessor: (r: PayoutRequest) => r.agencyInfo.phone },
+        { header: "Amount", accessor: (r: PayoutRequest) => formatCurrencyForExport(Number(r.amount)) },
+        { header: "Status", accessor: "status" },
+        { header: "Bank Name", accessor: (r: PayoutRequest) => r.bankDetails.bankName },
+        { header: "Account Number", accessor: (r: PayoutRequest) => r.bankDetails.accountNumber },
+        { header: "IFSC Code", accessor: (r: PayoutRequest) => r.bankDetails.ifscCode },
+      ],
+      "payout_requests_export"
+    );
+  };
+
 
   // Table Columns Definition for Desktop
   const columns: Column<PayoutRequest>[] = [
@@ -276,14 +288,17 @@ const PayoutHistory = () => {
                 />
               </div>
 
-              {/* Filter and Export Buttons */}
+    
               <div className="flex gap-2">
                 <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
                   <Filter className="w-4 h-4" />
                   <span className="hidden sm:inline">Filter</span>
                 </button>
 
-                <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm">
+                <button
+                  onClick={handleExportPayouts}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
+                >
                   <Download className="w-4 h-4" />
                   <span className="hidden sm:inline">Export</span>
                 </button>
@@ -302,11 +317,10 @@ const PayoutHistory = () => {
               <button
                 key={tab}
                 onClick={() => handleTabChange(tab as PayoutStatus | "all")}
-                className={`whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
-                  statusFilter === tab
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-colors text-sm ${statusFilter === tab
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -349,11 +363,10 @@ const PayoutHistory = () => {
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium border 
-      ${
-        currentPage === 1
-          ? "opacity-50 cursor-not-allowed"
-          : "hover:bg-gray-100"
-      }`}
+      ${currentPage === 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-100"
+            }`}
         >
           Previous
         </button>
@@ -366,11 +379,10 @@ const PayoutHistory = () => {
           disabled={currentPage >= Math.ceil(totalItems / pageSize)}
           onClick={() => setCurrentPage(currentPage + 1)}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium border 
-      ${
-        currentPage >= Math.ceil(totalItems / pageSize)
-          ? "opacity-50 cursor-not-allowed"
-          : "hover:bg-gray-100"
-      }`}
+      ${currentPage >= Math.ceil(totalItems / pageSize)
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-100"
+            }`}
         >
           Next
         </button>
