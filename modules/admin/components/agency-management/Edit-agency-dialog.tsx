@@ -19,14 +19,14 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Save } from "lucide-react";
 import { AgencyStatus } from "../../types/agency.status.enum";
-import { agencyActions } from "../../hooks/agency-management/use-agency-action";
+
 
 interface EditAgencyDialogProps {
   agency: Agency | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (agency: Agency) => void;
-  loading:boolean
+  loading: boolean
 }
 
 export const EditAgencyDialog = ({
@@ -36,7 +36,11 @@ export const EditAgencyDialog = ({
   onSave,
   loading
 }: EditAgencyDialogProps) => {
-  const [formData, setFormData] = useState<Partial<Agency>>({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    status: AgencyStatus;
+  }>({
     name: "",
     email: "",
     status: AgencyStatus.PENDING,
@@ -45,14 +49,14 @@ export const EditAgencyDialog = ({
   useEffect(() => {
     if (agency) {
       setFormData({
-        name: agency.name,
-        email: agency.email,
+        name: agency.user?.name || "",
+        email: agency.user?.email || "",
         status: agency.status,
       });
     }
   }, [agency]);
 
-  const handleChange = (field: keyof Agency, value: string | boolean) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -63,11 +67,13 @@ export const EditAgencyDialog = ({
     if (agency && formData.name && formData.email) {
       onSave({
         ...agency,
-        name: formData.name,
-        email: formData.email,
-        status: formData.status!,
+        user: {
+          ...agency.user,
+          name: formData.name,
+          email: formData.email,
+        },
+        status: formData.status,
       });
-      // onOpenChange(false);
     }
   };
   if (!agency) return null;
