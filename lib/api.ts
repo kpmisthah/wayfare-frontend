@@ -1,6 +1,6 @@
-
-import axios from "axios";
-import { useAuthStore } from "@/store/Auth";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
+import { StatusCode } from "@/shared/enums/status-code.enum";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -8,86 +8,73 @@ const api = axios.create({
 });
 
 
-// let isRefreshing = false;
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// let failedQueue: any[] = [];
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error: AxiosError<{ message?: string; statusCode?: number }>) => {
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const processQueue = (error: any, token: string | null = null) => {
-//   failedQueue.forEach((prom) => {
-//     if (error) {
-//       prom.reject(error);
-//     } else {
-//       prom.resolve(token);
-//     }
-//   });
-//   failedQueue = [];
-// };
+    const silentErrors = [StatusCode.UNAUTHORIZED]; 
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
-//     if (
-//       originalRequest.url.includes("/auth/signin") ||
-//       originalRequest.url.includes("/auth/signup") ||
-//       originalRequest.url.includes("/auth/refresh") ||
-//       originalRequest.url.includes("/auth/logout") ||
-//       originalRequest.url.includes("/auth/google")
-//     ) {
-//       return Promise.reject(error);
-//     }
+    if (error.response) {
+      const statusCode = error.response.status;
+      const errorMessage = error.response.data?.message || 'Something went wrong';
 
-//     const status = error.response?.status;
+      if (!silentErrors.includes(statusCode)) {
+        switch (statusCode) {
+          case StatusCode.BAD_REQUEST:
+            toast.error('Bad Request', {
+              description: errorMessage,
+            });
+            break;
+          case StatusCode.FORBIDDEN:
+            toast.error('Access Denied', {
+              description: 'You do not have permission to perform this action.',
+            });
+            break;
+          case StatusCode.NOT_FOUND:
+            toast.error('Not Found', {
+              description: errorMessage,
+            });
+            break;
+          case StatusCode.CONFLICT:
+            toast.error('Conflict', {
+              description: errorMessage,
+            });
+            break;
+          case StatusCode.UNPROCESSABLE_ENTITY:
+            toast.error('Validation Error', {
+              description: errorMessage,
+            });
+            break;
+          case StatusCode.TOO_MANY_REQUESTS:
+            toast.error('Too Many Requests', {
+              description: 'Please slow down and try again later.',
+            });
+            break;
+          case StatusCode.INTERNAL_SERVER_ERROR:
+          case StatusCode.BAD_GATEWAY:
+          case StatusCode.SERVICE_UNAVAILABLE:
+            toast.error('Server Error', {
+              description: 'Something went wrong on our end. Please try again later.',
+            });
+            break;
+          default:
+            toast.error('Error', {
+              description: errorMessage,
+            });
+        }
+      }
+    } else if (error.request) {
+      // Network error - no response received
+      toast.error('Network Error', {
+        description: 'Unable to connect to server. Please check your internet connection.',
+      });
+    }
 
-
-//     if (status === 403) {
-//       const message = error.response?.data?.message || "";
-//       if (message.toLowerCase().includes("block")) {
-//         if (typeof window !== "undefined") {
-//           useAuthStore.getState().clearAuth();
-//           window.location.href = "/login?blocked=true";
-//         }
-//         return Promise.reject(error);
-//       }
-//     }
-
-//     if (status === 401 && !originalRequest._retry) {
-//       if (isRefreshing) {
-//         return new Promise((resolve, reject) => {
-//           failedQueue.push({ resolve, reject });
-//         })
-//           .then(() => api(originalRequest))
-//           .catch((err) => Promise.reject(err));
-//       }
-
-//       originalRequest._retry = true;
-//       isRefreshing = true;
-
-//       try {
-//         await api.post("/auth/refresh");
-//         // Refresh succeeded → retry original request
-//         processQueue(null);
-//         return api(originalRequest);
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//       } catch (refreshError: any) {
-//         processQueue(refreshError);
-
-//         if (typeof window !== "undefined") {
-//           useAuthStore.getState().clearAuth();
-//           const currentPath = window.location.pathname;
-//           if (!currentPath.includes("/login") && !currentPath.includes("/signup")) {
-//             window.location.href = "/login?session=expired";
-//           }
-//         }
-//         return Promise.reject(refreshError);
-//       } finally {
-//         isRefreshing = false;
-//       }
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
+    // Re-throw the error so it can still be caught by specific handlers
+    return Promise.reject(error);
+  }
+);
 
 export default api;
