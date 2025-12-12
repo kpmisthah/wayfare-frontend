@@ -1,9 +1,42 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCallStore } from "@/store/useCallStore";
 import { Phone, PhoneOff, Video } from "lucide-react";
 import { useAuthStore } from "@/store/Auth";
 import { AnimatePresence, motion } from "framer-motion";
+
+// Simple ringtone generator using Web Audio API
+const createRingtone = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+  const playTone = (frequency: number, duration: number, delay: number) => {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime + delay);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + delay + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + delay + duration);
+
+    oscillator.start(audioContext.currentTime + delay);
+    oscillator.stop(audioContext.currentTime + delay + duration);
+  };
+
+  const playRingtone = () => {
+    // Classic phone ring pattern (two tones)
+    playTone(800, 0.2, 0);
+    playTone(900, 0.2, 0.25);
+    playTone(800, 0.2, 0.6);
+    playTone(900, 0.2, 0.85);
+  };
+
+  return { playRingtone, stop: () => audioContext.close() };
+};
 
 export default function CallNotificationManager() {
   const { user } = useAuthStore();
@@ -11,27 +44,93 @@ export default function CallNotificationManager() {
     useCallStore();
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ringtoneRef = useRef<{ playRingtone: () => void; stop: () => void } | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [pulseAnimation, setPulseAnimation] = useState(false);
 
   useEffect(() => {
     if (isIncomingCall) {
-      // Play ringtone
-      audioRef.current = new Audio("https://cdn.pixabay.com/download/audio/2021/08/09/audio_88447ea76b.mp3?filename=cell-phone-ringing-15109.mp3");
-      audioRef.current.loop = true;
-      audioRef.current.play().catch(e => console.error("Audio play failed", e));
+      // Start pulse animation
+      setPulseAnimation(true);
+
+      // Vibrate on mobile devices
+      if ('vibrate' in navigator) {
+        // Vibration pattern: vibrate 300ms, pause 200ms, vibrate 300ms
+        const vibratePattern = [300, 200, 300];
+        navigator.vibrate(vibratePattern);
+
+        // Repeat vibration every 2 seconds
+        intervalRef.current = setInterval(() => {
+          navigator.vibrate(vibratePattern);
+        }, 2000);
+      }
+
+      try {
+        // Try to use Web Audio API for ringtone (works better on iOS)
+        ringtoneRef.current = createRingtone();
+
+        // Play ringtone every 1.5 seconds
+        ringtoneRef.current.playRingtone();
+        const ringtoneInterval = setInterval(() => {
+          ringtoneRef.current?.playRingtone();
+        }, 1500);
+
+        // Fallback to audio file
+        audioRef.current = new Audio("https://cdn.pixabay.com/download/audio/2021/08/09/audio_88447ea76b.mp3?filename=cell-phone-ringing-15109.mp3");
+        audioRef.current.loop = true;
+        audioRef.current.volume = 0.5;
+
+        // Try to play audio (might fail on some browsers without user interaction)
+        audioRef.current.play().catch(e => {
+          console.log("Audio autoplay blocked, using Web Audio API only");
+        });
+
+        return () => {
+          clearInterval(ringtoneInterval);
+        };
+      } catch (error) {
+        console.error("Failed to play ringtone:", error);
+      }
     } else {
-      // Stop ringtone
+      // Stop everything
+      setPulseAnimation(false);
+
+      // Stop vibration
+      if ('vibrate' in navigator) {
+        navigator.vibrate(0);
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      // Stop audio
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
+      }
+
+      // Stop Web Audio
+      if (ringtoneRef.current) {
+        ringtoneRef.current.stop();
+        ringtoneRef.current = null;
       }
     }
 
     return () => {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(0);
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current = null;
       }
-    }
+      if (ringtoneRef.current) {
+        ringtoneRef.current.stop();
+      }
+    };
   }, [isIncomingCall]);
 
   const handleAccept = () => {
@@ -52,44 +151,106 @@ export default function CallNotificationManager() {
     <AnimatePresence>
       {isIncomingCall && (
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: -50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -50, scale: 0.9 }}
+          transition={{ type: "spring", damping: 20, stiffness: 300 }}
           className="fixed top-4 right-4 z-[9999] md:top-8 md:right-8"
         >
-          <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-white/20 w-80 md:w-96 overflow-hidden relative">
+          <div className="bg-gradient-to-br from-white via-white to-gray-50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/40 w-80 md:w-96 overflow-hidden relative">
 
-            {/* Background Glow */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-400/30 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-400/30 rounded-full blur-3xl animate-pulse delay-700"></div>
+            {/* Animated Background Rings */}
+            <div className="absolute inset-0 overflow-hidden">
+              <motion.div
+                animate={pulseAnimation ? {
+                  scale: [1, 1.5, 1],
+                  opacity: [0.3, 0, 0.3],
+                } : {}}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-green-500 rounded-full blur-2xl"
+              />
+              <motion.div
+                animate={pulseAnimation ? {
+                  scale: [1, 1.8, 1],
+                  opacity: [0.2, 0, 0.2],
+                } : {}}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-blue-500 rounded-full blur-3xl"
+              />
+            </div>
 
             <div className="relative z-10 text-center">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-tr from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4 shadow-inner">
-                {callType === 'video' ? (
-                  <Video className="w-10 h-10 text-gray-600 animate-bounce" />
-                ) : (
-                  <Phone className="w-10 h-10 text-gray-600 animate-bounce" />
-                )}
-              </div>
+              {/* Animated Icon */}
+              <motion.div
+                animate={pulseAnimation ? {
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                } : {}}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="w-24 h-24 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-5 shadow-xl relative"
+              >
+                {/* Ripple Effect */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.5],
+                    opacity: [0.6, 0]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeOut"
+                  }}
+                  className="absolute inset-0 bg-green-400 rounded-full"
+                />
 
-              <h2 className="text-xl font-bold text-gray-800 mb-1">Incoming {callType} Call</h2>
-              <p className="text-sm text-gray-500 mb-6">User ID: {callerId?.slice(0, 8)}...</p>
+                {callType === 'video' ? (
+                  <Video className="w-12 h-12 text-white relative z-10" />
+                ) : (
+                  <Phone className="w-12 h-12 text-white relative z-10" />
+                )}
+              </motion.div>
+
+              <motion.h2
+                animate={{ opacity: [1, 0.7, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2"
+              >
+                Incoming {callType === 'video' ? 'Video' : 'Voice'} Call
+              </motion.h2>
+              <p className="text-sm text-gray-500 mb-6">ID: {callerId?.slice(0, 8)}...</p>
 
               <div className="flex gap-4 justify-center">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleReject}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-100 text-red-600 rounded-xl font-semibold hover:bg-red-200 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all"
                 >
                   <PhoneOff className="w-5 h-5" />
                   Decline
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleAccept}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 shadow-lg shadow-green-200 transition-all hover:scale-105"
+                  className="flex-1 flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl font-semibold shadow-lg shadow-green-300/50 hover:shadow-xl transition-all"
                 >
                   <Phone className="w-5 h-5" />
                   Accept
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>

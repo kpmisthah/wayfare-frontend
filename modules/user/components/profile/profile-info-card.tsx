@@ -1,13 +1,13 @@
-import {MapPin} from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useUserProfile } from "../../hooks/use-userprofile";
 import { useAuthStore } from "@/store/Auth";
 // import { EditForm } from "./edit-from";
 export const ProfileCard = () => {
-    const {
-        connections,
-        trips
-    } = useUserProfile()
-    const {user} = useAuthStore()
+  const {
+    connections,
+    trips
+  } = useUserProfile()
+  const { user } = useAuthStore()
   return (
     <div className="flex-1 bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
       <div className="flex justify-between items-start mb-4">
@@ -36,7 +36,7 @@ export const ProfileCard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+      <div className="grid grid-cols-2 gap-6 pt-4 border-t border-gray-100">
         <div className="text-center">
           <div className="text-2xl font-bold text-gray-900">{trips.length}</div>
           <div className="text-sm text-gray-600">Trips</div>
@@ -46,10 +46,6 @@ export const ProfileCard = () => {
             {connections.length}
           </div>
           <div className="text-sm text-gray-600">Connections</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">4.9</div>
-          <div className="text-sm text-gray-600">Rating</div>
         </div>
       </div>
     </div>

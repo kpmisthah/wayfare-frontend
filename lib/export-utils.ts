@@ -59,9 +59,6 @@ export function exportToCSV<T extends object>(
     }
 }
 
-/**
- * Format date for export
- */
 export function formatDateForExport(date: Date | string): string {
     const d = new Date(date);
     return d.toLocaleDateString('en-IN', {
@@ -71,9 +68,7 @@ export function formatDateForExport(date: Date | string): string {
     });
 }
 
-/**
- * Format currency for export
- */
+
 export function formatCurrencyForExport(amount: number): string {
     return `₹${amount.toLocaleString('en-IN')}`;
 }

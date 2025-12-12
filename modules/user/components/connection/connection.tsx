@@ -468,7 +468,7 @@ export default function TravelConnections() {
               Travel Buddies
             </h1>
             <p className="text-sm text-gray-500">
-              Swipe right to connect, left to pass
+              Find your perfect travel companions
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -484,8 +484,40 @@ export default function TravelConnections() {
         </div>
       </div>
 
+      {/* Swipe Guide Banner */}
+      <div className="max-w-md mx-auto px-4 mb-4">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200/50 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-100 to-rose-200 flex items-center justify-center shadow-sm">
+                <X className="w-5 h-5 text-red-500" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-semibold text-gray-700">Swipe Left</p>
+                <p className="text-xs text-gray-500">Pass</p>
+              </div>
+            </div>
+
+            <div className="w-px h-10 bg-gray-300" />
+
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <p className="text-xs font-semibold text-gray-700">Swipe Right</p>
+                <p className="text-xs text-gray-500">Connect</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-100 to-purple-200 flex items-center justify-center shadow-sm">
+                <Heart className="w-5 h-5 text-pink-500 fill-pink-500" />
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-center text-gray-500 mt-3">
+            Or use the buttons below to make your choice
+          </p>
+        </div>
+      </div>
+
       {/* Card Stack Container */}
-      <div className="max-w-md mx-auto px-4 py-6 relative" style={{ height: "550px" }}>
+      <div className="max-w-md mx-auto px-4 relative" style={{ height: "550px" }}>
         {/* Background cards */}
         {travelers
           .slice(currentIndex + 1, currentIndex + 3)
@@ -518,13 +550,14 @@ export default function TravelConnections() {
         )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="max-w-md mx-auto px-4 pb-8">
-        <div className="flex items-center justify-center gap-8">
+      {/* Action Buttons - Properly Aligned */}
+      <div className="max-w-md mx-auto px-4 py-6">
+        <div className="flex items-center justify-center gap-10">
           <button
             onClick={handleSkip}
             disabled={isConnecting}
-            className="w-16 h-16 rounded-full bg-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center group hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-gray-100"
+            className="w-16 h-16 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center group hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-gray-100 hover:border-red-200"
+            aria-label="Pass"
           >
             <X className="w-8 h-8 text-red-400 group-hover:text-red-500 group-hover:scale-110 transition-all" />
           </button>
@@ -532,12 +565,18 @@ export default function TravelConnections() {
           <button
             onClick={handleLike}
             disabled={isConnecting}
-            className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 shadow-lg hover:shadow-2xl transition-all flex items-center justify-center group hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 shadow-xl hover:shadow-2xl transition-all flex items-center justify-center group hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed relative"
+            aria-label="Connect"
           >
             {isConnecting ? (
               <Loader2 className="w-10 h-10 text-white animate-spin" />
             ) : (
               <Heart className="w-10 h-10 text-white fill-white group-hover:scale-110 transition-transform" />
+            )}
+            {!isConnecting && (
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                <span className="text-xs font-semibold text-purple-600">Connect</span>
+              </div>
             )}
           </button>
         </div>

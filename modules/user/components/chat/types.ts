@@ -2,10 +2,12 @@ export interface ChatMessage {
     id: string;
     content: string;
     senderId: string;
+    senderName?: string;
+    senderProfileImage?: string;
     conversationId?: string;
     groupId?: string;
     createdAt: string;
-    status?: string; 
+    status?: string;
 }
 
 export interface ChatConnection {

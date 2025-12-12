@@ -55,6 +55,7 @@ export const usefetchAiTripPlan = () => {
 
 export const useGenerateTrip = () => {
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
   type FormData = {
     destination: string;
@@ -66,7 +67,12 @@ export const useGenerateTrip = () => {
     endDate: string;
     minBudget: number;
     maxBudget: number;
-    visibleToOthers: boolean
+    visibleToOthers: boolean;
+    preferences: {
+      activities: string[];
+      pace: string;
+      interests: string[];
+    };
   };
   const [formData, setFormData] = useState<FormData>({
     destination: "",
@@ -78,34 +84,195 @@ export const useGenerateTrip = () => {
     endDate: "",
     minBudget: 0,
     maxBudget: 0,
-    visibleToOthers: false
+    visibleToOthers: false,
+    preferences: {
+      activities: [],
+      pace: "moderate",
+      interests: [],
+    },
   });
+
   useEffect(() => {
     console.log(formData, "fromDate");
   }, []);
+
   const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const handlePreferenceChange = (field: string, value: string | string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        [field]: value,
+      },
+    }));
+  };
+
+  const toggleActivity = (activity: string) => {
+    setFormData((prev) => {
+      const currentActivities = prev.preferences.activities;
+      const newActivities = currentActivities.includes(activity)
+        ? currentActivities.filter((a) => a !== activity)
+        : [...currentActivities, activity];
+      return {
+        ...prev,
+        preferences: {
+          ...prev.preferences,
+          activities: newActivities,
+        },
+      };
+    });
+  };
+
+  const toggleInterest = (interest: string) => {
+    setFormData((prev) => {
+      const currentInterests = prev.preferences.interests;
+      const newInterests = currentInterests.includes(interest)
+        ? currentInterests.filter((i) => i !== interest)
+        : [...currentInterests, interest];
+      return {
+        ...prev,
+        preferences: {
+          ...prev.preferences,
+          interests: newInterests,
+        },
+      };
+    });
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Required field validations
+    if (!formData.destination.trim()) {
+      newErrors.destination = "Destination is required";
+    }
+
+    if (!formData.duration) {
+      newErrors.duration = "Trip duration is required";
+    } else {
+      const duration = Number(formData.duration);
+      if (duration < 1) {
+        newErrors.duration = "Duration must be at least 1 day";
+      } else if (duration > 5) {
+        newErrors.duration = "Short trips are limited to 5 days maximum";
+      }
+    }
+
+    if (!formData.budget) {
+      newErrors.budget = "Budget range is required";
+    }
+
+    if (!formData.travelWith) {
+      newErrors.travelWith = "Please select who you're traveling with";
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Start date is required";
+    } else {
+      const startDate = new Date(formData.startDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (startDate < today) {
+        newErrors.startDate = "Start date cannot be in the past";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const checkDuplicateTrip = async (): Promise<boolean> => {
+    try {
+      // Fetch existing trips for the user
+      const existingTrips = await fetchShortTripDetails();
+
+      // Calculate end date based on start date and duration
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + Number(formData.duration));
+
+      // Check for overlapping trips to the same destination
+      const duplicate = existingTrips.some((trip: TravelItineraryProps) => {
+        if (trip.destination.toLowerCase() !== formData.destination.toLowerCase()) {
+          return false;
+        }
+
+        // Parse existing trip dates (you may need to adjust based on your data structure)
+        const existingStart = new Date(trip.startDate || "");
+        const existingDuration = parseInt(trip.duration) || 0;
+        const existingEnd = new Date(existingStart);
+        existingEnd.setDate(existingEnd.getDate() + existingDuration);
+
+        // Check for date overlap
+        return (
+          (startDate >= existingStart && startDate <= existingEnd) ||
+          (endDate >= existingStart && endDate <= existingEnd) ||
+          (startDate <= existingStart && endDate >= existingEnd)
+        );
+      });
+
+      if (duplicate) {
+        setErrors((prev) => ({
+          ...prev,
+          duplicate: "You already have a trip planned to this destination during these dates. Please choose different dates or destination.",
+        }));
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error checking duplicate trips:", error);
+      // Continue with submission if check fails
+      return false;
+    }
   };
 
   const generateShortTrip = async () => {
-    if (Number(formData.duration) > 5) {
-      alert("Please plan trip for less than 5 days");
+    // Validate form
+    if (!validateForm()) {
+      return;
     }
+
+    // Check for duplicate trips
+    const isDuplicate = await checkDuplicateTrip();
+    if (isDuplicate) {
+      return;
+    }
+
     console.log(formData);
     try {
       setLoading(true);
-      let result = await generateTrip({
+      setErrors({});
+
+      const result = await generateTrip({
         destination: formData.destination,
         duration: formData.duration,
         travelerType: formData.travelWith,
         budget: formData.budget,
         startDate: formData.startDate,
-        visiblity: formData.visibleToOthers
+        visiblity: formData.visibleToOthers,
+        preferences: formData.preferences,
       });
-      console.log(result, "result after ai model geenrate itineraries");
+
+      console.log(result, "result after ai model generate itineraries");
       router.push(`/trip/${result.id}/${result.destination}`);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.error("Error generating trip:", error);
+      setErrors({
+        submit: error?.response?.data?.message || "Failed to generate trip. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -170,9 +337,13 @@ export const useGenerateTrip = () => {
   return {
     loading,
     formData,
+    errors,
     generateShortTrip,
     handleInputChange,
     handleTravelersChange,
+    handlePreferenceChange,
+    toggleActivity,
+    toggleInterest,
     generateTravel,
     onSubmit,
     handleBookNow,

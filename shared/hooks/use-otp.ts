@@ -81,29 +81,13 @@ export function useOtp(data: { userEmail: string, redirectUrl: string }) {
         console.log(user, 'in userOtp hook setAuth strore aavudooo');
 
         setAuthUser(user);
-        // new Promise((resolve)=>setTimeout(resolve,10000))
-        // switch (user.role) {
-        // case "AGENCY":
         router.push(data.redirectUrl)
-        // break;
-        // case "ADMIN" :
-        // router.push('/admin/dashboard') 
-        // break;
-        // de  // router.push('/')fault:
-
-        // }
       } catch (err) {
         if (err instanceof AxiosError) {
           let msg = err?.response?.data?.message
           if (msg == 'User not found or Blocked') {
-            // if(role == 'AGENCY'){
-            //   setError('You account is pending admin approval')
-            // }else{
-            //   setError('You have been blocked by the admin.');
-            // }
-
           } else {
-            setError('Something went wrong. Please try again.');
+            setError(msg || 'Something went wrong. Please try again.');
             console.error('OTP verification error:', err, "role");
           }
 
@@ -138,7 +122,11 @@ export function useOtp(data: { userEmail: string, redirectUrl: string }) {
         setError(result.message || 'Failed to resend OTP. Please try again.');
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
       console.error('OTP resend error:', err);
     } finally {
       setIsResending(false);

@@ -1,9 +1,14 @@
-import ChatUi from "@/modules/user/components/chat/chat-ui";
+"use client";
 
-export default async function Chat(){
-    return(
+import ChatUi from "@/modules/user/components/chat/chat-ui";
+import { withAuth } from "@/shared/components/HOC/withAuth";
+
+function ChatPage() {
+    return (
         <>
-        <ChatUi />
+            <ChatUi />
         </>
-    )
+    );
 }
+
+export default withAuth(ChatPage);

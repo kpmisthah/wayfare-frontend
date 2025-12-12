@@ -20,16 +20,20 @@ import {
 } from "lucide-react";
 import { Header } from "@/shared/components/layout/Header";
 import { useGenerateTrip } from "../../hooks/use-ai-trip-plan";
-import GooglePlacesAutocomplete from "react-google-autocomplete";
+import { DestinationAutocomplete } from "@/components/ui/destination-autocomplete";
 
 const PlanTrip = () => {
   const [activeTab, setActiveTab] = useState("short");
   const {
     loading,
     formData,
+    errors,
     generateShortTrip,
     handleInputChange,
     handleTravelersChange,
+    handlePreferenceChange,
+    toggleActivity,
+    toggleInterest,
     onSubmit,
   } = useGenerateTrip();
   const travelWithOptions = [
@@ -60,11 +64,10 @@ const PlanTrip = () => {
           <div className="bg-gray-100 p-1 rounded-xl flex space-x-1">
             <button
               onClick={() => setActiveTab("short")}
-              className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
-                activeTab === "short"
-                  ? "bg-white text-blue-600 shadow-md transform scale-105"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${activeTab === "short"
+                ? "bg-white text-blue-600 shadow-md transform scale-105"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               <Zap className="w-4 h-4" />
               <span>Short Trip</span>
@@ -72,11 +75,10 @@ const PlanTrip = () => {
             </button>
             <button
               onClick={() => setActiveTab("long")}
-              className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
-                activeTab === "long"
-                  ? "bg-white text-blue-600 shadow-md transform scale-105"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${activeTab === "long"
+                ? "bg-white text-blue-600 shadow-md transform scale-105"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               <Clock className="w-4 h-4" />
               <span>Long Trip</span>
@@ -111,19 +113,18 @@ const PlanTrip = () => {
                       <MapPin className="w-4 h-4 text-blue-500" />
                       Destination
                     </label>
-                    {/* <GooglePlacesAutocomplete
-                    apiKey={process.env.NEXT_PUBLIC_GOOGLE_PLACE_API_KEY}
-                    /> */}
-
-                    <input
-                      type="text"
+                    <DestinationAutocomplete
                       value={formData.destination}
-                      onChange={(e) =>
-                        handleInputChange("destination", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                      onChange={(value) => handleInputChange("destination", value)}
                       placeholder="Where do you want to go?"
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm ${errors.destination ? "border-red-300" : "border-gray-200"
+                        }`}
                     />
+                    {errors.destination && (
+                      <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                        <span className="font-medium">⚠</span> {errors.destination}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
@@ -137,8 +138,14 @@ const PlanTrip = () => {
                       onChange={(e) =>
                         handleInputChange("startDate", e.target.value)
                       }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm ${errors.startDate ? "border-red-300" : "border-gray-200"
+                        }`}
                     />
+                    {errors.startDate && (
+                      <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                        <span className="font-medium">⚠</span> {errors.startDate}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -155,10 +162,17 @@ const PlanTrip = () => {
                       onChange={(e) =>
                         handleInputChange("duration", Number(e.target.value))
                       }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm ${errors.duration ? "border-red-300" : "border-gray-200"
+                        }`}
                       placeholder="e.g. 3"
                       min="1"
+                      max="5"
                     />
+                    {errors.duration && (
+                      <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                        <span className="font-medium">⚠</span> {errors.duration}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -171,13 +185,19 @@ const PlanTrip = () => {
                       onChange={(e) =>
                         handleInputChange("budget", e.target.value)
                       }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm ${errors.budget ? "border-red-300" : "border-gray-200"
+                        }`}
                     >
                       <option value="">Select Budget</option>
                       <option value="low">Cheap</option>
                       <option value="medium">Moderate</option>
                       <option value="high">Luxury</option>
                     </select>
+                    {errors.budget && (
+                      <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                        <span className="font-medium">⚠</span> {errors.budget}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {/* </div> */}
@@ -191,15 +211,15 @@ const PlanTrip = () => {
                     {travelWithOptions.map((option) => (
                       <button
                         key={option.id}
+                        type="button"
                         onClick={() =>
                           handleInputChange("travelWith", option.id)
                         }
                         className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 shadow-sm
-                            ${
-                              formData.travelWith === option.id
-                                ? "bg-blue-500 text-white shadow-lg border-blue-500 scale-105"
-                                : "bg-gray-50 text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-gray-100"
-                            }`}
+                            ${formData.travelWith === option.id
+                            ? "bg-blue-500 text-white shadow-lg border-blue-500 scale-105"
+                            : "bg-gray-50 text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-gray-100"
+                          }`}
                       >
                         {option.icon}
                         <span className="mt-2 font-medium text-sm">
@@ -207,6 +227,131 @@ const PlanTrip = () => {
                         </span>
                       </button>
                     ))}
+                  </div>
+                  {errors.travelWith && (
+                    <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
+                      <span className="font-medium">⚠</span> {errors.travelWith}
+                    </p>
+                  )}
+                </div>
+
+                {/* Error Messages Section */}
+                {(errors.duplicate || errors.submit) && (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-red-800">
+                          {errors.duplicate || errors.submit}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* User Preferences Section */}
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-blue-600" />
+                    Trip Preferences (Optional)
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Help our AI customize your itinerary to match your interests
+                  </p>
+
+                  {/* Activity Preferences */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      What activities interest you?
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: "sightseeing", label: "Sightseeing", icon: "🏛️" },
+                        { id: "adventure", label: "Adventure", icon: "🏔️" },
+                        { id: "relaxation", label: "Relaxation", icon: "🧘" },
+                        { id: "food", label: "Food & Dining", icon: "🍽️" },
+                        { id: "shopping", label: "Shopping", icon: "🛍️" },
+                        { id: "nightlife", label: "Nightlife", icon: "🎭" },
+                        { id: "culture", label: "Culture", icon: "🎨" },
+                        { id: "nature", label: "Nature", icon: "🌳" },
+                        { id: "photography", label: "Photography", icon: "📸" },
+                      ].map((activity) => (
+                        <button
+                          key={activity.id}
+                          type="button"
+                          onClick={() => toggleActivity(activity.id)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${formData.preferences.activities.includes(activity.id)
+                            ? "bg-blue-500 text-white shadow-md border-2 border-blue-600"
+                            : "bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300"
+                            }`}
+                        >
+                          <span>{activity.icon}</span>
+                          <span className="text-xs">{activity.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Travel Pace */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      What's your preferred travel pace?
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: "relaxed", label: "Relaxed", desc: "2-3 activities/day" },
+                        { id: "moderate", label: "Moderate", desc: "4-5 activities/day" },
+                        { id: "packed", label: "Packed", desc: "6+ activities/day" },
+                      ].map((pace) => (
+                        <button
+                          key={pace.id}
+                          type="button"
+                          onClick={() => handlePreferenceChange("pace", pace.id)}
+                          className={`p-3 rounded-xl text-center transition-all duration-200 ${formData.preferences.pace === pace.id
+                            ? "bg-blue-500 text-white shadow-md border-2 border-blue-600"
+                            : "bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300"
+                            }`}
+                        >
+                          <div className="font-semibold text-sm">{pace.label}</div>
+                          <div className="text-xs mt-1 opacity-90">{pace.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Special Interests */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Any special interests?
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[
+                        { id: "history", label: "History" },
+                        { id: "art", label: "Art & Museums" },
+                        { id: "wildlife", label: "Wildlife" },
+                        { id: "beaches", label: "Beaches" },
+                        { id: "mountains", label: "Mountains" },
+                        { id: "local-cuisine", label: "Local Cuisine" },
+                        { id: "festivals", label: "Festivals" },
+                        { id: "wellness", label: "Wellness" },
+                      ].map((interest) => (
+                        <button
+                          key={interest.id}
+                          type="button"
+                          onClick={() => toggleInterest(interest.id)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${formData.preferences.interests.includes(interest.id)
+                            ? "bg-blue-500 text-white shadow-md"
+                            : "bg-white text-gray-700 border border-gray-200 hover:border-blue-300"
+                            }`}
+                        >
+                          {interest.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -216,11 +361,10 @@ const PlanTrip = () => {
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <div
-                      className={`w-14 h-8 rounded-full transition-all duration-300 cursor-pointer relative ${
-                        formData.visibleToOthers
-                          ? "bg-gradient-to-r from-blue-500 to-cyan-500"
-                          : "bg-gray-300"
-                      }`}
+                      className={`w-14 h-8 rounded-full transition-all duration-300 cursor-pointer relative ${formData.visibleToOthers
+                        ? "bg-gradient-to-r from-blue-500 to-cyan-500"
+                        : "bg-gray-300"
+                        }`}
                       onClick={() =>
                         handleInputChange(
                           "visibleToOthers",
@@ -229,9 +373,8 @@ const PlanTrip = () => {
                       }
                     >
                       <div
-                        className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
-                          formData.visibleToOthers ? "right-1" : "left-1"
-                        }`}
+                        className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${formData.visibleToOthers ? "right-1" : "left-1"
+                          }`}
                       />
                     </div>
                   </div>
@@ -324,14 +467,11 @@ const PlanTrip = () => {
                     <MapPin className="w-4 h-4 text-purple-500" />
                     Destination
                   </label>
-                  <input
-                    type="text"
+                  <DestinationAutocomplete
                     value={formData.destination}
-                    onChange={(e) =>
-                      handleInputChange("destination", e.target.value)
-                    }
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
+                    onChange={(value) => handleInputChange("destination", value)}
                     placeholder="Where do you want to go?"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
                   />
                 </div>
 

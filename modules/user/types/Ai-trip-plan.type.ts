@@ -47,6 +47,7 @@ export interface TravelItineraryProps {
   hotels: Hotel[];
   itinerary: DayPlan[];
   thumbnail?: string;
+  startDate?: string;
 }
 
 export type ConnectionStatus = 'NONE' | 'PENDING' | 'ACCEPTED' | 'REJECTED';

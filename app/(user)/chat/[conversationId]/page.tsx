@@ -1,10 +1,15 @@
-// "use client";
+"use client";
+
 import Chat from "@/modules/user/components/chat/chat";
-import { getUserFromServer } from "@/lib/getUser";
-export default async function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
-  const { conversationId } = await params;
-  const user = await getUserFromServer()
-  if (!user) return <p>Please login</p>
+import { withAuth } from "@/shared/components/HOC/withAuth";
+import { useAuthStore } from "@/store/Auth";
+
+function ChatPage({ params }: { params: { conversationId: string } }) {
+  const { user } = useAuthStore();
+  const conversationId = params.conversationId;
+
+  if (!user) return null; // withAuth will handle redirect
+
   return (
     <Chat
       chatId={conversationId}
@@ -12,3 +17,5 @@ export default async function ChatPage({ params }: { params: Promise<{ conversat
     />
   );
 }
+
+export default withAuth(ChatPage);

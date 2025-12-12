@@ -21,6 +21,7 @@ import {
   Search,
 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export const Trips = () => {
   const {
@@ -41,7 +42,7 @@ export const Trips = () => {
     totalTrips,
   } = useUserProfile();
 
-  // Trips are now filtered on the backend, so we use them directly
+  const router = useRouter();
   const filteredTrips = trips;
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -162,7 +163,7 @@ export const Trips = () => {
               <Filter className="w-4 h-4 mr-2" />
               All ({totalTrips})
             </Button>
-           
+
           </div>
         </div>
 
@@ -322,7 +323,7 @@ export const Trips = () => {
                 : `No ${tripStatus} trips found.`}
             </p>
             {tripStatus === "all" && (
-              <Button className="mt-4">
+              <Button className="mt-4" onClick={() => router.push("/plan-trip")}>
                 <Plus className="w-4 h-4 mr-2" />
                 Plan New Trip
               </Button>

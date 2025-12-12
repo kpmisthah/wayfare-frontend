@@ -110,8 +110,7 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
             <div className="h-px bg-border flex-1" />
           </div>
           <p className="text-muted-foreground mb-6">
-            Meet other travelers heading to {tripPlan.destination}. Click on a
-            profile to learn more and connect!
+            Discover travelers heading to {tripPlan.destination}. Click "View All" below to see everyone and connect with fellow travelers!
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
             {travellersData.map((traveler) => (
@@ -122,12 +121,13 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
               />
             ))}
           </div>
-          <div className="text-center">
+          <div className="text-center mt-6">
             <button
               onClick={() => router.push('/connection')}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
             >
-              View All
+              <Users className="w-5 h-5" />
+              View All & Connect
             </button>
           </div>
         </div>

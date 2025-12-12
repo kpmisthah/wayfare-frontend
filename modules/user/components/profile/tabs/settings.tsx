@@ -10,6 +10,7 @@ import {
   CardDescription,
 } from "@/shared/components/ui/card";
 import { TabsContent } from "@/shared/components/ui/tabs";
+import Modal from "@/shared/components/common/Modal";
 import {
   Shield,
   Lock,
@@ -88,16 +89,27 @@ export const Settings = () => {
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setTimeout(() => setIsModalOpen(false), 2000);
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setSuccessMessage("");
+        }, 2000);
       }
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       const msg = err.response?.data?.message || "Old password is incorrect ";
-      console.log(msg, 'in mesgg cahrchhcccee nlock')
       setErrors(prev => ({ ...prev, currentPassword: msg }));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setErrors({});
+    setSuccessMessage("");
   };
 
   return (
@@ -166,147 +178,149 @@ export const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Change Password Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-in fade-in duration-200">
-              {successMessage ? (
-                <div className="p-8 text-center space-y-4">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">{successMessage}</h3>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                  {/* Current Password */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Current Password</label>
-                    <div className="relative">
-                      <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={oldPassword}
-                        onChange={e => setOldPassword(e.target.value)}
-                        placeholder="Enter current password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.currentPassword ? "border-red-500" : "border-gray-300"
-                          }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    {errors.currentPassword && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> {errors.currentPassword}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* New Password */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">New Password</label>
-                    <div className="relative">
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        placeholder="Enter new password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.newPassword ? "border-red-500" : "border-gray-300"
-                          }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    {newPassword && (
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-600">Password strength:</span>
-                          <span
-                            className={`font-medium ${strength.label === "Strong"
-                              ? "text-green-600"
-                              : strength.label === "Medium"
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                              }`}
-                          >
-                            {strength.label}
-                          </span>
-                        </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full transition-all duration-300 ${strength.color}`}
-                            style={{ width: `${strength.strength}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    {errors.newPassword && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> {errors.newPassword}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Confirm Password */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Confirm New Password</label>
-                    <div className="relative">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm new password"
-                        className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                          }`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    {errors.confirmPassword && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> {errors.confirmPassword}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsModalOpen(false)}
-                      className="flex-1"
-                      disabled={isLoading}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Updating..." : "Update Password"}
-                    </Button>
-                  </div>
-                </form>
-              )}
+        {/* Change Password Modal - Now Using Reusable Component */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          title="Change Password"
+          subtitle="Update your password to keep your account secure"
+          size="md"
+        >
+          {successMessage ? (
+            <div className="py-4 text-center space-y-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">{successMessage}</h3>
             </div>
-          </div>
-        )}
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Current Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Current Password</label>
+                <div className="relative">
+                  <input
+                    type={showCurrentPassword ? "text" : "password"}
+                    value={oldPassword}
+                    onChange={e => setOldPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.currentPassword ? "border-red-500" : "border-gray-300"
+                      }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.currentPassword && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" /> {errors.currentPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* New Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">New Password</label>
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.newPassword ? "border-red-500" : "border-gray-300"
+                      }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {newPassword && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-600">Password strength:</span>
+                      <span
+                        className={`font-medium ${strength.label === "Strong"
+                          ? "text-green-600"
+                          : strength.label === "Medium"
+                            ? "text-yellow-600"
+                            : "text-red-600"
+                          }`}
+                      >
+                        {strength.label}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${strength.color}`}
+                        style={{ width: `${strength.strength}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {errors.newPassword && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" /> {errors.newPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Confirm New Password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                      }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" /> {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseModal}
+                  className="flex-1"
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Updating..." : "Update Password"}
+                </Button>
+              </div>
+            </form>
+          )}
+        </Modal>
       </div>
     </TabsContent>
   );

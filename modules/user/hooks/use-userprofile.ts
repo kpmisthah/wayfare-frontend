@@ -8,6 +8,7 @@ import {
   Preference,
 } from "../types/profile.type";
 
+
 import {
   bookingCancel,
   changePassword,
@@ -17,6 +18,8 @@ import {
   updateProfileImage,
   uploadUserProfileImage,
 } from "../services/userProfile.api";
+import { getAcceptedConnections } from "../services/connection.api";
+
 import { useAuthStore } from "@/store/Auth";
 import { toast } from "sonner";
 import { getPasswordError } from "@/shared/utils/password-validation";
@@ -50,6 +53,8 @@ export const useUserProfile = () => {
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [isLoadingConnections, setIsLoadingConnections] = useState(false);
 
   // Trip search and filter states
   const [tripSearch, setTripSearch] = useState('');
@@ -88,6 +93,20 @@ export const useUserProfile = () => {
     }
   };
 
+  // Load accepted connections
+  const loadConnections = async () => {
+    setIsLoadingConnections(true);
+    try {
+      const data = await getAcceptedConnections();
+      setConnections(data || []);
+    } catch (error) {
+      console.error('Failed to load connections:', error);
+      // Don't show error toast as it's not critical
+    } finally {
+      setIsLoadingConnections(false);
+    }
+  };
+
   // Initial load and when filters change
   useEffect(() => {
     loadUserTrips(true);
@@ -100,31 +119,11 @@ export const useUserProfile = () => {
     }
   }, [page]);
 
+  // Load connections on mount
+  useEffect(() => {
+    loadConnections();
+  }, []);
 
-  const [connections] = useState<Connection[]>([
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b9f8c2b8?w=50&h=50&fit=crop&crop=face",
-      destination: "Bali, Indonesia",
-      travelDate: "2024-08-15",
-      status: "active",
-      mutualConnections: 3,
-      isOnline: true,
-    },
-    {
-      id: "2",
-      name: "Mike Chen",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face",
-      destination: "Tokyo, Japan",
-      travelDate: "2024-09-20",
-      status: "pending",
-      mutualConnections: 1,
-      isOnline: false,
-    },
-  ]);
 
   const [bookings] = useState<Booking[]>([
     {
@@ -339,6 +338,7 @@ export const useUserProfile = () => {
     isLoadingTrips,
     isLoadingProfile,
     isChangingPassword,
+    isLoadingConnections,
     // Trip search/filter
     tripSearch,
     setTripSearch,

@@ -43,20 +43,34 @@ export const useSocket = (
     } else {
       console.log(`[Client] Group chat ${chatId} → already joined server-side`);
     }
+
     // Mark as read via API (persistence)
     api.post(`/messages/${chatId}/read`).catch(() => { });
-
-    // Also tell the socket (for real-time UI update on the other side)
-    // We don't have specific message IDs here, but we can signal "all read" differently or
-    // just rely on the other user seeing us online?
-    // For now, we will mark NEW incoming messages as read.
 
     const fetchMessages = async () => {
       try {
         // This endpoint works for both! (you already have it)
         const res = await api.get(`/messages/${chatId}`);
-        setMessages(res.data || []);
+        const fetchedMessages = res.data || [];
+
+        // Debug: Check if senderName is included
+        console.log('📩 Fetched messages sample:', fetchedMessages[0]);
+
+        setMessages(fetchedMessages);
         scrollToBottom();
+
+        // Mark all unread messages from other users as read via socket
+        const unreadMessageIds = fetchedMessages
+          .filter((msg: ChatMessage) => msg.senderId !== currentUserId && msg.status !== 'read')
+          .map((msg: ChatMessage) => msg.id);
+
+        if (unreadMessageIds.length > 0) {
+          socket.emit('markRead', {
+            conversationId: selectedUser?.type === 'group' ? undefined : chatId,
+            groupId: selectedUser?.type === 'group' ? chatId : undefined,
+            messageIds: unreadMessageIds
+          });
+        }
       } catch (err) {
         console.error("Failed to fetch messages:", err);
       }
@@ -65,6 +79,11 @@ export const useSocket = (
     fetchMessages();
 
     const onNewMessage = (msg: ChatMessage) => {
+      // Debug: Check if new message has sender info
+      console.log('📨 New message received:', msg);
+      console.log('👤 Sender name:', msg.senderName);
+      console.log('🖼️ Sender image:', msg.senderProfileImage);
+
       // Accept message if it belongs to this chat (either conversationId or groupId matches)
       if (msg.conversationId === chatId || msg.groupId === chatId) {
         setMessages((prev) =>

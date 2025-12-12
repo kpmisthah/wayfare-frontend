@@ -16,3 +16,27 @@ export const sendConnectionRequest = async (receiverId: string) => {
         throw new Error(errorMessage);
     }
 };
+
+export const getMyConnections = async () => {
+    try {
+        const response = await api.get('/connections');
+        return response.data;
+    } catch (err) {
+        const error = err as { response?: { data?: { message?: string } | string } };
+        const errorMessage = (typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message) || 'Failed to fetch connections';
+        console.error('Failed to fetch connections:', errorMessage);
+        throw new Error(errorMessage);
+    }
+};
+
+export const getAcceptedConnections = async () => {
+    try {
+        const response = await api.get('/connections/accepted');
+        return response.data;
+    } catch (err) {
+        const error = err as { response?: { data?: { message?: string } | string } };
+        const errorMessage = (typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message) || 'Failed to fetch accepted connections';
+        console.error('Failed to fetch accepted connections:', errorMessage);
+        throw new Error(errorMessage);
+    }
+};

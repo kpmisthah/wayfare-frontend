@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import api from "@/lib/api";
 import Chat from "./chat";
 import { useAuthStore } from "@/store/Auth";
@@ -35,20 +35,30 @@ export default function ChatUi() {
 
 
   const [isChatOpenOnMobile, setIsChatOpenOnMobile] = useState(false);
+
+  // Use ref to avoid stale closure in socket handler
+  const selectedRef = useRef<ChatConnection | null>(null);
+
+  useEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
+
   useEffect(() => {
     const socket = getSocket();
 
     const handleNewMessage = (msg: ChatMessage) => {
       setConnections((prev) => {
-        return prev
+        const updated = prev
           .map((chat) => {
             const chatId = chat.groupId || chat.conversationId;
             const msgChatId = msg.groupId || msg.conversationId;
 
             if (chatId === msgChatId) {
+              // Use ref to get current selected value
+              const currentSelected = selectedRef.current;
               const isCurrentChatOpen =
-                selected &&
-                (selected.groupId || selected.conversationId) === chatId;
+                currentSelected &&
+                (currentSelected.groupId || currentSelected.conversationId) === chatId;
 
               return {
                 ...chat,
@@ -60,21 +70,48 @@ export default function ChatUi() {
               };
             }
             return chat;
-          })
-          .sort((a, b) => {
-            const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
-            const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
-            return new Date(timeB).getTime() - new Date(timeA).getTime();
           });
+
+        // Always sort after updating messages
+        const sorted = updated.sort((a, b) => {
+          const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
+          const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
+          return new Date(timeB).getTime() - new Date(timeA).getTime();
+        });
+
+        return sorted;
       });
     };
 
+    const handleMessagesRead = (data: { messageIds: string[], conversationId?: string, groupId?: string }) => {
+      setConnections((prev) =>
+        prev.map((chat) => {
+          const chatId = chat.groupId || chat.conversationId;
+          const readChatId = data.groupId || data.conversationId;
+
+          // If this chat's last message was read, update its status
+          if (chatId === readChatId && chat.lastMessage && data.messageIds.includes(chat.lastMessage.id)) {
+            return {
+              ...chat,
+              lastMessage: {
+                ...chat.lastMessage,
+                status: 'read'
+              }
+            };
+          }
+          return chat;
+        })
+      );
+    };
+
     socket.on("receiveMessage", handleNewMessage);
+    socket.on("messagesRead", handleMessagesRead);
 
     return () => {
       socket.off("receiveMessage", handleNewMessage);
+      socket.off("messagesRead", handleMessagesRead);
     };
-  }, [selected, user?.id]);
+  }, [user?.id]); // Removed 'selected' from dependencies
 
   // --- useEffects ---
   useEffect(() => {
@@ -113,18 +150,57 @@ export default function ChatUi() {
     };
   }, [user?.id]);
 
+  // Fetch and sort connections
+  const fetchConnections = async () => {
+    try {
+      const res = await api.get<ChatConnection[]>("/messages/chats");
+      console.log(res.data, "=============result of chating in fetching");
 
+      // Sort connections by most recent message
+      const sorted = (res.data || []).sort((a, b) => {
+        const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
+        const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
+        return new Date(timeB).getTime() - new Date(timeA).getTime();
+      });
+
+      setConnections(sorted);
+    } catch (err) {
+      console.error("Failed to load connections", err);
+    }
+  };
+
+  // Initial fetch
   useEffect(() => {
-    const fetchConnections = async () => {
-      try {
-        const res = await api.get<ChatConnection[]>("/messages/chats");
-        console.log(res.data, "=============result of chating in feecthcing");
-        setConnections(res.data || []);
-      } catch (err) {
-        console.error("Failed to load connections", err);
+    fetchConnections();
+  }, []);
+
+  // Refetch when user returns to the page (tab becomes visible)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible, refetch to get latest messages
+        fetchConnections();
       }
     };
-    fetchConnections();
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // Also refetch when window gains focus
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchConnections();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
   // --- End useEffects ---
 
@@ -168,8 +244,8 @@ export default function ChatUi() {
         return [...prev, createdGroup];
       });
 
-      setSelected(createdGroup); 
-      setIsChatOpenOnMobile(true); 
+      setSelected(createdGroup);
+      setIsChatOpenOnMobile(true);
 
       // Reset & close
       setShowAddMembersModal(false);
@@ -189,12 +265,22 @@ export default function ChatUi() {
 
   const handleChatSelect = (chat: ChatConnection) => {
     setSelected(chat);
-    setIsChatOpenOnMobile(true); 
+    setIsChatOpenOnMobile(true);
+
+    // Mark the last message as read when selecting a chat
+    if (chat.lastMessage && chat.lastMessage.senderId !== user?.id) {
+      const socket = getSocket();
+      socket.emit('markRead', {
+        conversationId: chat.conversationId,
+        groupId: chat.groupId,
+        messageIds: [chat.lastMessage.id]
+      });
+    }
   };
 
   const handleCloseChatOnMobile = () => {
     setSelected(null);
-    setIsChatOpenOnMobile(false); 
+    setIsChatOpenOnMobile(false);
   };
 
   return (
@@ -273,7 +359,7 @@ export default function ChatUi() {
                         <p className="text-sm text-gray-600 truncate">
                           {c.lastMessage
                             ? c.lastMessage.senderId === user?.id
-                              ? `You: ${c.lastMessage.content}`
+                              ? `You: ${c.lastMessage.content} `
                               : c.lastMessage.content
                             : c.type === "group"
                               ? `${c.members?.length} members`
@@ -283,11 +369,6 @@ export default function ChatUi() {
                           {c.lastMessage && (
                             <span className="text-xs text-gray-500">
                               {dayjs(c.lastMessage.createdAt).format("HH:mm")}
-                            </span>
-                          )}
-                          {(c.unreadCount || 0) > 0 && (
-                            <span className="bg-green-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center mt-1">
-                              {c.unreadCount}
                             </span>
                           )}
                         </div>
@@ -307,10 +388,10 @@ export default function ChatUi() {
         >
           {selected ? (
             <Chat
-              chatId={getChatId(selected) || ''} 
+              chatId={getChatId(selected) || ''}
               currentUserId={user?.id}
-              selectedUser={selected} 
-              onBackClick={handleCloseChatOnMobile} 
+              selectedUser={selected}
+              onBackClick={handleCloseChatOnMobile}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center bg-gray-50">

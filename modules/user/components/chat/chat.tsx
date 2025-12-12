@@ -49,6 +49,22 @@ export default function Chat({
       .slice(0, 2);
   };
 
+  const getSenderDisplayName = (senderId: string) => {
+    // If senderId looks like a UUID, just show "Member"
+    if (senderId && senderId.includes('-') && senderId.length > 20) {
+      return "Member";
+    }
+    // If it's a short ID, capitalize and format nicely
+    if (senderId) {
+      // Extract readable part (e.g., "user123" -> "User 123")
+      const formatted = senderId
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+      return formatted || "Member";
+    }
+    return "Unknown";
+  };
+
   const handleStartCall = (type: "video" | "audio") => {
     const recipientId = selectedUser?.userId;
     console.log(recipientId, "reciepientIdd");
@@ -208,12 +224,22 @@ export default function Chat({
               <div className={`flex ${mine ? "justify-end" : "justify-start"} mb-1 group`}>
                 {!mine && (
                   <div className="flex-shrink-0 mr-2 self-end mb-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold
-                      ${isGroup ? "bg-blue-500" : "bg-green-500"}`}>
-                      {isGroup
-                        ? (m.senderId?.slice(0, 2).toUpperCase() || "U")
-                        : getInitials(selectedUser?.name || "U")}
-                    </div>
+                    {m.senderProfileImage ? (
+                      <img
+                        src={m.senderProfileImage}
+                        alt={m.senderName || 'User'}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold
+                        ${isGroup ? "bg-blue-500" : "bg-green-500"}`}>
+                        {isGroup && m.senderName
+                          ? getInitials(m.senderName)
+                          : isGroup
+                            ? getInitials(getSenderDisplayName(m.senderId))
+                            : getInitials(selectedUser?.name || "U")}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -227,7 +253,7 @@ export default function Chat({
                   {/* Sender Name in Group */}
                   {showSenderName && (
                     <p className="text-xs font-bold text-orange-600 mb-1">
-                      {m.senderId || "Unknown"}
+                      {m.senderName || getSenderDisplayName(m.senderId)}
                     </p>
                   )}
 

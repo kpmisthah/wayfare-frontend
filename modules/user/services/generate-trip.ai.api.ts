@@ -1,12 +1,24 @@
 import api from "@/lib/api";
 
-export const generateTrip = async (data: { destination: string, duration: string, travelerType: string, budget: string, startDate: string, visiblity: boolean }) => {
+export const generateTrip = async (data: {
+    destination: string;
+    duration: string;
+    travelerType: string;
+    budget: string;
+    startDate: string;
+    visiblity: boolean;
+    preferences?: {
+        activities: string[];
+        pace: string;
+        interests: string[];
+    };
+}) => {
     try {
         let response = await api.post('/trip/generate', data)
         return response.data
     } catch (error) {
         console.log(error);
-
+        throw error;
     }
 }
 
@@ -16,7 +28,7 @@ export const fetchTrip = async (id: string, destination: string) => {
         return response.data
     } catch (error) {
         console.log(error);
-
+        throw error;
     }
 }
 
@@ -52,5 +64,6 @@ export const generateLongTrip = async (data: {
         return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
