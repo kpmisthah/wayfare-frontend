@@ -13,12 +13,7 @@ import { useDashBoard } from "../hooks/use-dashboard";
 
 
 const AdminDashboard = () => {
-  // const dashboardStats = {
-  //   totalUsers: 12847,
-  //   totalAgencies: 245,
-  //   totalBookings: 3421,
-  //   totalRevenue: 2845720,
-  // };
+
   const {cards,revenue,statusOverview,loading} = useDashBoard()
    if (loading) return <p>Loading dashboard...</p>;
   return (

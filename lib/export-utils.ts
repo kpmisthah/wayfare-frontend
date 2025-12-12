@@ -1,15 +1,9 @@
-/**
- * Utility functions for exporting data to CSV format
- */
-
 interface ExportColumn<T> {
     header: string;
     accessor: keyof T | ((row: T) => string | number);
 }
 
-/**
- * Converts an array of objects to CSV format and triggers download
- */
+
 export function exportToCSV<T extends object>(
     data: T[],
     columns: ExportColumn<T>[],
@@ -20,10 +14,10 @@ export function exportToCSV<T extends object>(
         return;
     }
 
-    // Create headers
+    
     const headers = columns.map((col) => `"${col.header}"`).join(',');
 
-    // Create rows
+
     const rows = data.map((row) => {
         return columns
             .map((col) => {
@@ -33,7 +27,6 @@ export function exportToCSV<T extends object>(
                 } else {
                     value = row[col.accessor];
                 }
-                // Escape quotes and wrap in quotes
                 const stringValue = String(value ?? '');
                 return `"${stringValue.replace(/"/g, '""')}"`;
             })

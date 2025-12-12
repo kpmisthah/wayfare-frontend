@@ -29,8 +29,9 @@ export const useForgotPassword = (redirectUrl: string) => {
     try {
       await forgotPassword(forgotEmail);
       localStorage.setItem('resetEmail', forgotEmail)
-      router.push(`${redirectUrl}?email=${encodeURIComponent(forgotEmail)}`);
       setForgotPasswordSuccess(true);
+      // Redirect to OTP verification page, not directly to reset password
+      router.push(`${redirectUrl}?email=${encodeURIComponent(forgotEmail)}`);
     } catch (error) {
       const err = error as { response?: { data?: { message?: string }; message?: string }; message?: string };
       const message =

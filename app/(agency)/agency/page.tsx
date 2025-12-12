@@ -1,4 +1,3 @@
-// app/agency/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,7 +6,6 @@ import { Dashboard } from "@/modules/agency/components/dashboard/DashboardOvervi
 import { PackageManagement } from "@/modules/agency/components/packages/PackageManagement";
 import { BookingManagement } from "@/modules/agency/components/bookings/BookingManagement";
 import { AgencyWallet } from "@/modules/agency/components/packages/AddPackage";
-import { AnalyticsFeedback } from "@/modules/agency/components/analytics/AnalyticsFeedback";
 import AgencyProfile  from "@/modules/agency/components/profile/AgencyProfile";
 
 
@@ -25,8 +23,6 @@ const TravelAgencyDashboard = () => {
         return <BookingManagement />;
       case "AgencyWallet":
         return <AgencyWallet />;
-      case "analytics":
-        return <AnalyticsFeedback />;
       case "profile":
         return <AgencyProfile />;
       default:

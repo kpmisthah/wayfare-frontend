@@ -33,7 +33,6 @@ const FinancialManagement = () => {
   const {
     overview,
     loading,
-    // Transaction state
     transactions,
     transactionPage,
     setTransactionPage,
@@ -41,7 +40,6 @@ const FinancialManagement = () => {
     transactionLoading,
     transactionTotalPages,
     transactionTotal,
-    // Agency state
     agencyList,
     agencyPage,
     setAgencyPage,

@@ -5,14 +5,17 @@ import { wallet } from "../services/wallet.api";
 import { WalletSummary } from "../types/wallet.type";
 
 export const useAgencyWallet = () => {
-  const [walletData, setWalletData] = useState<WalletSummary|null>(null);
-  const[loading,setLoading] = useState(false)
+  const [walletData, setWalletData] = useState<WalletSummary | null>(null);
+  const [loading, setLoading] = useState(false)
   const fetchWalletData = async () => {
     try {
       setLoading(true);
       const walletRes = await wallet()
 
       setWalletData(walletRes);;
+    } catch (error) {
+      console.error('Failed to fetch wallet data:', error);
+      setWalletData(null);
     } finally {
       setLoading(false);
     }

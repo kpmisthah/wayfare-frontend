@@ -8,19 +8,43 @@ const api = axios.create({
 });
 
 
+interface ApiErrorResponse {
+  message?: string;
+  statusCode?: number;
+  code?: string;
+  error?: string;
+}
+
 api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error: AxiosError<{ message?: string; statusCode?: number }>) => {
-
-    const silentErrors = [StatusCode.UNAUTHORIZED]; 
+  (error: AxiosError<ApiErrorResponse>) => {
+    const silentError = error.config?.silentError;
 
     if (error.response) {
       const statusCode = error.response.status;
       const errorMessage = error.response.data?.message || 'Something went wrong';
 
-      if (!silentErrors.includes(statusCode)) {
+      const silentErrors = [StatusCode.UNAUTHORIZED];
+
+      if (statusCode === StatusCode.UNAUTHORIZED) {
+        const data = error.response.data;
+        if (data?.code === 'USER_BLOCKED' || data?.message?.includes('blocked')) {
+          toast.error('Account Blocked', {
+            description: 'Your account has been blocked by the administrator.',
+          });
+          if (typeof window !== 'undefined') {
+            const isAgency = window.location.pathname.startsWith('/agency');
+            setTimeout(() => {
+              window.location.href = isAgency ? '/agency/login' : '/login';
+            }, 2000);
+          }
+        }
+      }
+
+      // Don't show toast if silentError flag is set
+      if (!silentError && !silentErrors.includes(statusCode)) {
         switch (statusCode) {
           case StatusCode.BAD_REQUEST:
             toast.error('Bad Request', {
@@ -66,13 +90,11 @@ api.interceptors.response.use(
         }
       }
     } else if (error.request) {
-      // Network error - no response received
       toast.error('Network Error', {
         description: 'Unable to connect to server. Please check your internet connection.',
       });
     }
 
-    // Re-throw the error so it can still be caught by specific handlers
     return Promise.reject(error);
   }
 );

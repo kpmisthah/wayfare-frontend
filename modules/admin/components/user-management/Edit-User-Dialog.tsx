@@ -9,7 +9,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Save } from "lucide-react";
 import { EditUserDialogProps } from "../../types/edit-modal.type";
 import { useEditForm } from "../../hooks/user-management/use-edit-form";
-// Edit User Dialog
+
 export const EditUserDialog = ({ user, isOpen, onOpenChange, onSave }:EditUserDialogProps) => {
     const {formData,setFormData,handleChange}  = useEditForm(user)
     const handleSubmit = () => {

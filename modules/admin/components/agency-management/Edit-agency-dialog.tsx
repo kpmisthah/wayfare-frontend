@@ -19,15 +19,9 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Save } from "lucide-react";
 import { AgencyStatus } from "../../types/agency.status.enum";
+import { EditAgencyDialogProps } from "../../types/modal.type";
 
 
-interface EditAgencyDialogProps {
-  agency: Agency | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (agency: Agency) => void;
-  loading: boolean
-}
 
 export const EditAgencyDialog = ({
   agency,

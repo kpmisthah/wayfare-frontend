@@ -16,6 +16,7 @@ import { useRecentWalletTx } from "../../hooks/use-recent-transaction";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/Auth";
 import { Bank } from "../../types/bank.type";
+import { toast } from "sonner";
 export const AgencyWallet = () => {
   const { walletData } = useAgencyWallet();
   const { data, loading } = useRecentWalletTx();
@@ -38,6 +39,7 @@ export const AgencyWallet = () => {
   const [bankDetails, setBankDetails] = useState<Bank>(emptyBankData);
 
   const [payoutAmount, setPayoutAmount] = useState("");
+  const [payoutError, setPayoutError] = useState("");
   const [formData, setFormData] = useState(bankDetails);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,10 +68,14 @@ export const AgencyWallet = () => {
       let response;
       if (hasBankDetails) {
         response = await api.patch("/agency/update/bankDetails", payload);
-        alert("Bank details updated successfully!");
+        toast.success("Bank details updated!", {
+          description: "Your bank account information has been updated successfully.",
+        });
       } else {
         response = await api.post("/agency/bank-details", payload);
-        alert("Bank details saved successfully!");
+        toast.success("Bank details saved!", {
+          description: "Your bank account has been added successfully.",
+        });
       }
 
       await fetchBankDetails();
@@ -79,35 +85,64 @@ export const AgencyWallet = () => {
       const error = err as { response?: { data?: { message?: string } } };
       console.error("Bank save error:", error);
       const message = error.response?.data?.message || "Failed to save bank details";
-      alert(message);
+      toast.error("Error saving bank details", {
+        description: message,
+      });
     }
   };
 
   //handlePayoutSubmit 
   const handlePayoutSubmit = async () => {
+    setPayoutError("");
+
     if (!hasBankDetails) {
-      alert("Please add bank details first");
+      setPayoutError("Please add your bank details first before requesting a payout.");
       setActiveTab("bank");
       return;
     }
 
-    if (!payoutAmount || Number(payoutAmount) <= 0) {
-      alert("Please enter a valid amount");
+    if (!payoutAmount || payoutAmount.trim() === "") {
+      setPayoutError("Please enter a payout amount.");
+      return;
+    }
+
+    const amount = Number(payoutAmount);
+    const availableBalance = walletData?.walletAmount ?? 0;
+
+    if (amount <= 0) {
+      setPayoutError("Please enter a valid amount greater than ₹0.");
+      return;
+    }
+
+    if (amount > availableBalance) {
+      setPayoutError(
+        `Insufficient balance. You can only request up to ₹${availableBalance.toLocaleString()} (your current balance).`
+      );
+      return;
+    }
+
+    if (amount < 100) {
+      setPayoutError("Minimum payout amount is ₹100.");
       return;
     }
 
     try {
       await api.post("/agency/payout", {
-        amount: Number(payoutAmount),
+        amount: amount,
       });
 
-      alert("Payout request sent successfully!");
+      toast.success("Payout request submitted!", {
+        description: "The amount will be transferred to your bank account within 2-3 business days.",
+        duration: 5000,
+      });
       setShowPayoutModal(false);
       setPayoutAmount("");
+      setPayoutError("");
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
       console.error('Payout error:', error);
-      alert(error.response?.data?.message || "Payout failed");
+      const errorMessage = error.response?.data?.message || "Failed to process payout request. Please try again.";
+      setPayoutError(errorMessage);
     }
   };
   useEffect(() => {
@@ -240,14 +275,24 @@ export const AgencyWallet = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((transaction) => (
-                  <tr
-                    key={transaction.id}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                  >
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        {/* <div
+                {!Array.isArray(data) || data.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center text-slate-500">
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-lg font-medium">No transactions yet</p>
+                        <p className="text-sm">Your recent transactions will appear here</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  data.map((transaction) => (
+                    <tr
+                      key={transaction.id}
+                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                    >
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          {/* <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             transaction.type === "credit"
                               ? "bg-green-100"
@@ -264,66 +309,67 @@ export const AgencyWallet = () => {
                             <Clock className="w-5 h-5 text-orange-600" />
                           )}
                         </div> */}
-                        <div>
-                          <p className="font-semibold text-slate-800">
-                            {transaction.name}
-                          </p>
-                          {/* <p className="text-sm text-slate-500">
+                          <div>
+                            <p className="font-semibold text-slate-800">
+                              {transaction.name}
+                            </p>
+                            {/* <p className="text-sm text-slate-500">
                             {transaction.type === "credit"
                               ? "Received"
                               : transaction.type === "debit"
                               ? "Withdrawn"
                               : "Pending"}
                           </p> */}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    {/* <td className="py-4 px-6">
+                      </td>
+                      {/* <td className="py-4 px-6">
                       <p className="text-slate-700">{transaction.booking}</p>
                     </td> */}
-                    <td className="py-4 px-6">
-                      <p className="text-slate-600">
-                        {new Date(transaction.createdAt).toLocaleDateString(
-                          "en-IN"
-                        )}
-                      </p>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${transaction.status === "SUCCEEDED"
-                          ? "bg-green-100 text-green-700"
-                          : transaction.status === "PENDING"
-                            ? "bg-orange-100 text-orange-700"
-                            : "bg-blue-100 text-blue-700"
-                          }`}
-                      >
-                        {transaction.status === "SUCCEEDED" ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : transaction.status === "PENDING" ? (
-                          <Clock className="w-3 h-3" />
-                        ) : (
-                          <Clock className="w-3 h-3" />
-                        )}
-                        {transaction.status.charAt(0).toUpperCase() +
-                          transaction.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <p
-                      // className={`font-bold ${
-                      //   transaction.type === "credit"
-                      //     ? "text-green-600"
-                      //     : transaction.type === "debit"
-                      //     ? "text-red-600"
-                      //     : "text-orange-600"
-                      // }`}
-                      >
-                        {/* {transaction.type === "debit" ? "-" : "+"} ₹ */}
-                        {transaction.amount.toLocaleString()}
-                      </p>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="py-4 px-6">
+                        <p className="text-slate-600">
+                          {new Date(transaction.createdAt).toLocaleDateString(
+                            "en-IN"
+                          )}
+                        </p>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span
+                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${transaction.status === "SUCCEEDED"
+                            ? "bg-green-100 text-green-700"
+                            : transaction.status === "PENDING"
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-blue-100 text-blue-700"
+                            }`}
+                        >
+                          {transaction.status === "SUCCEEDED" ? (
+                            <CheckCircle className="w-3 h-3" />
+                          ) : transaction.status === "PENDING" ? (
+                            <Clock className="w-3 h-3" />
+                          ) : (
+                            <Clock className="w-3 h-3" />
+                          )}
+                          {transaction.status.charAt(0).toUpperCase() +
+                            transaction.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <p
+                        // className={`font-bold ${
+                        //   transaction.type === "credit"
+                        //     ? "text-green-600"
+                        //     : transaction.type === "debit"
+                        //     ? "text-red-600"
+                        //     : "text-orange-600"
+                        // }`}
+                        >
+                          {/* {transaction.type === "debit" ? "-" : "+"} ₹ */}
+                          {transaction.amount.toLocaleString()}
+                        </p>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -400,15 +446,29 @@ export const AgencyWallet = () => {
                         <input
                           type="number"
                           value={payoutAmount}
-                          onChange={(e) => setPayoutAmount(e.target.value)}
+                          onChange={(e) => {
+                            setPayoutAmount(e.target.value);
+                            setPayoutError(""); // Clear error on input change
+                          }}
                           placeholder="Enter amount to withdraw"
-                          className="w-full pl-10 pr-4 py-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-2xl font-bold"
+                          min="100"
+                          max={walletData?.walletAmount ?? 0}
+                          className={`w-full pl-10 pr-4 py-4 border-2 ${payoutError ? "border-red-500" : "border-slate-200"} rounded-xl focus:border-blue-500 focus:outline-none text-2xl font-bold`}
                         />
                       </div>
-                      <p className="text-sm text-slate-500 mt-3">
-                        Available balance: ₹
-                        {walletData?.walletAmount.toLocaleString()}
-                      </p>
+                      {payoutError && (
+                        <p className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                          <span className="font-semibold">⚠️</span> {payoutError}
+                        </p>
+                      )}
+                      <div className="mt-3 space-y-1">
+                        <p className="text-sm text-slate-600">
+                          Available balance: <span className="font-semibold text-green-600">₹{(walletData?.walletAmount ?? 0).toLocaleString()}</span>
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Minimum payout: ₹100 | Processing time: 2-3 business days
+                        </p>
+                      </div>
                     </div>
 
                     {/* Show Bank Summary */}
@@ -444,7 +504,12 @@ export const AgencyWallet = () => {
                       {hasBankDetails ? (
                         <button
                           onClick={handlePayoutSubmit}
-                          disabled={!payoutAmount || Number(payoutAmount) <= 0}
+                          disabled={
+                            !payoutAmount ||
+                            Number(payoutAmount) <= 0 ||
+                            Number(payoutAmount) < 100 ||
+                            Number(payoutAmount) > (walletData?.walletAmount ?? 0)
+                          }
                           className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           <Download className="w-5 h-5" />
@@ -575,6 +640,6 @@ export const AgencyWallet = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };

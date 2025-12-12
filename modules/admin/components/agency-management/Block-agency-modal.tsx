@@ -1,14 +1,8 @@
 import { Button } from "@/shared/components/ui/button";
 import Modal from "@/shared/components/common/Modal";
-import { Agency } from "../../types/agency.type";
+import { BlockAgencyModalProps } from "../../types/modal.type";
 
-interface BlockAgencyModalProps {
-  isOpen: boolean;
-  agency: Agency | null;
-  loading?: boolean;
-  onClose: () => void;
-  onConfirm: (updatedAgency: Agency) => void;
-}
+
 
 const BlockAgencyModal: React.FC<BlockAgencyModalProps> = ({
   isOpen,

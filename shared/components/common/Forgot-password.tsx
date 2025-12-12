@@ -16,9 +16,6 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { useForgotPassword } from "../../hooks/use-forgot-password";
 import { ForgotPasswordProps } from "@/shared/types/auth.type";
 
-// interface ForgotPasswordDialogProps {
-//   children: React.ReactNode;
-// }
 
 export const ForgotPasswordDialog = ({redirectUrl,children}:ForgotPasswordProps) => {
   console.log(redirectUrl,'in modal forgotpasswordDialog');

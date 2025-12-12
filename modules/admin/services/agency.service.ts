@@ -32,3 +32,20 @@ export const updateAgencies = async (agencyId: string) => {
     throw error;
   }
 };
+
+export const updateAgencyDetails = async (
+  agencyId: string,
+  data: {
+    name: string;
+    email: string;
+    status?: string;
+  }
+) => {
+  try {
+    const response = await api.patch(`/admin/agency/${agencyId}`, data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

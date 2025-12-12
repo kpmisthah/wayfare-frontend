@@ -8,7 +8,7 @@ function ChatPage({ params }: { params: { conversationId: string } }) {
   const { user } = useAuthStore();
   const conversationId = params.conversationId;
 
-  if (!user) return null; // withAuth will handle redirect
+  if (!user) return null; 
 
   return (
     <Chat

@@ -50,13 +50,10 @@ export default function Chat({
   };
 
   const getSenderDisplayName = (senderId: string) => {
-    // If senderId looks like a UUID, just show "Member"
     if (senderId && senderId.includes('-') && senderId.length > 20) {
       return "Member";
     }
-    // If it's a short ID, capitalize and format nicely
     if (senderId) {
-      // Extract readable part (e.g., "user123" -> "User 123")
       const formatted = senderId
         .replace(/[-_]/g, ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -102,7 +99,6 @@ export default function Chat({
     socket.on("userOffline", handleOffline);
     socket.on("userStatus", handleStatus);
 
-    // Get initial status
     if (selectedUser?.userId) {
       socket.emit("getStatus", selectedUser.userId);
     }
@@ -202,7 +198,6 @@ export default function Chat({
           const mine = m.senderId === currentUserId;
           const showSenderName = isGroup && !mine;
 
-          // Date Separator Logic
           const currentDate = dayjs(m.createdAt);
           const prevDate = index > 0 ? dayjs(messages[index - 1].createdAt) : null;
           const showDateSeparator = !prevDate || !currentDate.isSame(prevDate, 'day');
@@ -250,7 +245,6 @@ export default function Chat({
                       : "bg-white text-gray-900 rounded-tl-none"
                     }`}
                 >
-                  {/* Sender Name in Group */}
                   {showSenderName && (
                     <p className="text-xs font-bold text-orange-600 mb-1">
                       {m.senderName || getSenderDisplayName(m.senderId)}
@@ -317,7 +311,6 @@ export default function Chat({
           <input
             type="text"
             value={text}
-            // onChange={(e) => setText(e.target.value)}
             onChange={(e) => handleTyping(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

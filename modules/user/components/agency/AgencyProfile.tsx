@@ -32,46 +32,14 @@ import { useAgencyById, usePackages } from "../../hooks/use-agency";
 import { fetchAgencyPackages } from "../../services/agency-packages.api";
 import { fetchAgencyById } from "@/modules/agency/services/agency.api";
 
-const mockReviews = [
-  {
-    id: "1",
-    name: "Priya Sharma",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b1e0?w=50&h=50&fit=crop&crop=face",
-    rating: 5,
-    date: "2 weeks ago",
-    comment:
-      "Absolutely amazing experience! The guides were knowledgeable and safety was their top priority.",
-  },
-  {
-    id: "2",
-    name: "Rahul Kumar",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face",
-    rating: 5,
-    date: "1 month ago",
-    comment:
-      "Best trekking experience ever! Adventure Seekers made our Himalayan dream come true.",
-  },
-  {
-    id: "3",
-    name: "Sarah Johnson",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face",
-    rating: 4,
-    date: "2 months ago",
-    comment:
-      "Professional service and great value for money. Highly recommended for adventure enthusiasts!",
-  },
-];
 
 const AgencyProfile = ({ id }: { id: string }) => {
   const [activeTab, setActiveTab] = useState("about");
   const { agency, setAgency } = useAgencyById(id)
-  const { packages, /* setPackages, */ page, totalPages, loadMore, search, setSearch } = usePackages(id);
+  const { packages, page, totalPages, loadMore, search, setSearch } = usePackages(id);
 
-  // Packages are filtered on the backend now
   const filteredPackages = packages;
+
   useEffect(() => {
     async function fetchAgency() {
       let agency = await fetchAgencyById(id);
@@ -80,18 +48,32 @@ const AgencyProfile = ({ id }: { id: string }) => {
     fetchAgency();
   }, []);
 
+  useEffect(() => {
+    console.log('Packages data:', packages);
+    console.log('Packages length:', packages.length);
+    console.log('Agency ID:', id);
+  }, [packages, id]);
+
   if (!agency) return <p className="p-6">Agency not found</p>;
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       {/* Cover Image */}
-      <div className="relative h-64 md:h-80 overflow-hidden">
-        <img
-          src={agency?.user.image}
-          alt="Cover Image"
-          className="w-full h-full object-cover"
-        />
+      <div className="relative h-64 md:h-80 overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600">
+        {agency?.user?.bannerImage ? (
+          <img
+            src={agency?.user?.bannerImage || ''}
+            alt="Cover Image"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <h1 className="text-4xl font-bold text-white">
+              {agency?.user?.name}
+            </h1>
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Profile Info Overlay */}
@@ -99,48 +81,20 @@ const AgencyProfile = ({ id }: { id: string }) => {
           <div className="container mx-auto">
             <div className="flex items-end gap-6">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={agency?.user.image} alt={agency?.user.name} />
-                <AvatarFallback className="text-2xl">AS</AvatarFallback>
+                <AvatarImage src={agency?.user?.profileImage} alt={agency?.user?.name} />
+                <AvatarFallback className="text-2xl">
+                  {agency?.user?.name?.substring(0, 2).toUpperCase() || 'AG'}
+                </AvatarFallback>
               </Avatar>
 
               <div className="flex-1 text-white">
-                {/* <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold">{agency?.name}</h1>
-                  <div className="flex items-center gap-4">
-                    {agency?.certifications.map((cert, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="bg-white/20 text-white border-white/30"
-                      >
-                        <Award className="h-3 w-3 mr-1" />
-                        {cert}
-                      </Badge>
-                    ))}
-                  </div>
-                </div> */}
-
-                {/* <div className="flex items-center gap-6 text-sm">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{agency?.rating}</span>
-                    <span className="opacity-80">
-                      ({agency?.reviewCount} reviews)
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{agency?.location}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{agency?.yearsExperience}+ years experience</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span> happy clients</span>
-                  </div>
-                </div> */}
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">
+                  {agency?.user?.name}
+                </h1>
+                <p className="text-white/80 flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {agency?.address || 'Location not specified'}
+                </p>
               </div>
 
               <div className="flex gap-2">
@@ -167,7 +121,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="packages">Packages</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
           </TabsList>
 
           {/* About Tab */}
@@ -181,19 +134,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
                     <p className="text-muted-foreground leading-relaxed mb-4">
                       {agency?.description}
                     </p>
-
-                    {/* <h4 className="font-semibold mb-3">Our Services</h4> */}
-                    {/* <ul className="grid grid-cols-1 md:grid-cols-2 gap-2"> */}
-                    {/* {agency?.services.map((service, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center text-sm text-muted-foreground"
-                        >
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3" />
-                          {service}
-                        </li>
-                      ))} */}
-                    {/* </ul> */}
                   </CardContent>
                 </Card>
 
@@ -202,9 +142,8 @@ const AgencyProfile = ({ id }: { id: string }) => {
                   <CardContent className="p-6">
                     <h3 className="text-xl font-semibold mb-4">Specialties</h3>
                     <div className="flex flex-wrap gap-2">
-                      {/* {mockAgency.specialties.map((specialty, index) => ( */}
+
                       <Badge variant="outline">special</Badge>
-                      {/* ))} */}
                     </div>
                   </CardContent>
                 </Card>
@@ -250,19 +189,10 @@ const AgencyProfile = ({ id }: { id: string }) => {
 
                       <div className="flex items-start gap-3">
                         <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                        {/* <div>
-                          <p className="font-medium">Address</p>
-                          <p className="text-sm text-muted-foreground">
-                            {agency?.contact.address}
-                          </p>
-                        </div> */}
+
                       </div>
                     </div>
 
-                    <Button className="w-full mt-6">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Send Message
-                    </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -337,63 +267,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
                 </p>
               </div>
             )}
-          </TabsContent>
-
-          {/* Reviews Tab */}
-          <TabsContent value="reviews">
-            <div className="mb-6">
-              {/* <h3 className="text-2xl font-semibold mb-2">Customer Reviews</h3>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center">
-                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 mr-1" />
-                  <span className="text-lg font-medium">{agency?.rating}</span>
-                  <span className="text-muted-foreground ml-1">out of 5</span>
-                </div>
-                <span className="text-muted-foreground">
-                  {/* ({agency?.reviewCount} reviews) */}
-              {/* </span>
-              </div> */}
-            </div>
-
-            <div className="space-y-4">
-              {mockReviews.map((review) => (
-                <Card key={review.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarImage src={review.avatar} alt={review.name} />
-                        <AvatarFallback>{review.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{review.name}</h4>
-                          <span className="text-sm text-muted-foreground">
-                            {review.date}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center mb-3">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${i < review.rating
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-muted-foreground"
-                                }`}
-                            />
-                          ))}
-                        </div>
-
-                        <p className="text-muted-foreground">
-                          {review.comment}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </TabsContent>
         </Tabs>
       </div>

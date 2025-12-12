@@ -42,17 +42,6 @@ export const CheckoutForm: React.FC<Props> = ({ clientSecret,bookingId }) => {
         setPaymentStatus("failed");
         return
       }
-      //  else if (paymentIntent?.status === "succeeded") {
-      //   setPaymentStatus("succeeded");
-      //   router.push(`/booking/success?booking_id=${paymentIntent.id}&payment_method=card`);
-      // }
-      // setLoading(true)
-      // // setPaymentStatus("processing")
-      // const data = await verifyPayment(paymentIntent.id)
-      // console.log(data,'--------------------------------->data<------------------------')
-      // if(data.status == PAYMENTSTATUS.SUCCEEDED){
-      //   router.push(`/booking/success?booking_id=${paymentIntent.id}&payment_method=card`);
-      // }
       const pollPayment = async(interval=1000,maxAttempts=15,attempts=0)=>{
         const data = await verifyPayment(paymentIntent.id)
         console.log(data,'dataaaaaaaaaaa')

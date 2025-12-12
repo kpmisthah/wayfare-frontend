@@ -16,7 +16,6 @@ export const PersonalInformation = () => {
     isEditingProfile,
     handleChange,
     setIsEditingProfile,
-    // handlePreferenceToggle,
     handleSaveProfile,
   } = useUserProfile();
   const { user } = useAuthStore();
@@ -93,29 +92,6 @@ export const PersonalInformation = () => {
                 className="mt-1"
               />
             </div>
-            {/* <div>
-              <Label className="text-sm font-medium">Bio Tags</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {user?.preferences.map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => {
-                      handlePreferenceToggle(tag);
-                    }}
-                    className={`px-3 py-1 rounded-full border text-sm ${
-                      user?.preferences?.some((p) => p.id == tag.id)
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {tag.name}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Select up to 5 tags that best describe you
-              </p>
-            </div> */}
             <Button
               className="bg-blue-600 data-[state=active]:text-white rounded-lg"
               onClick={handleSaveProfile}
@@ -173,28 +149,6 @@ export const PersonalInformation = () => {
                 </Button>
               </div>
             )}
-            {/* {user?.preferences ? (
-              <div>
-                <p className="text-gray-700 leading-relaxed">
-                  {user?.preferences.map((pref) => pref.name).join(", ")}
-                </p>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center text-gray-400">
-                <p className="mb-2 italic">
-                  Tell other travelers about yourself
-                </p>
-                <Button
-                  onClick={() => setIsEditingProfile(true)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  <Plus className="w-3 h-3 mr-1" />
-                  Add Bio
-                </Button>
-              </div>
-            )} */}
           </div>
         )}
       </CardContent>

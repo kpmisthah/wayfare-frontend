@@ -95,29 +95,17 @@ export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => 
     setError("");
 
     try {
-      const requestBody: ResendOTPRequest = {
-        email: userEmail,
-      };
+      // Import forgotPassword from auth.api
+      const { forgotPassword } = await import("../services/auth.api");
 
-      const response = await fetch("/api/auth/resend-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
+      // Resend forgot password OTP by calling forgotPassword again
+      await forgotPassword(userEmail);
 
-      const data: APIResponse = await response.json();
-
-      if (response.ok && data.success) {
-        setTimeLeft(60);
-        setCanResend(false);
-        setOtp(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus(); // Focus first input
-        console.log("OTP resent successfully");
-      } else {
-        setError(data.message || "Failed to resend OTP. Please try again.");
-      }
+      setTimeLeft(60);
+      setCanResend(false);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus(); // Focus first input
+      console.log("OTP resent successfully");
     } catch (err) {
       setError("Something went wrong. Please try again.");
       console.error("OTP resend error:", err);
@@ -125,6 +113,7 @@ export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => 
       setIsResending(false);
     }
   };
+
 
   const handleBack = (): void => {
     // Navigate back to login page

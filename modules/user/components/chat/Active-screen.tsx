@@ -11,7 +11,6 @@ function ActiveCallContent() {
   const { isCallActive, callerId, conversationId, callType, callerSignalData, recipientId } = useCallStore();
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Determine partner ID correctly
   const partnerUserId = user?.id === callerId ? recipientId : callerId;
 
   const call = useCall(

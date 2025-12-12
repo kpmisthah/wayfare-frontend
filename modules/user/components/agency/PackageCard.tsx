@@ -2,17 +2,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Card,CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Clock, MapPin, Users, IndianRupee } from "lucide-react";
-import { itinerary } from "../../types/package.type";
 import Link from "next/link";
-interface PackageCardProps {
-  id: string;
-  title: string;
-  image: string[0];   
-  duration: string;
-  destination: string;
-  price: string;       
-  highlights: string;  
-}
+import { PackageCardProps } from "../../types/package.type";
 
 const PackageCard = ({
   id,
@@ -24,7 +15,7 @@ const PackageCard = ({
   highlights,
 
 }: PackageCardProps) => {
-  // const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
@@ -36,20 +27,6 @@ const PackageCard = ({
             alt={title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          {/* {discount > 0 && (
-            <div className="absolute top-4 left-4">
-              <Badge className="bg-primary">
-                {discount}% OFF
-              </Badge>
-            </div>
-          )} */}
-          {/* {difficulty && (
-            <div className="absolute top-4 right-4">
-              <Badge variant="secondary" className="bg-background/90">
-                {difficulty}
-              </Badge>
-            </div>
-          )} */}
         </div>
 
         <div className="p-6">

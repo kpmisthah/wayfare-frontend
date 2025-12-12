@@ -1,5 +1,4 @@
 import api from "@/lib/api";
-import { toast } from "sonner";
 import { AgencyProfile } from "../types/agency.type";
 
 export const fetchAgency = async () => {
@@ -38,9 +37,6 @@ export const createAgency = async (agency: {
     try {
         const response = await api.post('/agency/agency-profile', agency);
         console.log(response.data, 'from createAgency');
-        toast.success('Agency profile created!', {
-            description: 'Your agency profile has been successfully set up.',
-        });
         return response.data;
     } catch (error) {
         console.log(error);
@@ -51,9 +47,6 @@ export const createAgency = async (agency: {
 export const updateAgencyProfile = async (data: Partial<AgencyProfile>) => {
     try {
         const response = await api.patch('/agency/agency-profile', data);
-        toast.success('Profile updated!', {
-            description: 'Your agency profile has been successfully updated.',
-        });
         return response.data;
     } catch (error) {
         console.log(error);

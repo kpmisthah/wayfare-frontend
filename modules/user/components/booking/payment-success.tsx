@@ -20,21 +20,8 @@ import { motion } from "framer-motion";
 import { verifyPayment } from "../../services/verify-payment.api";
 import { PAYMENTSTATUS } from "../../types/payment.type";
 import PaymentFailurePage from "./payment-cancel";
-
-interface PaymentSuccessProps {
-  booking: {
-    id: string,
-    startDate: string,
-    duration: number,
-    title: string,
-    destination: string,
-    travelers: number,
-    totalAmount: number,
-    email: string,
-    bookingCode: string
-  };
-  paymentMethod: string
-}
+import { PaymentSuccessProps } from "../../types/payment.type";
+import { useRouter } from "next/navigation";
 
 const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMethod }) => {
   const handleDownloadTicket = () => console.log("Downloading ticket...");
@@ -43,8 +30,8 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
   const isPollingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const router = useRouter()
   useEffect(() => {
-    // Prevent multiple polling loops
     if (isPollingRef.current) return;
     isPollingRef.current = true;
 
@@ -54,7 +41,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
         const data = await verifyPayment(booking.id);
         console.log('Payment verification response:', data, 'attempt:', attempts + 1);
 
-        // Handle null/undefined response
         if (!data || !data.status) {
           console.log('No data or status in response, retrying...');
           if (attempts < maxAttempts) {
@@ -67,7 +53,7 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
 
         if (data.status === PAYMENTSTATUS.SUCCEEDED) {
           console.log('Payment SUCCEEDED!');
-
+          setStatus('success');
           return;
         } else if (data.status === PAYMENTSTATUS.FAILED) {
           console.log('Payment FAILED!');
@@ -103,7 +89,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
     // Start polling
     pollPayment();
 
-    // Cleanup on unmount
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -127,7 +112,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
     return <PaymentFailurePage bookingId={booking.id} />;
   }
 
-  // status === 'success'
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -247,12 +231,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
                   </div>
 
                   <div className="p-4 border rounded-lg">
-                    {/* <h4 className="font-medium text-gray-900">
-                      Transaction ID
-                    </h4>
-                    <p className="text-gray-700 font-mono text-sm break-all">
-                      {bookingData.transactionId}
-                    </p> */}
                   </div>
 
                   <div className="p-4 border rounded-lg">
@@ -273,30 +251,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="bg-white rounded-xl shadow-sm border p-5 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold mb-4">
-                Quick Actions
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <button
-                  onClick={handleDownloadTicket}
-                  className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Download className="w-5 h-5" />
-                  Download E-Ticket
-                </button>
-                <button
-                  onClick={handleShareBooking}
-                  className="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Share2 className="w-5 h-5" />
-                  Share Booking
-                </button>
-              </div>
-            </div>
-
             {/* Next Steps */}
             <div className="bg-white rounded-xl shadow-sm border p-5 sm:p-6 space-y-3">
               <h2 className="text-lg sm:text-xl font-semibold mb-3">
@@ -361,20 +315,10 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
                 </p>
               </div>
             </div>
-
-            {/* Continue exploring */}
-            <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-xl shadow-sm p-5 sm:p-6">
-              <h2 className="text-lg font-semibold mb-2">Continue Exploring</h2>
-              <p className="text-blue-100 text-sm mb-4">
-                Discover more amazing destinations for your next adventure.
-              </p>
-              <button className="w-full bg-white text-blue-600 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
-                Browse Packages
-              </button>
-            </div>
-
             {/* Back to Home */}
-            <button className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={()=>router.push('/')}
+            >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </button>

@@ -63,7 +63,7 @@ export const Settings = () => {
 
   const strength = passwordStrength(newPassword);
 
-  // Handle password change
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Errors = {};
@@ -178,7 +178,6 @@ export const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Change Password Modal - Now Using Reusable Component */}
         <Modal
           isOpen={isModalOpen}
           onClose={handleCloseModal}

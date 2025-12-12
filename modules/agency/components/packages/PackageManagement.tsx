@@ -111,7 +111,7 @@ export const PackageManagement = () => {
             To create a travel package, please complete your agency profile
             first.
           </p>
-  
+
         </div>
       </div>
     );
@@ -128,6 +128,22 @@ export const PackageManagement = () => {
               setShowForm(true);
               setEditingPackage(null);
               setFormData(initialFormData);
+              setPackageData({
+                title: "",
+                itinerary: [],
+                description: "",
+                destination: "",
+                duration: "",
+                highlights: [],
+                picture: [],
+                price: "",
+                status: PackageStatus.ACTIVE,
+                vehicle: "",
+                pickup_point: "",
+                drop_point: "",
+                details: "",
+                id: "",
+              });
             }}
             className="bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
           >
@@ -178,6 +194,23 @@ export const PackageManagement = () => {
                         setShowForm(true);
                         setEditingPackage(null);
                         setFormData(initialFormData);
+                        // Reset packageData to empty state
+                        setPackageData({
+                          title: "",
+                          itinerary: [],
+                          description: "",
+                          destination: "",
+                          duration: "",
+                          highlights: [],
+                          picture: [],
+                          price: "",
+                          status: PackageStatus.ACTIVE,
+                          vehicle: "",
+                          pickup_point: "",
+                          drop_point: "",
+                          details: "",
+                          id: "",
+                        });
                       }}
                       className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
                     >
@@ -454,9 +487,9 @@ export const PackageManagement = () => {
                   ].map(({ value, icon, desc }) => (
                     <label
                       key={value}
-                      className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${viewingPackage.vehicle === value
+                      className={`flex flex-col items-center p-4 border-2 rounded-xl transition-all duration-200 ${viewingPackage.vehicle === value
                         ? "border-indigo-500 bg-indigo-50"
-                        : "border-gray-200 hover:bg-indigo-50 hover:border-indigo-300"
+                        : "border-gray-200 bg-gray-50"
                         }`}
                     >
                       <input
@@ -465,12 +498,8 @@ export const PackageManagement = () => {
                         className="sr-only"
                         value={value}
                         checked={viewingPackage.vehicle === value}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            vehicle: e.target.value,
-                          })
-                        }
+                        disabled
+                        readOnly
                       />
                       <span className="text-3xl mb-2">{icon}</span>
                       <div className="text-center">
@@ -489,15 +518,9 @@ export const PackageManagement = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.pickupPoint}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pickupPoint: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g., Mumbai Airport / Railway Station"
+                    value={viewingPackage.pickup_point || "Not specified"}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-700"
                   />
                 </div>
                 <div>
@@ -506,12 +529,9 @@ export const PackageManagement = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.dropPoint}
-                    onChange={(e) =>
-                      setFormData({ ...formData, dropPoint: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    placeholder="e.g., Mumbai Airport / Railway Station"
+                    value={viewingPackage.drop_point || "Not specified"}
+                    readOnly
+                    className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-700"
                   />
                 </div>
               </div>

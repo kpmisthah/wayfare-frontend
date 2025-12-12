@@ -70,14 +70,13 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
     goToPage,
   } = useWallet(activeTab);
 
-  // Filter transactions based on active tab and search term
+  
   const filteredTransactions = transactionData.filter((t) => {
     const matchesTab =
       activeWalletTab === "all" ||
       (activeWalletTab === "credit" && t.transactionType === "CREDIT") ||
       (activeWalletTab === "debit" && t.transactionType === "DEBIT");
 
-    // Safety check for date
     const dateStr = t.date ? new Date(t.date).toLocaleDateString() : "";
 
     const matchesSearch =
@@ -203,13 +202,6 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
               <p className="text-sm text-muted-foreground">Detailed view of your credits and debits</p>
             </div>
 
-            {/* Actions: Export & Filter */}
-            {/* <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="h-9 gap-2">
-                    <Download className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Export</span>
-                </Button>
-            </div> */}
           </div>
 
           <Card className="shadow-sm overflow-hidden">

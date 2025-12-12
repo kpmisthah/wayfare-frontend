@@ -92,13 +92,6 @@ export function ProfileModal({ traveler, onClose, onConnect, connectionStatus }:
 
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-3">Interests</h3>
-            {/* <div className="flex flex-wrap gap-2">
-              {traveler.interests.map((interest, idx) => (
-                <span key={idx} className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium">
-                  {interest}
-                </span>
-              ))}
-            </div> */}
           </div>
 
           <div className="flex gap-3">

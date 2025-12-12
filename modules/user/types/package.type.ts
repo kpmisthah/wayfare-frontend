@@ -25,3 +25,13 @@ export interface PackagesResponse {
   total: number
   totalPages: number
 }
+
+export interface PackageCardProps {
+  id: string;
+  title: string;
+  image: string[0];   
+  duration: string;
+  destination: string;
+  price: string;       
+  highlights: string;  
+}

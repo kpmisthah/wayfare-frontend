@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/shared/components/layout/Header";
 import { useGenerateTrip } from "../../hooks/use-ai-trip-plan";
-import { DestinationAutocomplete } from "@/components/ui/destination-autocomplete";
+import { DestinationAutocomplete } from "@/shared/components/ui/destination-autocomplete";
 
 const PlanTrip = () => {
   const [activeTab, setActiveTab] = useState("short");

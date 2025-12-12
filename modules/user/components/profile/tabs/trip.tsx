@@ -103,34 +103,6 @@ export const Trips = () => {
       )}
 
       <TabsContent value="trips" className="space-y-6">
-        {/* Trip Stats */}
-        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {getTripStatusCount("upcoming")}
-            </div>
-            <div className="text-sm text-gray-600">Upcoming</div>
-          </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {getTripStatusCount("completed")}
-            </div>
-            <div className="text-sm text-gray-600">Completed</div>
-          </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">
-              {getTripStatusCount("confirmed")}
-            </div>
-            <div className="text-sm text-gray-600">Confirmed</div>
-          </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">
-              {getTripStatusCount("cancelled")}
-            </div>
-            <div className="text-sm text-gray-600">Cancelled</div>
-          </Card>
-        </div> */}
-
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search Input */}
@@ -194,12 +166,6 @@ export const Trips = () => {
                 </div>
 
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
-                  {/* <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>
-                          {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                        </span>
-                      </div> */}
                   <div className="flex items-center">
                     <Plane className="w-4 h-4 mr-2" />
                     <span>{trip.agencyName}</span>
@@ -214,15 +180,6 @@ export const Trips = () => {
                     <Plane className="w-4 h-4 mr-2" />
                     <span>Planned Date:{trip.travelDate}</span>
                   </div>
-                  {/* <div className="flex items-center justify-between">
-                        <span className="font-semibold text-lg text-blue-600">${trip.price}</span>
-                        {trip.rating && (
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                            <span>{trip.rating}</span>
-                          </div>
-                        )}
-                      </div> */}
                 </div>
 
                 {trip.highlights && (

@@ -13,8 +13,15 @@ export const useAgencyDashboard = () => {
                 setLoading(true);
                 const result = await fetchDashboardData();
                 setData(result);
+                setError(null);
             } catch (err: any) {
-                setError(err.message || 'Failed to load dashboard data');
+                // If it's a 404, the profile doesn't exist yet - don't show error
+                if (err?.response?.status === 404) {
+                    setData(null);
+                    setError(null);
+                } else {
+                    setError(err.message || 'Failed to load dashboard data');
+                }
             } finally {
                 setLoading(false);
             }

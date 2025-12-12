@@ -2,15 +2,8 @@
 import React from 'react';
 import { Button } from "@/shared/components/ui/button";
 import { AlertTriangle, X } from "lucide-react";
+import { DeleteConfirmDialogProps } from '../../types/modal.type';
 
-interface DeleteConfirmDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  title: string;
-  description: string;
-  itemName?: string;
-}
 
 export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   isOpen,

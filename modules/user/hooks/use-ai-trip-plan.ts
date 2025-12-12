@@ -98,7 +98,6 @@ export const useGenerateTrip = () => {
 
   const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -234,7 +233,6 @@ export const useGenerateTrip = () => {
       return false;
     } catch (error) {
       console.error("Error checking duplicate trips:", error);
-      // Continue with submission if check fails
       return false;
     }
   };

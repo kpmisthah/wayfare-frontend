@@ -10,7 +10,10 @@ export const useRecentWalletTx = () => {
     try {
       setLoading(true);
       const response = await getRecentWalletTx();
-      setData(response);
+      setData(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error('Failed to fetch wallet transactions:', error);
+      setData([]);
     } finally {
       setLoading(false);
     }

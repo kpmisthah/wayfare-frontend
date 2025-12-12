@@ -36,7 +36,7 @@ export default function ChatUi() {
 
   const [isChatOpenOnMobile, setIsChatOpenOnMobile] = useState(false);
 
-  // Use ref to avoid stale closure in socket handler
+
   const selectedRef = useRef<ChatConnection | null>(null);
 
   useEffect(() => {
@@ -54,7 +54,6 @@ export default function ChatUi() {
             const msgChatId = msg.groupId || msg.conversationId;
 
             if (chatId === msgChatId) {
-              // Use ref to get current selected value
               const currentSelected = selectedRef.current;
               const isCurrentChatOpen =
                 currentSelected &&
@@ -64,7 +63,7 @@ export default function ChatUi() {
                 ...chat,
                 lastMessage: msg,
                 unreadCount: isCurrentChatOpen
-                  ? 0 // Reset if this chat is open
+                  ? 0 
                   : (chat.unreadCount || 0) +
                   (msg.senderId === user?.id ? 0 : 1),
               };
@@ -72,7 +71,6 @@ export default function ChatUi() {
             return chat;
           });
 
-        // Always sort after updating messages
         const sorted = updated.sort((a, b) => {
           const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
           const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
@@ -89,7 +87,6 @@ export default function ChatUi() {
           const chatId = chat.groupId || chat.conversationId;
           const readChatId = data.groupId || data.conversationId;
 
-          // If this chat's last message was read, update its status
           if (chatId === readChatId && chat.lastMessage && data.messageIds.includes(chat.lastMessage.id)) {
             return {
               ...chat,
@@ -111,9 +108,9 @@ export default function ChatUi() {
       socket.off("receiveMessage", handleNewMessage);
       socket.off("messagesRead", handleMessagesRead);
     };
-  }, [user?.id]); // Removed 'selected' from dependencies
+  }, [user?.id]); 
 
-  // --- useEffects ---
+
   useEffect(() => {
     const socket = getSocket();
 
@@ -135,7 +132,6 @@ export default function ChatUi() {
         return updated;
       });
 
-      // Auto-select the group if YOU created it
       if (group.creatorId === user?.id) {
         setSelected(group);
         setIsChatOpenOnMobile(true);
@@ -144,19 +140,16 @@ export default function ChatUi() {
 
     socket.on("groupCreated", handleGroupCreated);
 
-    // Cleanup
     return () => {
       socket.off("groupCreated", handleGroupCreated);
     };
   }, [user?.id]);
 
-  // Fetch and sort connections
   const fetchConnections = async () => {
     try {
       const res = await api.get<ChatConnection[]>("/messages/chats");
       console.log(res.data, "=============result of chating in fetching");
 
-      // Sort connections by most recent message
       const sorted = (res.data || []).sort((a, b) => {
         const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
         const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
@@ -169,16 +162,13 @@ export default function ChatUi() {
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchConnections();
   }, []);
 
-  // Refetch when user returns to the page (tab becomes visible)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // Page became visible, refetch to get latest messages
         fetchConnections();
       }
     };
@@ -190,7 +180,6 @@ export default function ChatUi() {
     };
   }, []);
 
-  // Also refetch when window gains focus
   useEffect(() => {
     const handleFocus = () => {
       fetchConnections();
@@ -202,7 +191,7 @@ export default function ChatUi() {
       window.removeEventListener("focus", handleFocus);
     };
   }, []);
-  // --- End useEffects ---
+
 
   const filteredConnections = useMemo(() => {
     return connections.filter((c) =>
@@ -227,14 +216,14 @@ export default function ChatUi() {
     );
   };
 
-  // REAL GROUP CREATION
+
   const handleCreateGroup = async () => {
     if (!groupName.trim() || selectedMembers.length === 0 || !user?.id) return;
 
     try {
       const res = await api.post<ChatConnection>("/messages/group/create", {
         name: groupName,
-        memberIds: selectedMembers, // matches backend GroupChatDto
+        memberIds: selectedMembers, 
       });
       const createdGroup = res.data;
 
@@ -247,7 +236,6 @@ export default function ChatUi() {
       setSelected(createdGroup);
       setIsChatOpenOnMobile(true);
 
-      // Reset & close
       setShowAddMembersModal(false);
       setShowNewGroupModal(false);
       setGroupName("");
@@ -267,7 +255,6 @@ export default function ChatUi() {
     setSelected(chat);
     setIsChatOpenOnMobile(true);
 
-    // Mark the last message as read when selecting a chat
     if (chat.lastMessage && chat.lastMessage.senderId !== user?.id) {
       const socket = getSocket();
       socket.emit('markRead', {

@@ -70,9 +70,6 @@ const PaymentFailurePage: React.FC<PaymentFailureProps> = ({bookingId}) => {
           className="mt-6 mx-auto p-4 bg-white/40 backdrop-blur-md rounded-xl border border-black/10 shadow w-fit"
         >
           <p className="text-sm text-black/60">Reason</p>
-          {/* <p className="text-xl sm:text-2xl font-semibold text-red-600 tracking-wide text-center">
-            {reason}
-          </p> */}
         </motion.div>
 
         {/* Action Buttons */}
@@ -85,14 +82,6 @@ const PaymentFailurePage: React.FC<PaymentFailureProps> = ({bookingId}) => {
             Retry Payment
             </Link>
 
-
-          {/* <button
-            onClick={changeMethod}
-            className="flex items-center justify-center gap-2 border border-gray-300 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <CreditCard className="w-5 h-5" />
-            Change Payment Method
-          </button> */}
         </div>
       </div>
 

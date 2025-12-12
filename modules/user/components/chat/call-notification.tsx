@@ -5,7 +5,7 @@ import { Phone, PhoneOff, Video } from "lucide-react";
 import { useAuthStore } from "@/store/Auth";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Simple ringtone generator using Web Audio API
+
 const createRingtone = () => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
 
@@ -28,7 +28,6 @@ const createRingtone = () => {
   };
 
   const playRingtone = () => {
-    // Classic phone ring pattern (two tones)
     playTone(800, 0.2, 0);
     playTone(900, 0.2, 0.25);
     playTone(800, 0.2, 0.6);
@@ -50,37 +49,27 @@ export default function CallNotificationManager() {
 
   useEffect(() => {
     if (isIncomingCall) {
-      // Start pulse animation
       setPulseAnimation(true);
-
-      // Vibrate on mobile devices
       if ('vibrate' in navigator) {
-        // Vibration pattern: vibrate 300ms, pause 200ms, vibrate 300ms
         const vibratePattern = [300, 200, 300];
         navigator.vibrate(vibratePattern);
-
-        // Repeat vibration every 2 seconds
         intervalRef.current = setInterval(() => {
           navigator.vibrate(vibratePattern);
         }, 2000);
       }
 
       try {
-        // Try to use Web Audio API for ringtone (works better on iOS)
-        ringtoneRef.current = createRingtone();
 
-        // Play ringtone every 1.5 seconds
+        ringtoneRef.current = createRingtone();
         ringtoneRef.current.playRingtone();
         const ringtoneInterval = setInterval(() => {
           ringtoneRef.current?.playRingtone();
         }, 1500);
 
-        // Fallback to audio file
         audioRef.current = new Audio("https://cdn.pixabay.com/download/audio/2021/08/09/audio_88447ea76b.mp3?filename=cell-phone-ringing-15109.mp3");
         audioRef.current.loop = true;
         audioRef.current.volume = 0.5;
 
-        // Try to play audio (might fail on some browsers without user interaction)
         audioRef.current.play().catch(e => {
           console.log("Audio autoplay blocked, using Web Audio API only");
         });
@@ -104,7 +93,6 @@ export default function CallNotificationManager() {
         intervalRef.current = null;
       }
 
-      // Stop audio
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;

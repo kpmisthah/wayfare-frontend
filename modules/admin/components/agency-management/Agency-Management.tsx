@@ -1,4 +1,4 @@
-import { Search, Eye, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, Eye, ChevronDown, ChevronRight, Edit } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -14,6 +14,10 @@ import { AgencyDetailModal } from "./Agency-details-modal";
 import debounce from "lodash.debounce";
 import { useMemo } from "react";
 import BlockAgencyModal from "./Block-agency-modal";
+import ApprovalModal from "./Approval-modal";
+import { Agency } from "../../types/agency.type";
+import { EditAgencyDialog } from "./Edit-agency-dialog";
+
 const AgencyManagement = () => {
   const {
     filteredAgencies,
@@ -29,6 +33,7 @@ const AgencyManagement = () => {
     setEditAgencyOpen,
     handleBlockAgency,
     handleApprovalAgency,
+    handleSaveAgency,
     blockModalOpen,
     setBlockModalOpen,
     agencyToBlock,
@@ -37,6 +42,11 @@ const AgencyManagement = () => {
     setCurrentPage,
     totalPages,
   } = agencyActions();
+
+
+  const [approvalModalOpen, setApprovalModalOpen] = useState(false);
+  const [approvalAction, setApprovalAction] = useState<"accept" | "reject">("accept");
+  const [agencyToApprove, setAgencyToApprove] = useState<Agency | null>(null);
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
@@ -111,7 +121,7 @@ const AgencyManagement = () => {
                         <button
                           onClick={() => toggleRowExpansion(agency.id)}
                           className="p-1 hover:bg-gray-100 rounded"
-                          disabled={!isPending} // Optional: disable expansion if rejected
+                          disabled={!isPending}
                         >
                           {expandedRows.has(agency.id) ? (
                             <ChevronDown className="w-4 h-4" />
@@ -158,9 +168,11 @@ const AgencyManagement = () => {
                                 <Button
                                   variant="default"
                                   size="sm"
-                                  onClick={() =>
-                                    handleApprovalAgency(agency, "accept")
-                                  }
+                                  onClick={() => {
+                                    setAgencyToApprove(agency);
+                                    setApprovalAction("accept");
+                                    setApprovalModalOpen(true);
+                                  }}
                                 >
                                   Accept
                                 </Button>
@@ -168,16 +180,9 @@ const AgencyManagement = () => {
                                   variant="destructive"
                                   size="sm"
                                   onClick={() => {
-                                    const reason = prompt(
-                                      "Enter rejection reason:"
-                                    );
-                                    if (reason?.trim()) {
-                                      handleApprovalAgency(
-                                        agency,
-                                        "reject",
-                                        reason
-                                      );
-                                    }
+                                    setAgencyToApprove(agency);
+                                    setApprovalAction("reject");
+                                    setApprovalModalOpen(true);
                                   }}
                                 >
                                   Reject
@@ -277,6 +282,18 @@ const AgencyManagement = () => {
 
                       <Button
                         size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setSelectedAgency(agency);
+                          setEditAgencyOpen(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </Button>
+
+                      <Button
+                        size="sm"
                         variant={
                           agency.user.isBlock ? "default" : "destructive"
                         }
@@ -345,6 +362,32 @@ const AgencyManagement = () => {
           }}
         />
       )}
+
+      {/* Approval/Rejection Modal */}
+      <ApprovalModal
+        isOpen={approvalModalOpen}
+        agency={agencyToApprove}
+        action={approvalAction}
+        loading={loading}
+        onClose={() => {
+          setApprovalModalOpen(false);
+          setAgencyToApprove(null);
+        }}
+        onConfirm={(agency, action, reason) => {
+          handleApprovalAgency(agency, action, reason);
+          setApprovalModalOpen(false);
+          setAgencyToApprove(null);
+        }}
+      />
+
+      {/* Edit Agency Dialog */}
+      <EditAgencyDialog
+        agency={selectedAgency}
+        isOpen={editAgencyOpen}
+        onOpenChange={setEditAgencyOpen}
+        onSave={handleSaveAgency}
+        loading={loading}
+      />
     </div>
   );
 };

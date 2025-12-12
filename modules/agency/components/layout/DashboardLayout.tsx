@@ -20,11 +20,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }) => {
-  const { user } = useAuthStore();
-  
+  const { user, setAuthUser } = useAuthStore();
+
+  // Fetch fresh user data on component mount to ensure verification status is current
+  useEffect(() => {
+    const fetchFreshUserData = async () => {
+      try {
+        const { fetchUser } = await import('@/shared/services/auth.api');
+        const freshUser = await fetchUser();
+        if (freshUser) {
+          setAuthUser(freshUser);
+        }
+      } catch (error) {
+        console.error('Failed to fetch fresh user data:', error);
+      }
+    };
+
+    fetchFreshUserData();
+  }, []); // Run only once on mount
+
   return (
     <div className="min-h-screen bg-gray-50">
-            {!user?.isVerified && (
+      {!user?.isVerified && (
         <div className="bg-orange-500 text-black font-semibold text-sm py-2 px-4 overflow-hidden relative">
           <div className="flex whitespace-nowrap animate-marquee">
             <span className="mx-8">
@@ -59,7 +76,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
-      <div className="lg:ml-64">
+      <div className="lg:ml-72">
         {/* Header */}
         <Header
           isMobileMenuOpen={isMobileMenuOpen}

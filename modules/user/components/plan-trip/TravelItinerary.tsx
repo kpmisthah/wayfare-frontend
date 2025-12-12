@@ -110,7 +110,7 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
             <div className="h-px bg-border flex-1" />
           </div>
           <p className="text-muted-foreground mb-6">
-            Discover travelers heading to {tripPlan.destination}. Click "View All" below to see everyone and connect with fellow travelers!
+            Discover travelers heading to {tripPlan.destination}. Click "View All" below to see everyone and connect with fellow travelers
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
             {travellersData.map((traveler) => (

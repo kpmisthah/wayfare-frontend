@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  Heart,
   Star,
   MapPin,
   Users,
@@ -60,7 +59,6 @@ const TravelPackages = () => {
   const maxBudget = searchParams.get("maxBudget");
   const travelers = searchParams.get("travelers");
 
-  const [favorites, setFavorites] = useState(new Set());
   const [selectedPackage, setSelectedPackage] = useState<TravelPackage | null>(null);
   const [packages, setPackages] = useState<TravelPackage[]>([]);
   const [showDetails, setShowDetails] = useState(false);
@@ -70,12 +68,9 @@ const TravelPackages = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
   const [durationFilter, setDurationFilter] = useState<string>("all");
-  const [vehicleFilter, setVehicleFilter] = useState<string>("all");
 
-  // Pagination state
   const [loading, setLoading] = useState(false);
   const [totalPackages, setTotalPackages] = useState(0);
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const packagesPerPage = 9;
 
@@ -90,7 +85,6 @@ const TravelPackages = () => {
         maxBudget: maxBudget ?? 0,
         travelers: travelers ?? 0,
         search: searchTerm,
-        vehicle: vehicleFilter === "all" ? undefined : vehicleFilter,
         durationFilter: durationFilter === "all" ? undefined : durationFilter,
         page: currentPage,
         limit: packagesPerPage,
@@ -106,17 +100,7 @@ const TravelPackages = () => {
 
   useEffect(() => {
     fetchTravel();
-  }, [searchTerm, priceRange, durationFilter, vehicleFilter, currentPage]);
-
-  const toggleFavorite = (packageId: string) => {
-    const newFavorites = new Set(favorites);
-    if (favorites.has(packageId)) {
-      newFavorites.delete(packageId);
-    } else {
-      newFavorites.add(packageId);
-    }
-    setFavorites(newFavorites);
-  };
+  }, [searchTerm, priceRange, durationFilter, currentPage]);
 
   const handleDetailsClick = (pkg: TravelPackage) => {
     setSelectedPackage(pkg);
@@ -137,7 +121,7 @@ const TravelPackages = () => {
     }
   };
 
-  // Pagination calculations (backend handles this now)
+ 
   const currentPackages = packages;
   const totalPages = Math.ceil(totalPackages / packagesPerPage);
 
@@ -150,7 +134,6 @@ const TravelPackages = () => {
     setSearchTerm("");
     setPriceRange([0, 100000]);
     setDurationFilter("all");
-    setVehicleFilter("all");
     setCurrentPage(1);
   };
 
@@ -356,20 +339,6 @@ const TravelPackages = () => {
                     Book Now
                   </button>
                 </div>
-
-                <div className="mt-6 pt-4 border-t">
-                  <p className="text-xs text-gray-600 mb-2">Trip Details:</p>
-                  <p className="text-sm text-gray-700">
-                    {selectedPackage.details}
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-xs text-gray-600 mb-2">Need help?</p>
-                  <button className="text-blue-500 text-sm hover:underline">
-                    Contact {selectedPackage.agency}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -433,7 +402,7 @@ const TravelPackages = () => {
           {/* Filter Options */}
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Price Range - Backend filtering for price is already handled by start parameters, skipping additional UI filter for now as it duplicates logic */}
                 {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -483,27 +452,6 @@ const TravelPackages = () => {
                   </select>
                 </div>
 
-                {/* Vehicle Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Transport
-                  </label>
-                  <select
-                    value={vehicleFilter}
-                    onChange={(e) => {
-                      setVehicleFilter(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="bus">Bus</option>
-                    <option value="car">Car</option>
-                    <option value="train">Train</option>
-                    <option value="flight">Flight</option>
-                  </select>
-                </div>
-
                 {/* Clear Filters */}
                 <div className="flex items-end">
                   <button
@@ -539,17 +487,6 @@ const TravelPackages = () => {
                   alt={pkg.title}
                   className="w-full h-48 object-cover"
                 />
-                <button
-                  onClick={() => toggleFavorite(pkg.id)}
-                  className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-                >
-                  <Heart
-                    className={`w-5 h-5 ${favorites.has(pkg.id)
-                      ? "text-red-500 fill-current"
-                      : "text-gray-600"
-                      }`}
-                  />
-                </button>
                 <div className="absolute top-3 left-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${pkg.status === "ACTIVE"

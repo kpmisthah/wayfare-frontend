@@ -11,6 +11,7 @@ export interface Agency {
         name: string;
         email: string;
         verified: boolean;
-        image: string
+        profileImage: string
+        bannerImage:string
     }
 }

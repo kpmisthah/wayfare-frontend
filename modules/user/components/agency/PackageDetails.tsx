@@ -93,7 +93,7 @@ const PackageDetails = ({ id }: { id: string }) => {
     }
   }, [packageById?.picture]);
 
-  // Keyboard navigation for gallery
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isGalleryOpen) return;
@@ -115,7 +115,7 @@ const PackageDetails = ({ id }: { id: string }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isGalleryOpen, nextImage, prevImage]);
 
-  // Prevent body scroll when gallery is open
+
   useEffect(() => {
     if (isGalleryOpen) {
       document.body.style.overflow = "hidden";
@@ -175,26 +175,13 @@ const PackageDetails = ({ id }: { id: string }) => {
               <div className="flex gap-3 pt-2">
                 <Button
                   variant="outline"
-                  className="border-slate-600 text-slate-200 hover:bg-slate-800 hover:text-white"
+                  className="border-slate-600 text-black hover:bg-slate-800 hover:text-black"
                   onClick={() => openGallery(0)}
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
                   View Gallery
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="rounded-full bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700"
-                >
-                  <Heart className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="rounded-full bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700"
-                >
-                  <Share2 className="h-5 w-5" />
-                </Button>
+              
               </div>
             </div>
 
@@ -418,9 +405,6 @@ const PackageDetails = ({ id }: { id: string }) => {
           <div className="lg:col-span-1">
             <div id="booking-card" className="sticky top-24 space-y-6">
               <Card className="border-none shadow-xl ring-1 ring-slate-900/5 bg-white/95 backdrop-blur overflow-hidden">
-                <div className="bg-gradient-to-r from-primary to-primary/90 p-4 text-white text-center py-3">
-                  <p className="font-medium text-sm">Limited Time Offer</p>
-                </div>
                 <CardContent className="p-6 md:p-8">
                   <div className="text-center mb-6">
                     <p className="text-muted-foreground text-sm uppercase tracking-wide font-medium mb-1">Total Price Per Person</p>

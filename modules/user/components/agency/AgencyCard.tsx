@@ -38,7 +38,7 @@ const AgencyCard = ({
   packageCount = 0,
   isVerified = true,
 }: AgencyCardProps) => {
-  // Get initials for avatar fallback
+
   const getInitials = (name: string) => {
     return name
       .split(" ")

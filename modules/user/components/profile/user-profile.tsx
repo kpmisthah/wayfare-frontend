@@ -3,9 +3,7 @@
 import { Header } from "@/shared/components/layout/Header";
 import { useUserProfile } from "../../hooks/use-userprofile";
 import { UserProfileTabs } from "./tabs";
-// import { ProfileHeader } from "./profile/profile-header";
 import { ProfileHeader } from "./profile-header";
-// import { ProfileCompletionCard } from "./profile/Profile-completion-card";
 import { ProfileCompletionCard } from "./Profile-completion-card";
 import { useAuthStore } from "@/store/Auth";
 import { withAuth } from "@/shared/components/HOC/withAuth";

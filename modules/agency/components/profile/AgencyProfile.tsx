@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 import { useAgencyProfile } from "../../hooks/use-agency-profile";
-import { useUserProfile } from "@/modules/user/hooks/use-userprofile";
+import { useAgencyImageUpload } from "../../hooks/use-agency-image-upload";
 import { useAuthStore } from "@/store/Auth";
 import { LucideIcon } from "lucide-react";
 interface ReadOnlyFieldProps {
@@ -139,7 +139,7 @@ export default function AgencyProfile() {
     handleAvatarUpload,
     isUploadingAvatar,
     isUploadingBanner,
-  } = useUserProfile();
+  } = useAgencyImageUpload();
   const { user } = useAuthStore();
 
   if (!profileExists && !isCreating) {

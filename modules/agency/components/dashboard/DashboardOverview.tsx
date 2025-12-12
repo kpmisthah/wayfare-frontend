@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useAgencyDashboard } from '../../hooks/use-dashboard';
 
-export const Dashboard = () => { 
+export const Dashboard = () => {
   const { data, loading, error } = useAgencyDashboard();
 
   if (loading) {
@@ -28,19 +28,19 @@ export const Dashboard = () => {
   const stats = [
     {
       label: 'Total Packages',
-      value: data?.stats.totalPackages.toString() || '0',
+      value: data?.stats?.totalPackages?.toString() || '0',
       icon: Package,
       color: 'from-blue-500 to-blue-600',
     },
     {
       label: 'Active Bookings',
-      value: data?.stats.activeBookings.toString() || '0',
+      value: data?.stats?.activeBookings?.toString() || '0',
       icon: CalendarDays,
       color: 'from-green-500 to-green-600',
     },
     {
       label: 'Total Revenue',
-      value: `₹${(data?.stats.totalRevenue || 0).toLocaleString()}`,
+      value: `₹${(data?.stats?.totalRevenue || 0).toLocaleString()}`,
       icon: DollarSign,
       color: 'from-purple-500 to-purple-600',
     },
@@ -56,16 +56,6 @@ export const Dashboard = () => {
               Dashboard
             </h1>
             <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your agency.</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 bg-white text-gray-700 rounded-lg border hover:bg-gray-50 transition-colors duration-200">
-              <Clock className="w-4 h-4 inline mr-2" />
-              Recent
-            </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg">
-              <Eye className="w-4 h-4 inline mr-2" />
-              View Reports
-            </button>
           </div>
         </div>
 
@@ -100,10 +90,10 @@ export const Dashboard = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                {data?.recentBookings.length === 0 ? (
+                {!data?.recentBookings || data.recentBookings.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">No recent bookings</div>
                 ) : (
-                  data?.recentBookings.map((booking) => (
+                  data.recentBookings.map((booking) => (
                     <div key={booking.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 hover:shadow-md transition-all duration-200">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
