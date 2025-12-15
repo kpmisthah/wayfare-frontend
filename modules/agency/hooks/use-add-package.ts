@@ -122,7 +122,6 @@ export const useAddPackage = (
     if (!files) return;
     const fileArray = Array.from(files);
     console.log(fileArray, "fileArraaaaaaaaaaaaaaayy");
-    // Append new files to existing pictures instead of replacing
     setPackageData((prev) => ({ ...prev, picture: [...prev.picture, ...fileArray] }));
   };
   const handleAddHighlight = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

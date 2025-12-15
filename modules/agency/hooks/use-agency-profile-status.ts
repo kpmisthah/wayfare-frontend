@@ -10,8 +10,6 @@ export const useAgencyProfileStatus = () => {
             try {
                 setLoading(true);
                 const profile = await getAgencyProfile();
-
-                // Check if profile exists and has required fields
                 const hasProfile = profile &&
                     profile.description &&
                     profile.address &&
@@ -20,7 +18,6 @@ export const useAgencyProfileStatus = () => {
 
                 setIsProfileComplete(!!hasProfile);
             } catch (error) {
-                // If API fails, assume profile is incomplete
                 setIsProfileComplete(false);
             } finally {
                 setLoading(false);

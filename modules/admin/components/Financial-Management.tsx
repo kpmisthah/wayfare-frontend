@@ -22,10 +22,9 @@ import {
   AgencyRevenue,
 } from "../hooks/use-financial";
 import {
-  exportToCSV,
-  formatDateForExport,
-  formatCurrencyForExport,
-} from "@/lib/export-utils";
+  exportTransactions,
+  exportAgencyRevenue,
+} from "../services/export.service";
 import debounce from "lodash.debounce";
 
 const FinancialManagement = () => {
@@ -102,57 +101,12 @@ const FinancialManagement = () => {
     );
   };
 
-  const handleExportTransactions = () => {
-    exportToCSV<Transaction>(
-      transactions,
-      [
-        {
-          header: "Date",
-          accessor: (tx: Transaction) => formatDateForExport(tx.date),
-        },
-        {
-          header: "Time",
-          accessor: (tx: Transaction) =>
-            new Date(tx.date).toLocaleTimeString(),
-        },
-        {
-          header: "Agency",
-          accessor: (tx: Transaction) => tx.agencyName || "N/A",
-        },
-        {
-          header: "Destination",
-          accessor: (tx: Transaction) => tx.destination || "N/A",
-        },
-        {
-          header: "Booking Code",
-          accessor: (tx: Transaction) => tx.bookingCode || "N/A",
-        },
-        {
-          header: "Commission",
-          accessor: (tx: Transaction) => formatCurrencyForExport(tx.commission),
-        },
-        { header: "Status", accessor: "status" },
-        { header: "Type", accessor: "type" },
-      ],
-      "transactions_export"
-    );
+  const handleExportTransactions = async () => {
+    await exportTransactions();
   };
 
-  const handleExportAgencies = () => {
-    exportToCSV<AgencyRevenue>(
-      agencyList,
-      [
-        { header: "Agency Name", accessor: "agencyName" },
-        { header: "Agency ID", accessor: "agencyId" },
-        {
-          header: "Platform Earning",
-          accessor: (a: AgencyRevenue) =>
-            formatCurrencyForExport(a.platformEarning ?? 0),
-        },
-        { header: "Total Bookings", accessor: "all" },
-      ],
-      "agency_revenue_export"
-    );
+  const handleExportAgencies = async () => {
+    await exportAgencyRevenue();
   };
 
   const handleExport = () => {

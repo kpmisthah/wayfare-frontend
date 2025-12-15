@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Calendar, MapPin, Users, Clock, CreditCard, Shield, Phone, Mail, ArrowLeft, CheckCircle, Wallet } from 'lucide-react';
 import { useBooking } from '../../hooks/use-booking';
-import { Header } from '@/shared/components/layout/Header';
+import { Header } from '../../../../shared/components/layout/Header';
 import CancellationPolicy from './cancellation-policy';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
@@ -10,32 +10,32 @@ import { CheckoutForm } from './checkout-form';
 import { useWallet } from '../../hooks/use-wallet';
 import { useRouter } from 'next/navigation';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-console.log(stripePromise,'stripe promiseeee')
+console.log(stripePromise, 'stripe promiseeee')
 interface BookingProps {
-    id: string
+  id: string
 }
 
 
 const BookingPage: React.FC<BookingProps> = ({ id }) => {
   const router = useRouter()
-    const {
-      packages,
-      handleSubmit,
-      startDate,
-      travelers,
-      clientSecret,
-      bookingId,
-      paymentStatus
-    } = useBooking(id);
-    const{wallet,isProcessing,payWithWallet} = useWallet() 
-    const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');    
-    const getNumericPrice = (priceString: string) => {
-  
-      return parseInt('0');
-    };
-    
-    const packagePrice = getNumericPrice(packages?.price || '0');
-    const hasWalletBalance = wallet.balance >= packagePrice;
+  const {
+    packages,
+    handleSubmit,
+    startDate,
+    travelers,
+    clientSecret,
+    bookingId,
+    paymentStatus
+  } = useBooking(id);
+  const { wallet, isProcessing, payWithWallet } = useWallet()
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
+  const getNumericPrice = (priceString: string) => {
+
+    return parseInt('0');
+  };
+
+  const packagePrice = getNumericPrice(packages?.price || '0');
+  const hasWalletBalance = wallet.balance >= packagePrice;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,7 +103,7 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-4">
               <h2 className="text-xl font-semibold mb-4">Price Summary</h2>
-              
+
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Package Price</span>
@@ -131,7 +131,7 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
               <div className="space-y-4">
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-gray-700">Choose Payment Method</h3>
-                  
+
                   {/* Card Payment Option */}
                   <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <input
@@ -145,11 +145,10 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                     <CreditCard className="w-4 h-4 mr-2 text-gray-600" />
                     <span className="text-sm font-medium">Credit/Debit Card</span>
                   </label>
-                  
+
                   {/* Wallet Payment Option */}
-                  <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    !hasWalletBalance ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-50'
-                  }`}>
+                  <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${!hasWalletBalance ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-50'
+                    }`}>
                     <input
                       type="radio"
                       name="paymentMethod"
@@ -171,20 +170,19 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                     )}
                   </label>
                 </div>
-                
+
                 {/* Payment Action Based on Selection */}
                 {paymentMethod === 'wallet' ? (
                   // Wallet Payment Button
                   <button
-                    onClick={(e)=>handleSubmit(e,'wallet')}
+                    onClick={(e) => handleSubmit(e, 'wallet')}
                     disabled={!hasWalletBalance || isProcessing}
-                    className={`w-full py-3 rounded font-medium transition-colors ${
-                      !hasWalletBalance 
+                    className={`w-full py-3 rounded font-medium transition-colors ${!hasWalletBalance
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : isProcessing
                           ? 'bg-blue-400 text-white cursor-not-allowed'
                           : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                      }`}
                   >
                     {isProcessing ? (
                       <div className="flex items-center justify-center gap-2">
@@ -203,7 +201,7 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                   <div className="space-y-4">
                     {!clientSecret ? (
                       <button
-                        onClick={(e)=>handleSubmit(e,'card')}
+                        onClick={(e) => handleSubmit(e, 'card')}
                         className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700 transition-colors"
                       >
                         <div className="flex items-center justify-center gap-2">
@@ -212,8 +210,8 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                         </div>
                       </button>
                     ) : (
-                      <Elements stripe={stripePromise} options={{clientSecret}}>
-                        <CheckoutForm clientSecret={clientSecret} bookingId={bookingId}/>
+                      <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <CheckoutForm clientSecret={clientSecret} bookingId={bookingId} />
                       </Elements>
                     )}
                   </div>
@@ -222,13 +220,12 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
 
               {/* Payment Status Messages */}
               {paymentStatus && (
-                <div className={`mt-4 p-3 rounded-lg text-sm ${
-                  paymentStatus === 'wallet_success' 
+                <div className={`mt-4 p-3 rounded-lg text-sm ${paymentStatus === 'wallet_success'
                     ? 'bg-green-100 text-green-800'
                     : paymentStatus === 'insufficient_balance'
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-red-100 text-red-800'
-                }`}>
+                  }`}>
                   {paymentStatus === 'wallet_success' && (
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />

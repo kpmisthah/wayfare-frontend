@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   Menu,
   Home,
   Building2,
@@ -13,9 +13,9 @@ import {
   Bell,
   X
 } from 'lucide-react';
-import { useAuthStore } from '@/store/Auth';
-import { checkAuth } from '@/shared/services/auth.api';
-import { useLogout } from '@/shared/hooks/use-logout';
+import { useAuthStore } from '../../../store/Auth';
+import { checkAuth } from '../../../shared/services/auth.api';
+import { useLogout } from '../../../shared/hooks/use-logout';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,20 +26,20 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-    const { setAuthUser, clearAuth } = useAuthStore();
-    const {handleLogout} = useLogout()
-    useEffect(() => {
-      const verifyUser = async () => {
-        try {
-          const userData = await checkAuth();
-          setAuthUser(userData); 
-        } catch (err) {
-          clearAuth();
-        }
-      };
-  
-      verifyUser();
-    }, []);
+  const { setAuthUser, clearAuth } = useAuthStore();
+  const { handleLogout } = useLogout()
+  useEffect(() => {
+    const verifyUser = async () => {
+      try {
+        const userData = await checkAuth();
+        setAuthUser(userData);
+      } catch (err) {
+        clearAuth();
+      }
+    };
+
+    verifyUser();
+  }, []);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
     <div className="flex h-screen bg-gray-50">
       {/* Mobile overlay */}
       {isMobile && sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -122,11 +122,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                  activeTab === item.id
+                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === item.id
                     ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
                     : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
                 {(sidebarOpen || isMobile) && (
@@ -167,7 +166,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
                 {sidebarItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
               </h1>
             </div>
-            
+
             {/* Header actions */}
             <div className="flex items-center space-x-2 sm:space-x-4">
               <button className="p-2 rounded-lg hover:bg-gray-100 relative">

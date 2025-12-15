@@ -10,15 +10,16 @@ export async function getUserFromServer() {
   console.log("Cookies from getUserFromServer:", cookieString);
 
   try {
-    const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
+    const userRes = await fetch(`${apiUrl}/auth/me`, {
       headers: {
         Cookie: cookieString,
       },
       cache: "no-store",
       credentials: "include",
     });
-    
- 
+
+
 
     if (!userRes.ok) {
       console.log(`Core user fetch failed with status: ${userRes.status}`);
@@ -34,7 +35,7 @@ export async function getUserFromServer() {
     }
 
     const profileRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/user/me`,
+      `${apiUrl}/user/me`,
       {
         headers: {
           Cookie: cookieString,

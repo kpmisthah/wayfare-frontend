@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { Sidebar } from "./DashboardSidebar";
 import { Header } from "./DashboradHeader";
 import { useAuthStore } from "@/store/Auth";
-
+import { fetchUser } from "@/shared/services/auth.api";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   activeTab: string;
@@ -22,11 +22,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const { user, setAuthUser } = useAuthStore();
 
-  // Fetch fresh user data on component mount to ensure verification status is current
+
   useEffect(() => {
     const fetchFreshUserData = async () => {
       try {
-        const { fetchUser } = await import('@/shared/services/auth.api');
         const freshUser = await fetchUser();
         if (freshUser) {
           setAuthUser(freshUser);

@@ -22,7 +22,7 @@ import Modal from "@/shared/components/common/Modal";
 import { useUsers } from "../../hooks/user-management/use-user-management";
 import debounce from "lodash.debounce";
 import { useMemo, useCallback } from "react";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportUsers } from "../../services/export.service";
 import { User } from "../../types/user.type";
 
 const UserManagement = () => {
@@ -54,20 +54,9 @@ const UserManagement = () => {
     [setSearchTerm]
   );
 
-  const handleExportUsers = useCallback(() => {
-    exportToCSV<User>(
-      users,
-      [
-        { header: "Name", accessor: "name" },
-        { header: "Email", accessor: "email" },
-        { header: "Phone", accessor: "phone" },
-        { header: "Location", accessor: "location" },
-        { header: "Status", accessor: (u: User) => u.isBlock ? "Inactive" : "Active" },
-        { header: "Role", accessor: (u: User) => u.role ?? "USER" },
-      ],
-      "users_export"
-    );
-  }, [users]);
+  const handleExportUsers = useCallback(async () => {
+    await exportUsers();
+  }, []);
 
 
   return (

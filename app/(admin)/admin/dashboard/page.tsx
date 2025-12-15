@@ -1,4 +1,4 @@
-import AdminApp from '@/modules/admin/components/AdminApp'
+import AdminApp from '../../../../modules/admin/components/AdminApp'
 
 import React from 'react'
 

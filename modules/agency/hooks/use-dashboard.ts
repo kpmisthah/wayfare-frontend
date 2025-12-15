@@ -15,7 +15,6 @@ export const useAgencyDashboard = () => {
                 setData(result);
                 setError(null);
             } catch (err: any) {
-                // If it's a 404, the profile doesn't exist yet - don't show error
                 if (err?.response?.status === 404) {
                     setData(null);
                     setError(null);

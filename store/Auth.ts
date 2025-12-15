@@ -1,7 +1,7 @@
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { User } from '@/modules/admin/types/user.type';
+import { User } from '../modules/admin/types/user.type';
 
 interface AuthState {
     user: User | null;
@@ -44,8 +44,8 @@ export const useAuthStore = create<AuthState>()(
             }
         }),
         {
-            name: 'auth-storage', // name of the storage item
-            storage: createJSONStorage(() => localStorage), // use localStorage
+            name: 'auth-storage',
+            storage: createJSONStorage(() => localStorage),
         }
     )
 );

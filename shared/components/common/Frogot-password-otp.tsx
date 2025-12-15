@@ -1,8 +1,8 @@
 "use client"
 import { Plane, ArrowLeft, RotateCcw, AlertCircle } from 'lucide-react';
-import { OTPPageProps } from '@/shared/types/auth.type';
-import { useForgotPasswordOtp } from '@/shared/hooks/use-forgot-password-otp';
-const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.com" ,redirectUrl}) => {
+import { OTPPageProps } from '../../types/auth.type';
+import { useForgotPasswordOtp } from '../../hooks/use-forgot-password-otp';
+const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.com", redirectUrl }) => {
   const {
     handleBack,
     maskedEmail,
@@ -18,8 +18,8 @@ const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.c
     isResending,
     handleVerifyForgotPassword,
     isCompleteOtp,
-    timeLeft    
-  } = useForgotPasswordOtp(userEmail,redirectUrl)
+    timeLeft
+  } = useForgotPasswordOtp(userEmail, redirectUrl)
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       {/* Background decorations */}
@@ -90,7 +90,7 @@ const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.c
               {otp.map((digit, index) => (
                 <input
                   key={index}
-                  ref={el =>{
+                  ref={el => {
                     inputRefs.current[index] = el
                   }}
                   type="text"
@@ -99,13 +99,12 @@ const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.c
                   value={digit}
                   onChange={(e) => handleChangeOtp(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDownOtp(index, e)}
-                  onPaste={handlePasteOtp }
+                  onPaste={handlePasteOtp}
                   disabled={isLoading}
-                  className={`w-12 h-12 text-center text-lg font-semibold border-2 rounded-xl focus:outline-none transition-colors ${
-                    error 
-                      ? 'border-red-300 focus:border-red-500' 
-                      : 'border-gray-200 focus:border-blue-500'
-                  } ${isLoading ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+                  className={`w-12 h-12 text-center text-lg font-semibold border-2 rounded-xl focus:outline-none transition-colors ${error
+                    ? 'border-red-300 focus:border-red-500'
+                    : 'border-gray-200 focus:border-blue-500'
+                    } ${isLoading ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                 />
               ))}
             </div>
@@ -132,11 +131,10 @@ const ForgotPasswordOtp: React.FC<OTPPageProps> = ({ userEmail = "user@example.c
             <button
               onClick={handleVerifyForgotPassword}
               disabled={!isCompleteOtp || isLoading}
-              className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${
-                isCompleteOtp && !isLoading
-                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg hover:shadow-xl'
-                  : 'bg-gray-300 cursor-not-allowed'
-              }`}
+              className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${isCompleteOtp && !isLoading
+                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg hover:shadow-xl'
+                : 'bg-gray-300 cursor-not-allowed'
+                }`}
             >
               {isLoading ? (
                 <>

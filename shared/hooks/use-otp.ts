@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchUser, resendOtp, verifyOtp } from '../services/auth.api';
-import { useAuthStore } from '@/store/Auth';
+import { useAuthStore } from '../../store/Auth';
 import { AxiosError } from 'axios';
-import { AgencyStatus } from '@/modules/admin/types/agency.status.enum';
+import { AgencyStatus } from '../../modules/admin/types/agency.status.enum';
 
 interface ResendOTPRequest {
   email: string;

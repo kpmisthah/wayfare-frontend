@@ -20,6 +20,7 @@ export const sendConnectionRequest = async (receiverId: string) => {
 export const getMyConnections = async () => {
     try {
         const response = await api.get('/connections');
+        console.log(response.data, 'response.data in getMyConnections');
         return response.data;
     } catch (err) {
         const error = err as { response?: { data?: { message?: string } | string } };

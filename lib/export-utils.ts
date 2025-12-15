@@ -14,7 +14,7 @@ export function exportToCSV<T extends object>(
         return;
     }
 
-    
+
     const headers = columns.map((col) => `"${col.header}"`).join(',');
 
 

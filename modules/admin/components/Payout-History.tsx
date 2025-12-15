@@ -17,7 +17,7 @@ import Detail from "@/shared/components/common/Detail";
 import { PayoutStatus } from "../types/payout-status.enum";
 import { usePayoutReq } from "../hooks/use-payout-req";
 import { PayoutRequest } from "../types/payout-request.type";
-import { exportToCSV, formatCurrencyForExport } from "@/lib/export-utils";
+import { exportPayouts } from "../services/export.service";
 
 // Status Badge Component
 const StatusBadge = ({ status }: { status: PayoutStatus }) => {
@@ -171,21 +171,8 @@ const PayoutHistory = () => {
   } = usePayoutReq();
 
 
-  const handleExportPayouts = () => {
-    exportToCSV<PayoutRequest>(
-      payout,
-      [
-        { header: "Agency Name", accessor: (r: PayoutRequest) => r.agencyInfo.name },
-        { header: "Agency Email", accessor: (r: PayoutRequest) => r.agencyInfo.email },
-        { header: "Phone", accessor: (r: PayoutRequest) => r.agencyInfo.phone },
-        { header: "Amount", accessor: (r: PayoutRequest) => formatCurrencyForExport(Number(r.amount)) },
-        { header: "Status", accessor: "status" },
-        { header: "Bank Name", accessor: (r: PayoutRequest) => r.bankDetails.bankName },
-        { header: "Account Number", accessor: (r: PayoutRequest) => r.bankDetails.accountNumber },
-        { header: "IFSC Code", accessor: (r: PayoutRequest) => r.bankDetails.ifscCode },
-      ],
-      "payout_requests_export"
-    );
+  const handleExportPayouts = async () => {
+    await exportPayouts();
   };
 
 
@@ -288,7 +275,7 @@ const PayoutHistory = () => {
                 />
               </div>
 
-    
+
               <div className="flex gap-2">
                 <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
                   <Filter className="w-4 h-4" />

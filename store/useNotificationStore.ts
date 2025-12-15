@@ -1,6 +1,6 @@
 // src/store/notificationStore.ts
 import { create } from 'zustand';
-import { notifcations } from '@/modules/user/types/notification.type';
+import { notifcations } from '../modules/user/types/notification.type';
 
 type ConnectionRequest = {
   id: string;

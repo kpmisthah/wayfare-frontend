@@ -126,14 +126,12 @@ export const agencyActions = () => {
     try {
       setLoading(true);
 
-      // Call backend API to save changes
       const updatedAgency = await updateAgencyDetails(updated.id, {
         name: updated.user.name,
         email: updated.user.email,
         status: updated.status,
       });
 
-      // Update local state with the response from backend
       setAgencies((prev) =>
         prev.map((agency) =>
           agency.id === updated.id ? updatedAgency : agency
@@ -143,11 +141,9 @@ export const agencyActions = () => {
       setEditAgencyOpen(false);
       setSelectedAgency(null);
 
-      // Show success message
       console.log("Agency updated successfully");
     } catch (error) {
       console.error("Error updating agency:", error);
-      // Error will be shown by the API interceptor
     } finally {
       setLoading(false);
     }
