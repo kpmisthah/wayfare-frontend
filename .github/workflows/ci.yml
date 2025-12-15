@@ -9,9 +9,9 @@ name: Frontend CI
 # WHEN does this run?
 on:
   push:
-    branches: [main, develop]    # Runs when you push to main or develop
+    branches: [main, master, develop]    # Runs when you push to these branches
   pull_request:
-    branches: [main, develop]    # Runs when you create a PR to these branches
+    branches: [main, master, develop]    # Runs when you create a PR to these branches
 
 # Environment variables available to all jobs
 env:
@@ -126,7 +126,8 @@ jobs:
       - name: 🔨 Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .\n          file: ./Dockerfile
+          context: .
+          file: ./Dockerfile
           push: false
           tags: wanderly-frontend:latest
           build-args: |
