@@ -20,3 +20,4 @@ function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
 }
 
 export default withAuth(ChatPage);
+
