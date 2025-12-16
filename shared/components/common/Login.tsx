@@ -200,7 +200,7 @@ export const Login = ({
               variant="outline"
               className="w-full hover:bg-gray-50 transition-colors flex items-center justify-center"
               onClick={() =>
-                window.location.href = "http://localhost:3005/auth/google"
+                window.location.href = "http://app:3000/auth/google"
               }
               disabled={isLoading}
             >
