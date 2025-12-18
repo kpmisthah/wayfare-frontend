@@ -78,6 +78,9 @@ export async function middleware(request: NextRequest) {
         if (name && value) {
           response.cookies.set(name.trim(), value.trim(), {
             httpOnly: true,
+            secure:true,
+            sameSite:'none',
+            domain:'.misthah.site',
             path: "/",
           });
         }
