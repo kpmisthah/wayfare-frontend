@@ -37,6 +37,13 @@ export const Login = ({
     handleLoginSubmit,
   } = useLoginForm({ role, onSubmit, redirectLogin });
 
+
+  console.log(
+  "BUILD TIME NEXT_PUBLIC_API_URL:",
+  process.env.NEXT_PUBLIC_API_URL
+);
+
+
   return (
     <AuthLayout>
       <Card className="border-0 shadow-lg">
