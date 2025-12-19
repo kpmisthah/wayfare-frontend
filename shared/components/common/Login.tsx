@@ -200,7 +200,7 @@ export const Login = ({
               variant="outline"
               className="w-full hover:bg-gray-50 transition-colors flex items-center justify-center"
               onClick={() =>
-                window.location.href = "https://api.wayfare.misthah.site/auth/google"
+                window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
               }
               disabled={isLoading}
             >
