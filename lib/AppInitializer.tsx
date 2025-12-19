@@ -15,13 +15,17 @@ export default function AppInitializer({
 }) {
   const [loaded, setLoaded] = useState(false)
   const setAuthUser = useAuthStore((state) => state.setAuthUser)
+  const clearAuth = useAuthStore((state) => state.clearAuth)
   useCallListeners(user?.id);
   useEffect(() => {
     if (user) {
       setAuthUser(user)
+    } else {
+      // Clear persisted auth state when server confirms no user is authenticated
+      clearAuth()
     }
     setLoaded(true)
-  }, [user, setAuthUser])
+  }, [user, setAuthUser, clearAuth])
 
   if (!loaded) return null
   return <>{children}</>
