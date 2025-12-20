@@ -14,6 +14,7 @@ import {
   CheckCircle,
   Ban,
   Search,
+  AlertTriangle,
 } from "lucide-react";
 import { useFetchPackages } from "../../hooks/use-fetch-packages";
 import { PackageData } from "../../types/package.type";
@@ -23,6 +24,7 @@ import { Button } from "@/shared/components/ui/button";
 import { PackageStatus } from "../../types/package.enum";
 import { updatePackageStatus } from "../../services/package.api";
 import Modal from "@/shared/components/common/Modal";
+import { useAuthStore } from "@/store/Auth";
 
 export const PackageManagement = () => {
   const {
@@ -100,6 +102,9 @@ export const PackageManagement = () => {
     }
   }
 
+  const { user } = useAuthStore();
+  const isVerified = user?.isVerified ?? false;
+
   if (!agency) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -119,12 +124,30 @@ export const PackageManagement = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br ">
       <div className="max-w-7xl mx-auto">
+        {/* Verification Warning Banner */}
+        {!isVerified && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-amber-800">Agency Verification Pending</h3>
+              <p className="text-amber-700 text-sm mt-1">
+                Your agency is not yet verified by admin. You cannot add new packages until your agency is approved.
+                Please wait for admin verification.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800">
             Travel Package Management
           </h1>
           <button
             onClick={() => {
+              if (!isVerified) {
+                alert("Your agency is not yet verified. Please wait for admin approval before adding packages.");
+                return;
+              }
               setShowForm(true);
               setEditingPackage(null);
               setFormData(initialFormData);
@@ -145,9 +168,13 @@ export const PackageManagement = () => {
                 id: "",
               });
             }}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
+            disabled={!isVerified}
+            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition ${isVerified
+              ? "bg-indigo-600 text-white hover:bg-indigo-700"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
           >
-            <Plus size={20} /> Add Package
+            <Plus size={20} />{isVerified ? "Add Package" : "Verification Required"}
           </button>
         </div>
 
@@ -191,6 +218,10 @@ export const PackageManagement = () => {
 
                     <button
                       onClick={() => {
+                        if (!isVerified) {
+                          alert("Your agency is not yet verified. Please wait for admin approval before adding packages.");
+                          return;
+                        }
                         setShowForm(true);
                         setEditingPackage(null);
                         setFormData(initialFormData);
@@ -212,9 +243,13 @@ export const PackageManagement = () => {
                           id: "",
                         });
                       }}
-                      className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
+                      disabled={!isVerified}
+                      className={`mt-6 px-6 py-3 rounded-lg flex items-center gap-2 transition ${isVerified
+                          ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
                     >
-                      <Plus size={18} /> Add Package
+                      <Plus size={18} />{isVerified ? "Add Package" : "Verification Required"}
                     </button>
                   </div>
                 ) : (
