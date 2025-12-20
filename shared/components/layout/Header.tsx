@@ -288,16 +288,16 @@ export const Header = () => {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-3">
                   <button
                     onClick={handleLogin}
-                    className="text-blue-600 font-medium"
+                    className="text-blue-600 font-medium hover:text-blue-700 transition"
                   >
                     Log In
                   </button>
                   <button
                     onClick={handleSignUp}
-                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition text-sm"
                   >
                     Sign Up
                   </button>
@@ -333,6 +333,28 @@ export const Header = () => {
                 </a>
               ))}
               {!isAuthenticated && (
+                <div className="pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleLogin();
+                    }}
+                    className="w-full py-2.5 text-blue-600 font-medium border border-blue-600 rounded-lg hover:bg-blue-50 transition"
+                  >
+                    Log In
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleSignUp();
+                    }}
+                    className="w-full py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+              {isAuthenticated && (
                 <button
                   onClick={handleLogout}
                   className="w-full text-left py-2 text-red-600 font-medium"
