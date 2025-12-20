@@ -53,6 +53,7 @@ export const useUserProfile = () => {
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [isLoadingConnections, setIsLoadingConnections] = useState(false);
 
@@ -235,6 +236,7 @@ export const useUserProfile = () => {
   const handleSaveProfile = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!user) return;
+    setIsSavingProfile(true);
     try {
       const { name, email, phone, location } = user;
       const update = await updateProfile({ name, email, phone, location });
@@ -242,6 +244,8 @@ export const useUserProfile = () => {
       setIsEditingProfile(false);
     } catch (error) {
       console.error("Failed to save profile:", error);
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -338,6 +342,7 @@ export const useUserProfile = () => {
     isLoadingTrips,
     isLoadingProfile,
     isChangingPassword,
+    isSavingProfile,
     isLoadingConnections,
     // Trip search/filter
     tripSearch,

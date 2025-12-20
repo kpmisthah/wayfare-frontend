@@ -19,7 +19,6 @@ import {
 } from "@/shared/components/ui/avatar";
 import {
   Star,
-  MapPin,
   Phone,
   Mail,
   Globe,
@@ -91,10 +90,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
                 <h1 className="text-2xl md:text-3xl font-bold mb-1">
                   {agency?.user?.name}
                 </h1>
-                <p className="text-white/80 flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  {agency?.address || 'Location not specified'}
-                </p>
               </div>
 
               <div className="flex gap-2">
@@ -187,10 +182,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3">
-                        <MapPin className="h-5 w-5 text-primary mt-0.5" />
-
-                      </div>
                     </div>
 
                   </CardContent>

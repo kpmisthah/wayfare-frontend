@@ -231,7 +231,7 @@ const TravelerCard = ({
           }}
           className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-full hover:bg-white hover:scale-110 transition-all z-20 shadow-lg"
         >
-          <Info className="w-5 h-5 text-gray-700" />
+          <Info className="w-5 h-5 text-blue-600" />
         </button>
 
         {/* User Info Overlay */}

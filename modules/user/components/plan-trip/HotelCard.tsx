@@ -1,7 +1,6 @@
 
 import { Star, MapPin } from "lucide-react";
 import { Card } from "@/shared/components/ui/card";
-import { Button } from "@/shared/components/ui/button";
 
 interface Hotel {
   hotelName: string;
@@ -45,23 +44,14 @@ export function HotelCard({ hotel }: HotelCardProps) {
           </div>
         </div>
       </div>
-      
+
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2 text-card-foreground">{hotel.hotelName}</h3>
         <div className="flex items-start gap-2 mb-3 text-muted-foreground">
           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <p className="text-sm">{hotel.hotelAddress}</p>
         </div>
-        <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{hotel.description}</p>
-        
-        <div className="flex gap-3">
-          {/* <Button variant="default" className="flex-1">
-            View Details
-          </Button> */}
-          <Button variant="outline" className="flex-1">
-            Book Now
-          </Button>
-        </div>
+        <p className="text-muted-foreground text-sm leading-relaxed">{hotel.description}</p>
       </div>
     </Card>
   );

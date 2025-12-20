@@ -10,7 +10,7 @@ import {
   Phone,
   ChevronRight,
   Clock,
-  DollarSign,
+  IndianRupee,
   Star,
   Hotel,
   Map,
@@ -129,7 +129,7 @@ const ShortTrip = () => {
                     <span>{trip.duration}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-gray-700 bg-gray-50 px-3 py-1.5 rounded-lg">
-                    <DollarSign className="w-4 h-4 text-green-600" />
+                    <IndianRupee className="w-4 h-4 text-green-600" />
                     <span>{trip.budget}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-gray-700 bg-gray-50 px-3 py-1.5 rounded-lg">
@@ -241,7 +241,7 @@ const ShortTrip = () => {
                       <span className="text-sm font-medium">{trip.hotels[0].rating}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <IndianRupee className="w-4 h-4 text-green-600" />
                       <span className="text-sm font-medium">{trip.hotels[0].price}</span>
                     </div>
                   </div>
@@ -293,7 +293,7 @@ const ShortTrip = () => {
                             )}
                             {activity.ticketPrice && (
                               <div className="flex items-center gap-1">
-                                <DollarSign className="w-3 h-3" />
+                                <IndianRupee className="w-3 h-3" />
                                 <span>{activity.ticketPrice}</span>
                               </div>
                             )}

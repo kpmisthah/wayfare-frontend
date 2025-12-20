@@ -8,7 +8,7 @@ import {
 } from "@/shared/components/ui/card";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { Edit3, Mail, MapPin, Phone, Plus, User } from "lucide-react";
+import { Edit3, Loader2, Mail, MapPin, Phone, Plus, User } from "lucide-react";
 import { useUserProfile } from "../../hooks/use-userprofile";
 import { useAuthStore } from "@/store/Auth";
 export const PersonalInformation = () => {
@@ -17,6 +17,7 @@ export const PersonalInformation = () => {
     handleChange,
     setIsEditingProfile,
     handleSaveProfile,
+    isSavingProfile,
   } = useUserProfile();
   const { user } = useAuthStore();
   console.log(user, "zustand user in personal-infromation in front end");
@@ -95,8 +96,16 @@ export const PersonalInformation = () => {
             <Button
               className="bg-blue-600 data-[state=active]:text-white rounded-lg"
               onClick={handleSaveProfile}
+              disabled={isSavingProfile}
             >
-              Save Changes
+              {isSavingProfile ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </div>
         ) : (

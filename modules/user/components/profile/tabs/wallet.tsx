@@ -70,7 +70,7 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
     goToPage,
   } = useWallet(activeTab);
 
-  
+
   const filteredTransactions = transactionData.filter((t) => {
     const matchesTab =
       activeWalletTab === "all" ||
@@ -241,7 +241,8 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
             </div>
 
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
+              {/* Desktop Table View - Hidden on Mobile */}
+              <div className="hidden md:block overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -365,14 +366,118 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Mobile Card View - Shown only on Mobile */}
+              <div className="md:hidden">
+                {filteredTransactions.length > 0 ? (
+                  <div className="divide-y">
+                    {filteredTransactions.map((transaction) => {
+                      const categoryInfo = getCategoryInfo(transaction.category);
+                      return (
+                        <div key={transaction.id} className="p-4 hover:bg-muted/20 transition-colors">
+                          {/* Top Row: Type Icon + Amount */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-full ${transaction.transactionType === "CREDIT" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                {transaction.transactionType === "CREDIT" ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
+                              </div>
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {transaction.transactionType === "CREDIT" ? "Credit" : "Debit"}
+                                </p>
+                                <p className="text-xs text-muted-foreground font-mono">
+                                  #{transaction.id.slice(0, 8)}
+                                </p>
+                              </div>
+                            </div>
+                            <span className={`font-bold text-lg ${transaction.transactionType === "CREDIT" ? "text-green-600" : "text-red-500"}`}>
+                              {transaction.transactionType === "CREDIT" ? "+" : "-"}₹{typeof transaction.amount === 'number' ? transaction.amount.toLocaleString('en-IN') : transaction.amount}
+                            </span>
+                          </div>
+
+                          {/* Middle Row: Date, Category, Status */}
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {formatDate(transaction.date)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formatTime(transaction.date)}
+                            </span>
+                          </div>
+
+                          {/* Bottom Row: Category + Status Badges */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${categoryInfo.color}`}
+                            >
+                              {categoryInfo.label}
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className={`capitalize text-xs ${transaction.paymentStatus.toLowerCase() === 'succeeded' ||
+                                transaction.paymentStatus.toLowerCase() === 'confirmed' ||
+                                transaction.paymentStatus.toLowerCase() === 'success' ||
+                                transaction.paymentStatus.toLowerCase() === 'paid'
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : transaction.paymentStatus.toLowerCase() === 'pending'
+                                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                  : "bg-red-50 text-red-700 border-red-200"
+                                }`}
+                            >
+                              {transaction.paymentStatus}
+                            </Badge>
+                          </div>
+
+                          {/* Related To (if exists) */}
+                          {(transaction.booking || transaction.agency?.user?.name) && (
+                            <div className="mt-2 pt-2 border-t border-dashed">
+                              {transaction.booking ? (
+                                <div className="text-sm">
+                                  <p className="font-medium text-foreground truncate">
+                                    {transaction.booking.package?.destination || transaction.booking.package?.itineraryName || 'Trip'}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Booking: {transaction.booking.bookingCode}
+                                  </p>
+                                </div>
+                              ) : transaction.agency?.user?.name && (
+                                <div className="text-sm">
+                                  <p className="font-medium text-foreground truncate">
+                                    {transaction.agency.user.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">Agency</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <Search className="h-8 w-8 opacity-50" />
+                      </div>
+                      <p className="font-medium">No transactions found</p>
+                      <p className="text-sm">Try adjusting your filters or search</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
-                Showing page {page} of {totalPages} ({total} total transactions)
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+              <p className="text-sm text-muted-foreground text-center sm:text-left">
+                Page {page} of {totalPages} ({total} total)
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -382,10 +487,11 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
                   disabled={page === 1 || isLoading}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <span className="hidden sm:inline ml-1">Previous</span>
                 </Button>
 
-                <div className="flex items-center gap-1">
+                {/* Page numbers - hidden on mobile */}
+                <div className="hidden sm:flex items-center gap-1">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     let pageNum;
                     if (totalPages <= 5) {
@@ -412,13 +518,18 @@ export const Wallet = ({ activeTab }: { activeTab: string }) => {
                   })}
                 </div>
 
+                {/* Page indicator for mobile */}
+                <span className="sm:hidden text-sm font-medium px-3">
+                  {page} / {totalPages}
+                </span>
+
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={nextPage}
                   disabled={page === totalPages || isLoading}
                 >
-                  Next
+                  <span className="hidden sm:inline mr-1">Next</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

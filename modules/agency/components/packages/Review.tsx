@@ -1,4 +1,4 @@
-import { AlertCircle, Award, Clock, DollarSign, Eye, MapPin, Star, TrendingUp, Users } from "lucide-react";
+import { AlertCircle, Award, Clock, IndianRupee, Eye, MapPin, Star, TrendingUp, Users } from "lucide-react";
 import { RenderStepProps } from "../../types/agency.type";
 
 export const RenderStep7: React.FC<RenderStepProps> = ({ packageData }) => {
@@ -41,7 +41,7 @@ export const RenderStep7: React.FC<RenderStepProps> = ({ packageData }) => {
               <Users className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" />
             </div>
             <div className="flex items-center">
-              <DollarSign className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" />
+              <IndianRupee className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" />
               <span className="text-2xl font-bold text-gray-900">
                 ₹{packageData?.price || "0"}
               </span>

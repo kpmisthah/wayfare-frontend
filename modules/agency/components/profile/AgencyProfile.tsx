@@ -14,6 +14,8 @@ import {
   UserCheck,
   ArrowRight,
   Camera,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 import { useAgencyProfile } from "../../hooks/use-agency-profile";
@@ -51,6 +53,7 @@ interface EditableInputProps {
   required?: boolean;
   placeholder?: string;
   type?: string;
+  error?: string;
 }
 
 const EditableInput = ({
@@ -62,6 +65,7 @@ const EditableInput = ({
   required,
   placeholder,
   type = "text",
+  error,
 }: EditableInputProps) => (
   <div className="group">
     <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
@@ -75,8 +79,15 @@ const EditableInput = ({
       value={value || ""}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${error ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        }`}
     />
+    {error && (
+      <p className="mt-2 text-sm text-red-600 flex items-center">
+        <AlertCircle className="w-4 h-4 mr-1" />
+        {error}
+      </p>
+    )}
   </div>
 );
 
@@ -89,6 +100,7 @@ interface EditableTextareaProps {
   required?: boolean;
   placeholder?: string;
   rows?: number;
+  error?: string;
 }
 
 const EditableTextarea = ({
@@ -100,6 +112,7 @@ const EditableTextarea = ({
   required,
   placeholder,
   rows = 3,
+  error,
 }: EditableTextareaProps) => (
   <div className="group">
     <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
@@ -113,8 +126,15 @@ const EditableTextarea = ({
       onChange={onChange}
       rows={rows}
       placeholder={placeholder}
-      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none ${error ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        }`}
     />
+    {error && (
+      <p className="mt-2 text-sm text-red-600 flex items-center">
+        <AlertCircle className="w-4 h-4 mr-1" />
+        {error}
+      </p>
+    )}
   </div>
 );
 
@@ -126,6 +146,9 @@ export default function AgencyProfile() {
     isCreating,
     setIsCreating,
     isEditing,
+    isSubmitting,
+    isLoadingProfile,
+    errors,
     handleInputChange,
     handleCreateProfile,
     handleEditProfile,
@@ -141,6 +164,27 @@ export default function AgencyProfile() {
     isUploadingBanner,
   } = useAgencyImageUpload();
   const { user } = useAuthStore();
+
+  // Show loader while fetching profile data
+  if (isLoadingProfile) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-6">
+            <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-pulse mx-auto"></div>
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Loading Profile</h3>
+          <p className="text-gray-500">Please wait while we fetch your agency details...</p>
+          <div className="flex gap-1.5 mt-4 justify-center">
+            <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+            <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+            <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!profileExists && !isCreating) {
     return (
@@ -227,17 +271,28 @@ export default function AgencyProfile() {
           <div className="flex space-x-3">
             <button
               onClick={handleCancel}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl flex items-center space-x-2"
+              disabled={isSubmitting}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X className="w-5 h-5" />
               <span>Cancel</span>
             </button>
             <button
               onClick={isCreating ? handleCreateProfile : handleSaveEdit}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 shadow-lg"
+              disabled={isSubmitting}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Save className="w-5 h-5" />
-              <span>{isCreating ? "Create Profile" : "Save Changes"}</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>{isCreating ? "Creating..." : "Saving..."}</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  <span>{isCreating ? "Create Profile" : "Save Changes"}</span>
+                </>
+              )}
             </button>
           </div>
         )}
@@ -358,6 +413,7 @@ export default function AgencyProfile() {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter your business address"
+                  error={errors.address}
                 />
                 <EditableInput
                   label="Website"
@@ -367,6 +423,7 @@ export default function AgencyProfile() {
                   onChange={handleInputChange}
                   type="url"
                   placeholder="https://youragency.com"
+                  error={errors.websiteUrl}
                 />
               </>
             ) : (
@@ -416,6 +473,7 @@ export default function AgencyProfile() {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter owner's full name"
+                  error={errors.ownerName}
                 />
                 <EditableInput
                   label="License Number"
@@ -425,6 +483,7 @@ export default function AgencyProfile() {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter license number"
+                  error={errors.licenseNumber}
                 />
                 <EditableTextarea
                   label="Description"
@@ -435,6 +494,7 @@ export default function AgencyProfile() {
                   rows={6}
                   required
                   placeholder="Describe your agency and services"
+                  error={errors.description}
                 />
               </>
             ) : (

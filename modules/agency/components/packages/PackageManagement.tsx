@@ -9,7 +9,7 @@ import {
   Users,
   Calendar,
   MapPin,
-  DollarSign,
+  IndianRupee,
   X,
   CheckCircle,
   Ban,
@@ -251,12 +251,12 @@ export const PackageManagement = () => {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <DollarSign
+                            <IndianRupee
                               size={18}
                               className="text-green-600"
                             />
                             <span className="font-semibold">
-                              ${pkg.price} per person
+                              ₹{pkg.price} per person
                             </span>
                           </div>
 
@@ -418,7 +418,7 @@ export const PackageManagement = () => {
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Price Per Person</p>
                   <p className="text-xl font-semibold">
-                    ${viewingPackage.price}
+                    ₹{viewingPackage.price}
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg">

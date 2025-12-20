@@ -1,4 +1,4 @@
-import { X, Plus, Upload, Image as ImageIcon, Calendar, MapPin as MapPinIcon, DollarSign, Clock, Trash2 } from "lucide-react";
+import { X, Plus, Upload, Image as ImageIcon, Calendar, MapPin as MapPinIcon, IndianRupee, Clock, Trash2 } from "lucide-react";
 import { AddPackageFormProps } from "../../types/package.type";
 import { PackageStatus } from "../../types/package.enum";
 
@@ -78,7 +78,7 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
+                  <IndianRupee className="w-4 h-4" />
                   Price Per Person <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -287,8 +287,8 @@ export const AddPackageForm: React.FC<AddPackageFormProps> = ({
                   <label
                     key={value}
                     className={`flex flex-col items-center p-3 sm:p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${packageData.vehicle === value
-                        ? "border-blue-500 bg-blue-50 shadow-md"
-                        : "border-gray-200 hover:bg-blue-50 hover:border-blue-300"
+                      ? "border-blue-500 bg-blue-50 shadow-md"
+                      : "border-gray-200 hover:bg-blue-50 hover:border-blue-300"
                       }`}
                   >
                     <input
