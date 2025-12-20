@@ -10,12 +10,13 @@ import StatCard from "./statCard";
 import Chart from "./Chart";
 import RecentActivity from "./Recent-Activity";
 import { useDashBoard } from "../hooks/use-dashboard";
+import { DashboardLoader } from "@/shared/components/ui/DashboardLoader";
 
 
 const AdminDashboard = () => {
 
-  const {cards,revenue,statusOverview,loading} = useDashBoard()
-   if (loading) return <p>Loading dashboard...</p>;
+  const { cards, revenue, statusOverview, loading } = useDashBoard()
+  if (loading) return <DashboardLoader message="Loading dashboard..." size="lg" />;
   return (
     <>
       <div className="space-y-6">
@@ -51,9 +52,9 @@ const AdminDashboard = () => {
           />
         </div>
         {/* Charts */}
-        <Chart 
-        revenueData={revenue ?? []}
-        bookingStatusData={statusOverview ?? []}
+        <Chart
+          revenueData={revenue ?? []}
+          bookingStatusData={statusOverview ?? []}
         />
         {/* Recent Activity */}
         <RecentActivity />
