@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Button } from "@/shared/components/ui/button";
-import { Save } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { AgencyStatus } from "../../types/agency.status.enum";
 import { EditAgencyDialogProps } from "../../types/modal.type";
 
@@ -123,7 +123,7 @@ export const EditAgencyDialog = ({
         </div>
 
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
           <Button
@@ -131,8 +131,17 @@ export const EditAgencyDialog = ({
             className="flex items-center space-x-2"
             disabled={loading}
           >
-            <Save className="w-4 h-4" />
-            {loading ? "Saving..." : "Save Change"}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save Changes</span>
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>
