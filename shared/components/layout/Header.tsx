@@ -57,11 +57,11 @@ export const Header = () => {
 
       socket.on(
         "connectionRequest",
-        (payload: { senderId: string; senderName: string }) => {
+        (payload: { connectionId: string; senderId: string; senderName: string; senderProfileImage: string }) => {
           addConnectionRequest({
-            id: payload.senderId,
+            id: payload.connectionId,
             name: payload.senderName,
-            profileImage: `https://i.pravatar.cc/150?u=${payload.senderId}`,
+            profileImage: payload.senderProfileImage || `https://i.pravatar.cc/150?u=${payload.senderId}`,
           });
         }
       );
