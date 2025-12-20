@@ -1,6 +1,7 @@
 import { Button } from "@/shared/components/ui/button";
 import Modal from "@/shared/components/common/Modal";
 import { BlockAgencyModalProps } from "../../types/modal.type";
+import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
 
 
@@ -35,7 +36,7 @@ const BlockAgencyModal: React.FC<BlockAgencyModalProps> = ({
       </div>
 
       <div className="mt-6 flex justify-end gap-3">
-        <Button variant="outline" size="sm" onClick={onClose}>
+        <Button variant="outline" size="sm" onClick={onClose} disabled={loading}>
           Cancel
         </Button>
 
@@ -53,7 +54,22 @@ const BlockAgencyModal: React.FC<BlockAgencyModalProps> = ({
             })
           }
         >
-          {loading ? "Processing..." : "Yes, Confirm"}
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : isBlocked ? (
+            <>
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Yes, Activate
+            </>
+          ) : (
+            <>
+              <XCircle className="w-4 h-4 mr-2" />
+              Yes, Deactivate
+            </>
+          )}
         </Button>
       </div>
     </Modal>
@@ -61,3 +77,4 @@ const BlockAgencyModal: React.FC<BlockAgencyModalProps> = ({
 };
 
 export default BlockAgencyModal;
+
