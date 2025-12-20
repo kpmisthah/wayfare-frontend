@@ -27,6 +27,7 @@ type Connection = {
 export const Notification = () => {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
+  const [processingIds, setProcessingIds] = useState<Record<string, "accept" | "reject" | null>>({});
   const router = useRouter();
   const {
     notifications,
@@ -64,13 +65,13 @@ export const Notification = () => {
     });
     socket.on(
       "connectionRequest",
-      (payload: { senderId: string; senderName: string }) => {
+      (payload: { connectionId: string; senderId: string; senderName: string; senderProfileImage: string }) => {
         useNotificationStore.getState().addConnectionRequest({
-          id: payload.senderId,
+          id: payload.connectionId,
           name: payload.senderName,
           type: NotificationStatus.CONNECTION_REQUEST,
           status: "PENDING",
-          profileImage: `https://i.pravatar.cc/150?u=${payload.senderId}`,
+          profileImage: payload.senderProfileImage || `https://i.pravatar.cc/150?u=${payload.senderId}`,
         });
       }
     );
@@ -81,18 +82,28 @@ export const Notification = () => {
   }, []);
 
   const handleAccept = async (id: string) => {
-    await api.patch(`/connections/${id}/accept`);
-    removeConnectionRequest(id);
+    setProcessingIds(prev => ({ ...prev, [id]: "accept" }));
+    try {
+      await api.patch(`/connections/${id}/accept`);
+      removeConnectionRequest(id);
+    } catch (err) {
+      console.error("Failed to accept connection", err);
+    } finally {
+      setProcessingIds(prev => ({ ...prev, [id]: null }));
+    }
   };
 
 
   const handleReject = async (connectionId: string) => {
+    setProcessingIds(prev => ({ ...prev, [connectionId]: "reject" }));
     try {
       await api.patch(`/connections/${connectionId}/reject`);
       removeConnectionRequest(connectionId);
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
       alert(error.response?.data?.message || "Failed to reject");
+    } finally {
+      setProcessingIds(prev => ({ ...prev, [connectionId]: null }));
     }
   };
 
@@ -130,6 +141,9 @@ export const Notification = () => {
 
   const filtered =
     filter === "unread" ? notifications.filter((n) => n.unread) : notifications;
+
+  // Show connection requests in unread tab as well (they are inherently unread)
+  const showConnectionRequests = filter === "all" || (filter === "unread" && requests.length > 0);
 
   const NotificationBellBadge = () => (
     <div className="relative">
@@ -178,8 +192,8 @@ export const Notification = () => {
             <button
               onClick={() => setFilter("all")}
               className={`pb-3 px-1 font-medium border-b-2 transition ${filter === "all"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500"
                 }`}
             >
               All
@@ -187,8 +201,8 @@ export const Notification = () => {
             <button
               onClick={() => setFilter("unread")}
               className={`pb-3 px-1 font-medium border-b-2 transition ${filter === "unread"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500"
                 }`}
             >
               Unread
@@ -210,7 +224,7 @@ export const Notification = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {requests.length > 0 && filter === "all" && (
+            {showConnectionRequests && requests.length > 0 && (
               <section>
                 <h2 className="text-lg font-semibold mb-4">
                   Connection Requests ({requests.length})
@@ -235,15 +249,29 @@ export const Notification = () => {
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleAccept(req.id)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm flex items-center gap-2"
+                          disabled={!!processingIds[req.id]}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-5 py-2 rounded-lg text-sm flex items-center gap-2 min-w-[100px] justify-center"
                         >
-                          <Check className="w-4 h-4" /> Accept
+                          {processingIds[req.id] === "accept" ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Check className="w-4 h-4" /> Accept
+                            </>
+                          )}
                         </button>
                         <button
                           onClick={() => handleReject(req.id)}
-                          className="bg-gray-100 hover:bg-gray-200 px-5 py-2 rounded-lg text-sm flex items-center gap-2"
+                          disabled={!!processingIds[req.id]}
+                          className="bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 px-5 py-2 rounded-lg text-sm flex items-center gap-2 min-w-[100px] justify-center"
                         >
-                          <X className="w-4 h-4" /> Decline
+                          {processingIds[req.id] === "reject" ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <X className="w-4 h-4" /> Decline
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -264,8 +292,8 @@ export const Notification = () => {
                   <div
                     key={notif.id}
                     className={`bg-white rounded-xl border p-5 transition-all hover:shadow-md ${notif.unread
-                        ? "border-blue-300 bg-blue-50/40"
-                        : "border-gray-200"
+                      ? "border-blue-300 bg-blue-50/40"
+                      : "border-gray-200"
                       }`}
                   >
                     <div className="flex gap-4">
