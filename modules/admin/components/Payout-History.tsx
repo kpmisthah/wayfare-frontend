@@ -18,6 +18,7 @@ import { PayoutStatus } from "../types/payout-status.enum";
 import { usePayoutReq } from "../hooks/use-payout-req";
 import { PayoutRequest } from "../types/payout-request.type";
 import { exportPayouts } from "../services/export.service";
+import { DashboardLoader } from "@/shared/components/ui/DashboardLoader";
 
 // Status Badge Component
 const StatusBadge = ({ status }: { status: PayoutStatus }) => {
@@ -317,17 +318,23 @@ const PayoutHistory = () => {
 
         {/* Desktop Table View - Hidden on Mobile */}
         <div className="hidden lg:block overflow-x-auto">
-          <Table
-            col={columns}
-            data={filteredRequests}
-            title=""
-            description=""
-          />
+          {isLoading ? (
+            <DashboardLoader message="Loading payout requests..." size="md" />
+          ) : (
+            <Table
+              col={columns}
+              data={filteredRequests}
+              title=""
+              description=""
+            />
+          )}
         </div>
 
         {/* Mobile Card View - Hidden on Desktop */}
         <div className="lg:hidden p-4 space-y-3">
-          {filteredRequests.length > 0 ? (
+          {isLoading ? (
+            <DashboardLoader message="Loading payout requests..." size="md" />
+          ) : filteredRequests.length > 0 ? (
             filteredRequests.map((request) => (
               <MobilePayoutCard
                 key={request.id}
