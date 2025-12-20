@@ -5,10 +5,10 @@ import { useSearchParams } from "next/navigation";
 
 interface OTPPageProps {
   userEmail?: string;
-  redirectUrl:string
+  redirectUrl: string
 }
 
-const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
+const OTPPage: React.FC<OTPPageProps> = ({ redirectUrl }) => {
   const searchParams = useSearchParams();
   const userEmail = searchParams.get("email");
   // const role = searchParams.get("role")||"USER"
@@ -29,7 +29,7 @@ const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
     handlePaste,
     handleVerify,
     handleResend,
-  } = useOtp({userEmail,redirectUrl});
+  } = useOtp({ userEmail, redirectUrl });
 
   const handleBack = (): void => {
     // Navigate back to login page
@@ -58,16 +58,7 @@ const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
         <div className="w-8 h-8 rounded-full bg-current"></div>
       </div>
 
-      {/* Navigation */}
-      <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
-        >
-          <ArrowLeft size={16} />
-          <span className="text-sm font-medium text-gray-700">Back</span>
-        </button>
-      </div>
+
 
       {/* Main content */}
       <div className="w-full max-w-md">
@@ -119,11 +110,10 @@ const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   disabled={isLoading}
-                  className={`w-12 h-12 text-center text-lg font-semibold border-2 rounded-xl focus:outline-none transition-colors ${
-                    error
+                  className={`w-12 h-12 text-center text-lg font-semibold border-2 rounded-xl focus:outline-none transition-colors ${error
                       ? "border-red-300 focus:border-red-500"
                       : "border-gray-200 focus:border-blue-500"
-                  } ${isLoading ? "bg-gray-50 cursor-not-allowed" : ""}`}
+                    } ${isLoading ? "bg-gray-50 cursor-not-allowed" : ""}`}
                 />
               ))}
             </div>
@@ -151,13 +141,12 @@ const OTPPage: React.FC<OTPPageProps> = ({redirectUrl}) => {
 
             {/* Verify Button */}
             <button
-              onClick={()=>handleVerify(userEmail)}
+              onClick={() => handleVerify(userEmail)}
               disabled={!isComplete || isLoading}
-              className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${
-                isComplete && !isLoading
+              className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${isComplete && !isLoading
                   ? "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg hover:shadow-xl"
                   : "bg-gray-300 cursor-not-allowed"
-              }`}
+                }`}
             >
               {isLoading ? (
                 <>
