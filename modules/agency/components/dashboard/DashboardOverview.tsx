@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Package,
   CalendarDays,
-  DollarSign,
+  IndianRupee,
   MapPin,
   Clock,
   ArrowRight,
@@ -41,7 +41,7 @@ export const Dashboard = () => {
     {
       label: 'Total Revenue',
       value: `₹${(data?.stats?.totalRevenue || 0).toLocaleString()}`,
-      icon: DollarSign,
+      icon: IndianRupee,
       color: 'from-purple-500 to-purple-600',
     },
   ];
