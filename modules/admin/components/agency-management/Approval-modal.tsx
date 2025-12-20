@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Modal from "@/shared/components/common/Modal";
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Agency } from "../../types/agency.type";
 
 interface ApprovalModalProps {
@@ -148,7 +148,22 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
                         disabled={loading}
                         className="flex-1"
                     >
-                        {loading ? "Processing..." : action === "accept" ? "Confirm Approval" : "Confirm Rejection"}
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Processing...
+                            </>
+                        ) : action === "accept" ? (
+                            <>
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Confirm Approval
+                            </>
+                        ) : (
+                            <>
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Confirm Rejection
+                            </>
+                        )}
                     </Button>
                 </div>
             </div>
@@ -157,3 +172,4 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
 };
 
 export default ApprovalModal;
+
