@@ -7,6 +7,9 @@ import {
   Trash2,
   Save,
   AlertTriangle,
+  Loader2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -47,6 +50,7 @@ const UserManagement = () => {
     userToBlock,
     setUserToBlock,
     isLoading,
+    blockLoading,
   } = useUsers();
   const debouncedSearch = useMemo(
     () =>
@@ -293,6 +297,7 @@ const UserManagement = () => {
               <Button
                 variant="outline"
                 size="sm"
+                disabled={blockLoading}
                 onClick={() => {
                   setBlockModalOpen(false);
                   setUserToBlock(null);
@@ -303,13 +308,29 @@ const UserManagement = () => {
               <Button
                 variant={userToBlock.isBlock ? "default" : "destructive"}
                 size="sm"
-                onClick={() => {
-                  handleToggleBlockUser(userToBlock);
+                disabled={blockLoading}
+                onClick={async () => {
+                  await handleToggleBlockUser(userToBlock);
                   setBlockModalOpen(false);
                   setUserToBlock(null);
                 }}
               >
-                Yes, Confirm
+                {blockLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : userToBlock.isBlock ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Yes, Unblock
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Yes, Block
+                  </>
+                )}
               </Button>
             </div>
           </div>
