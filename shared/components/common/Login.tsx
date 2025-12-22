@@ -37,9 +37,6 @@ export const Login = ({
     handleLoginSubmit,
   } = useLoginForm({ role, onSubmit, redirectLogin });
 
-
-  "BUILD TIME NEXT_PUBLIC_API_URL:",
-  process.env.NEXT_PUBLIC_API_URL
 );
 
 
