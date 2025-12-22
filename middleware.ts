@@ -52,62 +52,75 @@ export async function middleware(request: NextRequest) {
       .getAll()
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join(";");
-    const result = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-      {
-        method: "POST",
-        headers: {
-          Cookie: cookieString,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-        credentials: "include",
-      }
-    );
 
-    if (result.ok) {
-      const response = NextResponse.next();
-
-      const setCookieHeaders = result.headers.getSetCookie();
-      setCookieHeaders.forEach((cookie) => {
-        // Parse name=value; options
-        const [fullCookie] = cookie.split(";");
-        const [name, value] = fullCookie.split("=");
-        if (name && value) {
-          response.cookies.set(name.trim(), value.trim(), {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            domain: '.misthah.site',
-            path: "/",
-          });
+    try {
+      const result = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: cookieString,
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
         }
-      });
+      );
 
-      const newAccessToken = response.cookies.get("accessToken")?.value;
-      if (newAccessToken) {
-        response.headers.set("Authorization", `Bearer ${newAccessToken}`);
-      }
+      console.log('[Middleware] Refresh token response status:', result.status);
 
-      return response;
-    } else {
+      if (result.ok) {
+        const response = NextResponse.next();
 
-      const protectedUserPaths = [
-        "/plan-trip",
-        "/booking",
-        "/connection",
-        "/profile",
-        "/notifications"
-      ];
-      const isProtectedPath = protectedUserPaths.some((path) => pathname.startsWith(path));
+        const setCookieHeaders = result.headers.getSetCookie();
+        console.log('[Middleware] Set-Cookie headers received:', setCookieHeaders.length);
 
-      if (isProtectedPath) {
-        const response = NextResponse.redirect(new URL("/login", request.url));
-        response.cookies.delete("accessToken");
-        response.cookies.delete("refreshToken");
+        setCookieHeaders.forEach((cookie) => {
+          // Parse name=value; options
+          const [fullCookie] = cookie.split(";");
+          const [name, value] = fullCookie.split("=");
+          if (name && value) {
+            response.cookies.set(name.trim(), value.trim(), {
+              httpOnly: true,
+              secure: true,
+              sameSite: 'none',
+              domain: '.misthah.site',
+              path: "/",
+            });
+          }
+        });
+
+        const newAccessToken = response.cookies.get("accessToken")?.value;
+        if (newAccessToken) {
+          response.headers.set("Authorization", `Bearer ${newAccessToken}`);
+          console.log('[Middleware] New access token set successfully');
+        }
+
         return response;
-      }
+      } else {
+        console.log('[Middleware] Refresh failed with status:', result.status);
+        const errorText = await result.text().catch(() => 'Unable to read error');
+        console.log('[Middleware] Refresh error:', errorText);
 
+        const protectedUserPaths = [
+          "/plan-trip",
+          "/booking",
+          "/connection",
+          "/profile",
+          "/notifications"
+        ];
+        const isProtectedPath = protectedUserPaths.some((path) => pathname.startsWith(path));
+
+        if (isProtectedPath) {
+          const response = NextResponse.redirect(new URL("/login", request.url));
+          response.cookies.delete("accessToken");
+          response.cookies.delete("refreshToken");
+          return response;
+        }
+
+        hasValidAccessToken = false;
+      }
+    } catch (error) {
+      console.error('[Middleware] Refresh token fetch error:', error);
       hasValidAccessToken = false;
     }
   }
