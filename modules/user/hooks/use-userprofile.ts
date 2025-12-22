@@ -265,8 +265,10 @@ export const useUserProfile = () => {
     }
   };
 
-  const cancelBooking = async (id: string) => {
+  const [isCancelling, setIsCancelling] = useState(false);
 
+  const cancelBooking = async (id: string) => {
+    setIsCancelling(true);
     try {
       await bookingCancel(id);
       setTrips((prev) =>
@@ -278,6 +280,8 @@ export const useUserProfile = () => {
       setSelectedTripForCancel(null)
       setRefereshWallet(prev => !prev)
     } catch (error) {
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -339,6 +343,7 @@ export const useUserProfile = () => {
     isChangingPassword,
     isSavingProfile,
     isLoadingConnections,
+    isCancelling,
     // Trip search/filter
     tripSearch,
     setTripSearch,
