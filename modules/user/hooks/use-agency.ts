@@ -11,6 +11,7 @@ export const useAgencies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("az");
   const [agencies, setAgencies] = useState<Agency[]>([])
+  const [loading, setLoading] = useState(true);
   // const [agency,setAgency] = useState<Agency>()
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,9 +19,14 @@ export const useAgencies = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       const fetchAgencies = async () => {
-        const response = await searchListAgencies(searchTerm, page, limit, sortBy);
-        setAgencies(response.data)
-        setTotalPages(response.totalPages)
+        setLoading(true);
+        try {
+          const response = await searchListAgencies(searchTerm, page, limit, sortBy);
+          setAgencies(response.data)
+          setTotalPages(response.totalPages)
+        } finally {
+          setLoading(false);
+        }
       };
       fetchAgencies();
     }, 500)
@@ -41,6 +47,7 @@ export const useAgencies = () => {
     sortBy,
     setSortBy,
     agencies,
+    loading,
     page,
     totalPages,
     nextPage,
@@ -99,7 +106,7 @@ export const usePackages = (id: string) => {
     if (page < totalPages) setPage(prev => prev + 1)
   }
 
-  // Reset page when search changes
+
   useEffect(() => {
     setPage(1);
   }, [search]);
