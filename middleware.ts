@@ -46,24 +46,12 @@ export async function middleware(request: NextRequest) {
   let hasValidAccessToken = accessToken && !accessTokenExpired;
 
   if (needsRefresh) {
-    // Use request.cookies directly - this is the correct API for middleware
-    // Note: cookies() from next/headers is for Server Components, NOT middleware
     const allCookies = request.cookies.getAll();
     const cookieString = allCookies
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-    // Debug logging - check your production logs
-    console.log('[Middleware Debug] ================');
-    console.log('[Middleware Debug] Path:', pathname);
-    console.log('[Middleware Debug] API URL:', apiUrl);
-    console.log('[Middleware Debug] Access Token Present:', !!accessToken);
-    console.log('[Middleware Debug] Refresh Token Present:', !!refreshToken);
-    console.log('[Middleware Debug] Access Token Expired:', accessTokenExpired);
-    console.log('[Middleware Debug] Needs Refresh:', needsRefresh);
-    console.log('[Middleware Debug] Cookie String:', cookieString ? `${cookieString.substring(0, 50)}...` : 'EMPTY');
 
     try {
       const refreshUrl = `${apiUrl}/auth/refresh`;
@@ -91,7 +79,6 @@ export async function middleware(request: NextRequest) {
         console.log('[Middleware] Set-Cookie headers received:', setCookieHeaders.length);
 
         setCookieHeaders.forEach((cookie) => {
-          // Parse name=value; options
           const [fullCookie] = cookie.split(";");
           const [name, value] = fullCookie.split("=");
           if (name && value) {
