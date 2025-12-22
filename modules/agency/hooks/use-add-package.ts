@@ -89,7 +89,6 @@ export const useAddPackage = (
     const fetchAgency = async () => {
       try {
         const response = await getAgencyProfile();
-        console.log(response, "response");
 
         setAgency(response);
       } catch (error) {
@@ -99,7 +98,6 @@ export const useAddPackage = (
     fetchAgency();
   }, []);
   useEffect(() => {
-    console.log(agency);
   }, []);
   const [currentStep, setCurrentStep] = useState(1);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -111,17 +109,13 @@ export const useAddPackage = (
     >
   ) => {
     const { name, value } = e.target;
-    console.log(name, "name");
-    console.log(value, "value");
     setPackageData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    console.log(files, "fileesssss");
     if (!files) return;
     const fileArray = Array.from(files);
-    console.log(fileArray, "fileArraaaaaaaaaaaaaaayy");
     setPackageData((prev) => ({ ...prev, picture: [...prev.picture, ...fileArray] }));
   };
   const handleAddHighlight = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -142,7 +136,6 @@ export const useAddPackage = (
   };
 
   const addDay = () => {
-    console.log(packageData.itinerary.length, "before adding new day");
 
     const newDay: Itinerary = {
       day: packageData?.itinerary.length + 1,
@@ -212,10 +205,8 @@ export const useAddPackage = (
   const handlePublish = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     try {
-      console.log(packageData, "packagedata before adding");
       try {
         if (!editingPackage) {
-          console.log("atho ivde aano");
           setIsPublishing(true);
           setIsPublished(false);
           const newPackage = await addPackage({
@@ -235,7 +226,6 @@ export const useAddPackage = (
           setPackages && setPackages((prev) => [...prev, newPackage]);
           setShowForm(false);
         } else {
-          console.log("videe else case work aavndooo");
           let updatePackage = await updatedPackage(packageData, editingPackage.id);
           setPackages && setPackages((prev) =>
             prev.map((pkg) => pkg.id == editingPackage.id ? updatePackage : pkg)
@@ -244,12 +234,10 @@ export const useAddPackage = (
         }
         setIsPublished(true);
       } catch (error) {
-        console.log(error);
       } finally {
         setIsPublishing(false);
       }
     } catch (err) {
-      console.log(err);
     }
   };
   //.....................

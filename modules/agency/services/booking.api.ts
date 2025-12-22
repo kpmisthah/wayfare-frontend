@@ -11,13 +11,11 @@ export const bookPackage = async (data: {
 }) => {
     try {
         const response = await api.post('/booking/package', data);
-        console.log(response, 'response from bookPackage api');
         toast.success('Booking initiated!', {
             description: 'Redirecting to payment...',
         });
         return response.data;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };
@@ -27,7 +25,6 @@ export const fetchBookingByAgency = async () => {
         const response = await api.get('/booking/get-bookings');
         return response.data;
     } catch (error) {
-        console.log(error);
     }
 };
 
@@ -47,10 +44,8 @@ export const updateBookingStatus = async (id: string, status: BookingStatus) => 
 export const fetchShortTripDetails = async () => {
     try {
         const response = await api.get('/trip');
-        console.log(response, 'response from fetchShortTripDetails');
         return response.data;
     } catch (error) {
-        console.log(error, 'Error');
     }
 };
 
@@ -66,6 +61,5 @@ export const fetchBookingsByPackage = async (
         });
         return response.data;
     } catch (error) {
-        console.log(error, 'Error');
     }
 };

@@ -42,7 +42,6 @@ export const usePayoutReq = () => {
       setPayout(result.data || []);
       setTotalItems(result.total);
     } catch (error) {
-      console.log(error);
     } finally {
       setIsLoading(false);
     }

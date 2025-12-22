@@ -37,9 +37,7 @@ function getRoleFromToken(token: string): string | null {
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
-  console.log(accessToken, 'accessTokennnn');
   const refreshToken = request.cookies.get("refreshToken")?.value;
-  console.log(refreshToken, 'refreshTokennn');
   const { pathname } = request.nextUrl;
 
   const accessTokenExpired = accessToken ? isTokenExpired(accessToken) : true;
@@ -78,9 +76,9 @@ export async function middleware(request: NextRequest) {
         if (name && value) {
           response.cookies.set(name.trim(), value.trim(), {
             httpOnly: true,
-            secure:true,
-            sameSite:'none',
-            domain:'.misthah.site',
+            secure: true,
+            sameSite: 'none',
+            domain: '.misthah.site',
             path: "/",
           });
         }

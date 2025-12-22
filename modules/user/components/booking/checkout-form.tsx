@@ -9,57 +9,51 @@ import { PAYMENTSTATUS } from "../../types/payment.type";
 import { loadStripe } from "@stripe/stripe-js";
 interface Props {
   clientSecret: string;
-  bookingId:string
+  bookingId: string
 }
 
-export const CheckoutForm: React.FC<Props> = ({ clientSecret,bookingId }) => {
-  {console.log(clientSecret,'clientt secrettttt')}
+export const CheckoutForm: React.FC<Props> = ({ clientSecret, bookingId }) => {
   const router = useRouter()
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-  console.log(stripe,'stripeeeeee')
-  console.log(elements,'elemetntsss')
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
     setLoading(true);
     // setPaymentStatus(null);
-    
+
     const cardElement = elements.getElement(CardElement);
-    console.log(cardElement,'cardElementtt')
     if (!cardElement) return;
 
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: { card: cardElement },
       });
-      console.log(error,'error----')
       if (error) {
         console.error(error);
         setPaymentStatus("failed");
         return
       }
-      const pollPayment = async(interval=1000,maxAttempts=15,attempts=0)=>{
+      const pollPayment = async (interval = 1000, maxAttempts = 15, attempts = 0) => {
         const data = await verifyPayment(paymentIntent.id)
-        console.log(data,'dataaaaaaaaaaa')
-        if(data.status == PAYMENTSTATUS.SUCCEEDED){
+        if (data.status == PAYMENTSTATUS.SUCCEEDED) {
           router.push(`/booking/success?booking_id=${bookingId}&payment_method=card`)
-        }else if(data.status == PAYMENTSTATUS.FAILED){
+        } else if (data.status == PAYMENTSTATUS.FAILED) {
           setPaymentStatus('failed')
           setLoading(false)
-        }else if(attempts<maxAttempts){
-          setTimeout(()=>pollPayment(interval,maxAttempts,attempts+1),interval)
-        }else{
+        } else if (attempts < maxAttempts) {
+          setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval)
+        } else {
           setPaymentStatus('pending')
           setLoading(false)
         }
       }
       pollPayment()
     } catch (err) {
-      console.error(err,'ererr-----------');
+      console.error(err, 'ererr-----------');
       setPaymentStatus("failed");
     } finally {
       setLoading(false);
@@ -92,15 +86,14 @@ export const CheckoutForm: React.FC<Props> = ({ clientSecret,bookingId }) => {
             <CardElement options={cardElementOptions} />
           </div>
         </div>
-        
+
         <button
           type="submit"
           disabled={!stripe || loading}
-          className={`w-full py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-            !stripe || loading
+          className={`w-full py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${!stripe || loading
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`}
+            }`}
         >
           {loading ? (
             <>
@@ -117,12 +110,11 @@ export const CheckoutForm: React.FC<Props> = ({ clientSecret,bookingId }) => {
       </form>
 
       {/* Payment Status */}
-       {paymentStatus && (
-        <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${
-          paymentStatus === "succeeded" 
-            ? "bg-green-100 text-green-800" 
+      {paymentStatus && (
+        <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${paymentStatus === "succeeded"
+            ? "bg-green-100 text-green-800"
             : "bg-red-100 text-red-800"
-        }`}>
+          }`}>
           {paymentStatus === "succeeded" ? (
             <>
               <CheckCircle className="w-4 h-4" />
@@ -134,8 +126,8 @@ export const CheckoutForm: React.FC<Props> = ({ clientSecret,bookingId }) => {
               Payment failed! Please try again.
             </>
           )}
-        </div> 
-      )} 
+        </div>
+      )}
 
       {/* Card Security Info */}
       <div className="text-xs text-gray-500 text-center">

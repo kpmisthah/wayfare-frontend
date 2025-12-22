@@ -48,9 +48,6 @@ const AgencyProfile = ({ id }: { id: string }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Packages data:', packages);
-    console.log('Packages length:', packages.length);
-    console.log('Agency ID:', id);
   }, [packages, id]);
 
   if (!agency) return <p className="p-6">Agency not found</p>;

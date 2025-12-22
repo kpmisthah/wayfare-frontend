@@ -154,7 +154,6 @@ export const AgencyWallet = () => {
     try {
       const res = await api.get("/agency/bank/details");
       const bank = res.data;
-      console.log(bank, "---------->Bank<-----------------");
       if (bank) {
         setHasBankDetails(true);
         setIsEditingBank(false);
@@ -170,7 +169,6 @@ export const AgencyWallet = () => {
         setIsEditingBank(true);
       }
     } catch (e) {
-      console.log(e);
     }
   }
 

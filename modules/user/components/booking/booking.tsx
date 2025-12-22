@@ -10,7 +10,6 @@ import { CheckoutForm } from './checkout-form';
 import { useWallet } from '../../hooks/use-wallet';
 import { useRouter } from 'next/navigation';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-console.log(stripePromise, 'stripe promiseeee')
 interface BookingProps {
   id: string
 }

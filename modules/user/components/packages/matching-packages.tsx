@@ -92,7 +92,6 @@ const TravelPackages = () => {
       setPackages(result?.data || []);
       setTotalPackages(result?.total || 0);
     } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }

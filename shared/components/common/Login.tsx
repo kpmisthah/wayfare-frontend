@@ -38,7 +38,6 @@ export const Login = ({
   } = useLoginForm({ role, onSubmit, redirectLogin });
 
 
-  console.log(
   "BUILD TIME NEXT_PUBLIC_API_URL:",
   process.env.NEXT_PUBLIC_API_URL
 );

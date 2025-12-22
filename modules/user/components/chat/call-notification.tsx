@@ -71,7 +71,6 @@ export default function CallNotificationManager() {
         audioRef.current.volume = 0.5;
 
         audioRef.current.play().catch(e => {
-          console.log("Audio autoplay blocked, using Web Audio API only");
         });
 
         return () => {

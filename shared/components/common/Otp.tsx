@@ -33,7 +33,6 @@ const OTPPage: React.FC<OTPPageProps> = ({ redirectUrl }) => {
 
   const handleBack = (): void => {
     // Navigate back to login page
-    console.log("Going back to login...");
     // You can use Next.js router here:
     // router.back();
   };

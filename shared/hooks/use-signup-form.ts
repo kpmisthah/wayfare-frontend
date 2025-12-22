@@ -67,7 +67,6 @@ export const useSignup = ({ role = 'USER', redirectLogin, onSubmit }: UseSignupP
     setErrors({});
 
     try {
-      console.log("Signup submitted:", signupData);
       await onSubmit({ ...signupData, role });
       router.push(`/${redirectLogin}?email=${encodeURIComponent(signupData.email)}`);
     } catch (error: unknown) {

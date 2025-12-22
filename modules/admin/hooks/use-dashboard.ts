@@ -22,7 +22,6 @@ export const useDashBoard = () => {
         setRevenue(result.charts.revenueOverview);
         setStatusOverview(result.charts.bookingStatusOverview);
       } catch (error) {
-        console.log(error);
         
       }finally{
         setLoading(false)

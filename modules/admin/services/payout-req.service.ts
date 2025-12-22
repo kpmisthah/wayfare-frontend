@@ -17,7 +17,6 @@ export const payoutRequest = async (
     const response = await api.get("/admin/payout-details",{params});
     return response.data;
   } catch (error) {
-    console.log(error);
   }
 };
 

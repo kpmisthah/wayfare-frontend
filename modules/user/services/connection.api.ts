@@ -3,7 +3,6 @@ import { toast } from "sonner";
 
 export const sendConnectionRequest = async (receiverId: string) => {
     try {
-        console.log(receiverId, 'receiverId in sendConnectionRequest');
         const response = await api.post(`/connections/${receiverId}`);
         toast.success('Request sent!', {
             description: 'Your connection request has been sent.',
@@ -20,7 +19,6 @@ export const sendConnectionRequest = async (receiverId: string) => {
 export const getMyConnections = async () => {
     try {
         const response = await api.get('/connections');
-        console.log(response.data, 'response.data in getMyConnections');
         return response.data;
     } catch (err) {
         const error = err as { response?: { data?: { message?: string } | string } };

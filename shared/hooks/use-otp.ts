@@ -72,13 +72,11 @@ export function useOtp(data: { userEmail: string, redirectUrl: string }) {
       setError('');
       try {
         const result = await verifyOtp({ otpCode, email });
-        console.log(result, 'from verifyOtp front end');
         if (result.message == 'Agency created successfully waiting admin approval') {
           setError('You account is pending admin approval')
           return
         }
         const user = await fetchUser();
-        console.log(user, 'in userOtp hook setAuth strore aavudooo');
 
         setAuthUser(user);
         router.push(data.redirectUrl)
@@ -104,7 +102,6 @@ export function useOtp(data: { userEmail: string, redirectUrl: string }) {
     setError('');
     try {
       let result = await resendOtp(data.userEmail)
-      console.log(result, 'result from backend')
       if (result.message == 'otp send successfully') {
         setError("");
         setTimeLeft(60);

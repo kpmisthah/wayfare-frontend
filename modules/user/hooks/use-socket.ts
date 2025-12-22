@@ -39,9 +39,7 @@ export const useSocket = (
     if (!selectedUser?.type || selectedUser.type !== "group") {
       const roomPayload = { conversationId: chatId };
       socket.emit("joinRoom", roomPayload);
-      console.log(`[Client] Joined direct chat: ${chatId}`);
     } else {
-      console.log(`[Client] Group chat ${chatId} → already joined server-side`);
     }
 
     // Mark as read via API (persistence)
@@ -54,7 +52,6 @@ export const useSocket = (
         const fetchedMessages = res.data || [];
 
         // Debug: Check if senderName is included
-        console.log('📩 Fetched messages sample:', fetchedMessages[0]);
 
         setMessages(fetchedMessages);
         scrollToBottom();
@@ -80,9 +77,6 @@ export const useSocket = (
 
     const onNewMessage = (msg: ChatMessage) => {
       // Debug: Check if new message has sender info
-      console.log('📨 New message received:', msg);
-      console.log('👤 Sender name:', msg.senderName);
-      console.log('🖼️ Sender image:', msg.senderProfileImage);
 
       // Accept message if it belongs to this chat (either conversationId or groupId matches)
       if (msg.conversationId === chatId || msg.groupId === chatId) {

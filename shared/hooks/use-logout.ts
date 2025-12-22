@@ -12,7 +12,6 @@ export const useLogout = () => {
   const handleLogout = async () => {
     const response = await logout()
     let role = response?.role
-    console.log(role, '==============frpm use-logout=============')
     clearAuth()
     if (role == 'ADMIN') {
       router.push("/admin/login")

@@ -3,7 +3,6 @@ import { forgotPassword } from "../services/auth.api";
 import { useRouter } from "next/navigation";
 
 export const useForgotPassword = (redirectUrl: string) => {
-  console.log(redirectUrl, 'in userHooks');
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");

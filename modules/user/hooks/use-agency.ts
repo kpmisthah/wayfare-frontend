@@ -27,7 +27,6 @@ export const useAgencies = () => {
     return () => clearTimeout(handler)
   }, [searchTerm, page, sortBy]);
   useEffect(() => {
-    console.log(agencies, 'agenciessss')
   }, [])
   const nextPage = () => {
     if (page < totalPages) setPage((prev) => prev + 1);
@@ -126,7 +125,6 @@ export const usePackage = (id: string) => {
         const data = await fetchPackagesById(id)
         setPackageById(data)
       } catch (error) {
-        console.log(error)
       } finally {
         setIsLoading(false)
       }

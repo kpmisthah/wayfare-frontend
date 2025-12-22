@@ -13,14 +13,11 @@ export const getSocket = (): Socket => {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected:", socket?.id);
     });
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected");
     });
   }else{
-    console.log("Reusing existing socket:", socket.id);
   }
   return socket;
 };

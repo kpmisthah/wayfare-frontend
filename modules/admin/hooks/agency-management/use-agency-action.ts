@@ -39,7 +39,6 @@ export const agencyActions = () => {
   }, [currentPage, searchTerm]);
 
   useEffect(() => {
-    console.log(agencies, "agencies in useEffect");
   }, [agencies]);
 
   const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
@@ -100,7 +99,6 @@ export const agencyActions = () => {
     []
   );
   const handleBlockAgency = async (updateAgency: Agency) => {
-    console.log(updateAgency, "updateAGency");
 
     try {
       setLoading(true);
@@ -141,7 +139,6 @@ export const agencyActions = () => {
       setEditAgencyOpen(false);
       setSelectedAgency(null);
 
-      console.log("Agency updated successfully");
     } catch (error) {
       console.error("Error updating agency:", error);
     } finally {

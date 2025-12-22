@@ -24,8 +24,8 @@ import { PaymentSuccessProps } from "../../types/payment.type";
 import { useRouter } from "next/navigation";
 
 const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMethod }) => {
-  const handleDownloadTicket = () => console.log("Downloading ticket...");
-  const handleShareBooking = () => console.log("Sharing booking...");
+  const handleDownloadTicket = () => { /* TODO: Implement ticket download */ };
+  const handleShareBooking = () => { /* TODO: Implement booking share */ };
   const [status, setStatus] = useState<'pending' | 'success' | 'failed'>('pending');
   const isPollingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,12 +37,9 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
 
     const pollPayment = async (interval = 1500, maxAttempts = 10, attempts = 0) => {
       try {
-        console.log('Polling payment status, attempt:', attempts + 1);
         const data = await verifyPayment(booking.id);
-        console.log('Payment verification response:', data, 'attempt:', attempts + 1);
 
         if (!data || !data.status) {
-          console.log('No data or status in response, retrying...');
           if (attempts < maxAttempts) {
             timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
           } else {
@@ -52,24 +49,19 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
         }
 
         if (data.status === PAYMENTSTATUS.SUCCEEDED) {
-          console.log('Payment SUCCEEDED!');
           setStatus('success');
           return;
         } else if (data.status === PAYMENTSTATUS.FAILED) {
-          console.log('Payment FAILED!');
           setStatus('failed');
 
           return;
         } else if (data.status === PAYMENTSTATUS.PENDING) {
-          console.log('Payment still PENDING, attempt:', attempts + 1);
           if (attempts < maxAttempts) {
             timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
           } else {
-            console.log('Max attempts reached, showing success as fallback');
             setStatus('success');
           }
         } else {
-          console.log('Unknown status:', data.status);
           if (attempts < maxAttempts) {
             timeoutRef.current = setTimeout(() => pollPayment(interval, maxAttempts, attempts + 1), interval);
           } else {
@@ -317,7 +309,7 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
             </div>
             {/* Back to Home */}
             <button className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
-            onClick={()=>router.push('/')}
+              onClick={() => router.push('/')}
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home

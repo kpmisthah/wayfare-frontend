@@ -78,7 +78,6 @@ export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => 
         let result = await verifyForgotPassword({ otp: otpCode, email: userEmail });
         // const user = await fetchUser()
         // setAuthUser(user)
-        console.log(result, "otp");
         // router.push('/reset-password')
         router.push(redirectUrl);
       } catch (err) {
@@ -105,7 +104,6 @@ export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => 
       setCanResend(false);
       setOtp(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus(); // Focus first input
-      console.log("OTP resent successfully");
     } catch (err) {
       setError("Something went wrong. Please try again.");
       console.error("OTP resend error:", err);
@@ -117,7 +115,6 @@ export const useForgotPasswordOtp = (userEmail: string, redirectUrl: string) => 
 
   const handleBack = (): void => {
     // Navigate back to login page
-    console.log("Going back to login...");
     // You can use Next.js router here:
     // router.back();
   };

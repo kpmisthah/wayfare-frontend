@@ -115,7 +115,6 @@ export default function ChatUi() {
     const socket = getSocket();
 
     const handleGroupCreated = (group: ChatConnection) => {
-      console.log("New group received via socket!", group.name);
       setConnections((prev) => {
         // Prevent duplicates
         const exists = prev.some(
@@ -148,7 +147,6 @@ export default function ChatUi() {
   const fetchConnections = async () => {
     try {
       const res = await api.get<ChatConnection[]>("/messages/chats");
-      console.log(res.data, "=============result of chating in fetching");
 
       const sorted = (res.data || []).sort((a, b) => {
         const timeA = a.lastMessage?.createdAt || a.createdAt || 0;

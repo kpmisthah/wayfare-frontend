@@ -137,7 +137,6 @@ export const useViewBookings = (pkgId: string) => {
         setBooking(data?.data || []);
         setTotalPages(data?.totalPages || 1);
       } catch (error) {
-        console.log(error);
       } finally {
         setLoading(false);
       }

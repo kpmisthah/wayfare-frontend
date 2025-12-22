@@ -17,7 +17,6 @@ export const getFinance = async (params?: FinanceQueryParams) => {
         });
         return response.data;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };
@@ -33,7 +32,6 @@ export const getAgencyRevenue = async (params?: FinanceQueryParams) => {
         });
         return response.data;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };

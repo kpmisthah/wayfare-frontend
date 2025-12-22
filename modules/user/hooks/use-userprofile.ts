@@ -199,10 +199,8 @@ export const useUserProfile = () => {
     try {
       setIsUploadingBanner(true);
       const { imageUrl } = await uploadUserProfileImage(file, "banner");
-      console.log(imageUrl);
 
       setUpdateUser({ bannerImage: imageUrl });
-      console.log(user, "from store");
 
       setIsEditingBanner(false);
     } catch (error) {
@@ -219,7 +217,6 @@ export const useUserProfile = () => {
     try {
       setIsUploadingAvatar(true);
       const { imageUrl } = await uploadUserProfileImage(file, "profile");
-      console.log("Upload Image From URL", imageUrl);
       setUpdateUser({ profileImage: imageUrl });
     } catch (error) {
       console.error("Error uploading avatar:", error);
@@ -269,7 +266,6 @@ export const useUserProfile = () => {
   };
 
   const cancelBooking = async (id: string) => {
-    console.log(id, "from use-user-profile booking id");
 
     try {
       await bookingCancel(id);
@@ -282,7 +278,6 @@ export const useUserProfile = () => {
       setSelectedTripForCancel(null)
       setRefereshWallet(prev => !prev)
     } catch (error) {
-      console.log(error);
     }
   };
 

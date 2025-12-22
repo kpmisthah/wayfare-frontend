@@ -7,7 +7,6 @@ export async function getUserFromServer() {
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
-  console.log("Cookies from getUserFromServer:", cookieString);
 
   try {
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
@@ -22,13 +21,11 @@ export async function getUserFromServer() {
 
 
     if (!userRes.ok) {
-      console.log(`Core user fetch failed with status: ${userRes.status}`);
       return null;
     }
     let userData = {};
     try {
       userData = await userRes.json();
-      console.log(userData, "in lib===");
     } catch (parseError) {
       console.error("Error parsing userRes JSON:", parseError);
       return null;
@@ -53,15 +50,10 @@ export async function getUserFromServer() {
         if (text) {
           profileData = JSON.parse(text);
         } else {
-          console.log("Profile response body is empty");
         }
       } catch (error) {
         console.error("Error parsing profileRes JSON:", error);
       }
-    } else {
-      console.log(
-        `User profile data not found or fetch failed with status: ${profileRes.status}`
-      );
     }
 
     const completeUser = {

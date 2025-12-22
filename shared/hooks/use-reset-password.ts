@@ -6,7 +6,6 @@ import { useAuthStore } from "@/store/Auth";
 import { getPasswordError } from "../utils/password-validation";
 
 export const useResetPassword = (redirectPath: string) => {
-  console.log(redirectPath, 'redirect path for reset password');
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -52,9 +51,7 @@ export const useResetPassword = (redirectPath: string) => {
 
     try {
       const response = await resetPassword(email, newPassword);
-      console.log(response, 'response from reset password');
       setAuthUser(response.user);
-      console.log('user store', response.user);
       localStorage.removeItem("resetEmail");
       router.push(redirectPath);
     } catch (error) {

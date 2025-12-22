@@ -47,7 +47,6 @@ export function TravelItinerary({ id, destination }: { id: string, destination: 
       }));
     }, 2000);
 
-    console.log("Connection request sent to:", travelerId);
   };
 
   const getConnectionStatus = (travelerId: string) => {

@@ -29,10 +29,8 @@ export const useAuthStore = create<AuthState>()(
                 })
             },
             setUpdateUser: (updateFields: Partial<User>) => {
-                console.log(updateFields, 'updateFields');
 
                 const currentUser = get().user
-                console.log(currentUser, 'cuurrrent user .,setUpdateUser');
 
                 if (!currentUser) return
                 set({

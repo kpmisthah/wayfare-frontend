@@ -17,7 +17,6 @@ export const generateTrip = async (data: {
         let response = await api.post('/trip/generate', data)
         return response.data
     } catch (error) {
-        console.log(error);
         throw error;
     }
 }
@@ -27,7 +26,6 @@ export const fetchTrip = async (id: string, destination: string) => {
         const response = await api.get(`/trip/${id}/${destination}`)
         return response.data
     } catch (error) {
-        console.log(error);
         throw error;
     }
 }
@@ -63,7 +61,6 @@ export const generateLongTrip = async (data: {
         });
         return response.data;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };

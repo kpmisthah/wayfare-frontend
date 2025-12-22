@@ -17,9 +17,7 @@ export const useBooking = (id: string) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const startDate = searchParams.get("startDate");
-  console.log(startDate, "strtDate");
   const travelers = searchParams.get("travelers");
-  console.log(travelers, "travelers");
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -46,14 +44,12 @@ export const useBooking = (id: string) => {
           paymentType,
         };
         const result = await bookPackage(data);
-        console.log(result, "booking successful");
         if (paymentType == "card") {
           // setClientSecret(result.clientSecret);
           setBookingId(result.bookingId);
           window.location.href = result.checkoutUrl;
         }
         if (paymentType == "wallet") {
-          console.log("Ivide paymetType wallet kk verndooo nokaaaaanm");
           router.push(
             "/booking/success?booking_id=" +
             result.booking.id +
@@ -63,7 +59,6 @@ export const useBooking = (id: string) => {
         return result;
       }
     } catch (err: unknown) {
-      console.log("Booking failed:", err);
       const error = err as AxiosError<{ message: string }>;
       const errorMessage = error.response?.data?.message ?? "Something went wrong";
       if (errorMessage === "Insufficient balance") {

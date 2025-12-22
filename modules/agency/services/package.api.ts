@@ -38,20 +38,17 @@ export const addPackage = async (data: {
       }
     });
 
-    console.log("w", data);
 
     const response = await api.post("/agency/add/packages", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
     });
-    console.log(response.data, 'from backend');
     toast.success('Package created!', {
       description: 'Your travel package has been successfully added.',
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -63,7 +60,6 @@ export const fetchPackages = async (page: number = 1, limit: number = 5, search:
     });
     return response.data;
   } catch (error) {
-    console.log(error);
   }
 };
 
@@ -72,21 +68,17 @@ export const fetchAgencyProfile = async () => {
     const response = await api.get('/agency/get/packages');
     return response.data;
   } catch (error) {
-    console.log(error);
   }
 };
 
 export const updatedPackage = async (updatedPackage: Partial<PackageData>, packageId: string) => {
   try {
-    console.log(updatedPackage, 'update package before send to backend, packageId:', packageId);
     const response = await api.put(`/agency/package/${packageId}`, updatedPackage);
-    console.log(response, 'response');
     toast.success('Package updated!', {
       description: 'Your travel package has been successfully updated.',
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -94,13 +86,11 @@ export const updatedPackage = async (updatedPackage: Partial<PackageData>, packa
 export const updatePackageStatus = async (status: PackageStatus, packageId: string) => {
   try {
     const response = await api.patch(`/agency/package/status/${packageId}`, { status });
-    console.log(response.data, 'response');
     toast.success('Status updated!', {
       description: `Package is now ${status.toLowerCase()}.`,
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

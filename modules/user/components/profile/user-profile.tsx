@@ -24,7 +24,6 @@ const UserProfilePage: React.FC = () => {
     isUploadingAvatar
   } = useUserProfile();
   const { user } = useAuthStore()
-  console.log(user, 'in store');
 
   const isProfileIncomplete =
     !user?.location

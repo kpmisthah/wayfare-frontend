@@ -47,8 +47,6 @@ export const useLoginForm = ({ role = 'USER', onSubmit, redirectLogin }: UseSign
 
       await onSubmit({ ...loginData, role })
       const user = await fetchUser();
-      console.log(user, 'login user admin or user')
-      console.log(user.role, "user role");
       setAuthUser(user);
       router.replace(redirectLogin)
     } catch (error) {
@@ -58,7 +56,6 @@ export const useLoginForm = ({ role = 'USER', onSubmit, redirectLogin }: UseSign
         err?.response?.message ||
         err?.message ||
         "Login failed. Please try again";
-      console.log(message, 'error message in login hook')
       if (err?.response?.status === 403 || message.toLowerCase().includes("token")) {
         setErrors({
           general: "Your account has been blocked by the admin. Please contact support.",

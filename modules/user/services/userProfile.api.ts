@@ -5,15 +5,12 @@ export const getUserProfile = async () => {
   try {
     let response;
     response = await api.get('/user/me');
-    console.log(typeof response.data, 'user profile response');
 
     if (response.data == '') {
-      console.log("No user profile, fetching auth");
       response = await api.get('/auth/me');
     }
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -29,7 +26,6 @@ export const uploadUserProfileImage = async (file: File, type: 'profile' | 'bann
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(response.data, 'response from cloudinary');
     toast.success('Image uploaded!', {
       description: `Your ${type} image has been updated.`,
     });
@@ -45,21 +41,18 @@ export const updateProfileImage = async (imageUrl: string) => {
     const response = await api.put('/user/update-profile-image', imageUrl);
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
 
 export const updateProfile = async (data: { name: string; email: string; phone: string; location: string }) => {
   try {
-    console.log(data, 'update profile data');
     const response = await api.put('/user/update-profile', data);
     toast.success('Profile updated!', {
       description: 'Your profile information has been saved.',
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -78,10 +71,8 @@ export const getUserBooking = async (
     if (status && status !== 'all') params.append('status', status);
 
     const response = await api.get(`/booking/user?${params.toString()}`);
-    console.log(response.data, 'response data in getUserBooking');
     return response.data;
   } catch (error) {
-    console.log(error, 'error');
     throw error;
   }
 };
@@ -89,13 +80,11 @@ export const getUserBooking = async (
 export const bookingCancel = async (id: string) => {
   try {
     const response = await api.post(`/booking/cancel/${id}`);
-    console.log(response.data, 'in CancelBooking');
     toast.success('Booking cancelled', {
       description: 'Your booking has been cancelled and refund initiated.',
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -108,7 +97,6 @@ export const changePassword = async (data: { oldPassword: string; newPassword: s
     });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

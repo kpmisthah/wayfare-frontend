@@ -18,7 +18,6 @@ export const getUser = async (
 
 export const updateUser = async (id:string,updateData:Partial<User>)=>{
     try {
-        console.log(updateData,'update data in service' )
         const response = await api.patch(`/users/${id}`,updateData)
         return response.data
     } catch (error) {

@@ -27,7 +27,6 @@ export const useAgencyProfile = () => {
       setIsLoadingProfile(true);
       try {
         const result = await fetchAgency();
-        console.log(result, 'fetched agency profile');
         setProfileData(result);
         if (result && result.licenseNumber) {
           setProfileExists(true);
@@ -129,7 +128,6 @@ export const useAgencyProfile = () => {
         ownerName: profileData?.ownerName ?? '',
         websiteUrl: profileData?.websiteUrl ?? ''
       });
-      console.log(agency, 'agency in create profile');
       setProfileData(agency);
       setProfileExists(true);
       setIsCreating(false);

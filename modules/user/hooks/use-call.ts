@@ -9,7 +9,6 @@ export const useCall = (
   partnerUserId: string | undefined,
   conversationId: string
 ) => {
-  console.log('-----------------------<>', currentUserId, 'currentuserId in uswe-call', 'partnerUserId', partnerUserId, conversationId, 'conversationId------------------------------------------->')
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
@@ -103,7 +102,6 @@ export const useCall = (
   // }, [stream,partnerUserId, socket]);
   // use-call.ts (inside hook)
   const endCall = useCallback(() => {
-    console.log("Ending call locally...");
     // const {callerId,recipientId} = useCallStore()
     const callerId = useCallStore.getState().callerId;
     const recipientId = useCallStore.getState().recipientId;
@@ -154,7 +152,6 @@ export const useCall = (
     // This runs whenever 'stream' is set (in startCall or acceptCall)
     // and ensures the video element is ready.
     if (myVideo.current && stream) {
-      console.log("Setting local video srcObject.");
       myVideo.current.srcObject = stream;
     }
   }, [stream, myVideo]); // Dependency on stream (and myVideo, though it's a stable ref)
@@ -162,7 +159,6 @@ export const useCall = (
 
   // Start Call
   const startCall = async (callType: "video" | "audio") => {
-    console.log(partnerUserId, '.........parntnerUserId.........', currentUserId, '....currentUserIddddddd in use-call.ts......')
     if (!partnerUserId || !currentUserId) {
       console.warn("Missing user IDs for call initiation.");
       return;
@@ -187,7 +183,6 @@ export const useCall = (
           throw videoError;
         }
       }
-      console.log(userStream, '==============userStreaammmmmm=====');
       setStream(userStream);
       // setLocalCallAccepted(true)
       // useCallStore.getState().acceptCallUI(conversationId, currentUserId, callType);
@@ -213,7 +208,6 @@ export const useCall = (
 
       // ✅ FIX 2: Ensure remote stream is correctly added
       peer.on("stream", (remoteStream) => {
-        console.log("REMOTE STREAM RECEIVED!");
         if (partnerVideo.current) {
           partnerVideo.current.srcObject = remoteStream;
         }
@@ -224,7 +218,6 @@ export const useCall = (
 
       // Listen for acceptance (This listener is tied to this specific Peer instance)
       const handleCallAccepted = (data: { signal: Peer.SignalData }) => {
-        console.log("Call accepted, connecting peer...");
         // CallAccepted is already true from the initial setCallAccepted(true) above
         // setCallAccepted(true); // Don't need to set again
         setLocalCallAccepted(true)
@@ -258,7 +251,6 @@ export const useCall = (
 
     try {
       const hasVideo = callType === "video";
-      console.log("Accepting call with video:", hasVideo);
 
       let userStream;
       try {
@@ -319,7 +311,6 @@ export const useCall = (
 
       // ✅ FIX 2: Ensure remote stream is correctly added
       peer.on("stream", (remoteStream) => {
-        console.log("PARTNER VIDEO RECEIVED!");
         if (partnerVideo.current) {
           partnerVideo.current.srcObject = remoteStream;
         }
@@ -373,7 +364,6 @@ export const useCall = (
   // ADD THIS INSIDE useCall hook — this is the ONLY thing that was missing
   useEffect(() => {
     const handleRemoteEnd = () => {
-      console.log("Partner ended the call → FULL CLEANUP on MY side");
       endCall(); // ← This stops camera, destroys peer, clears video
     };
 
@@ -388,7 +378,6 @@ export const useCall = (
   useEffect(() => {
     return () => {
       if (stream) {
-        console.log("Hook unmounting, stopping tracks");
         stream.getTracks().forEach(track => track.stop());
       }
     };

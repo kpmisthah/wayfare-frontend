@@ -5,7 +5,6 @@ export const listDestinations = async()=>{
         const response = await api.get('/agency/trending/packages')
         return response.data
     } catch (error) {
-        console.log(error);
         
     }
 }   

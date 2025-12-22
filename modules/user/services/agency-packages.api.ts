@@ -13,21 +13,17 @@ export const fetchAgencyPackages = async (
         if (search) params.append('search', search);
 
         const response = await api.get(`/agency/${agencyId}/packages?${params.toString()}`);
-        console.log(response.data, 'response form fetch agency packages');
 
         return response.data;
     } catch (error) {
-        console.log(error);
     }
 };
 
 export const fetchPackagesById = async (id: string) => {
     try {
         const response = await api.get(`/agency/${id}/package-details`)
-        console.log(response, 'reposne from id of fetchPalcacakge');
 
         return response.data
     } catch (error) {
-        console.log(error);
     }
 }

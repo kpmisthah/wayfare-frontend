@@ -118,7 +118,6 @@ const FinancialManagement = () => {
   };
 
   const TransactionRow = ({ tx }: { tx: Transaction }) => {
-    console.log('Transaction data:', tx);
     return (
       <tr className="hover:bg-gray-50 transition-colors">
         <td className="px-4 py-4 whitespace-nowrap">

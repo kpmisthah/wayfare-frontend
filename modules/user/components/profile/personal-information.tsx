@@ -20,7 +20,6 @@ export const PersonalInformation = () => {
     isSavingProfile,
   } = useUserProfile();
   const { user } = useAuthStore();
-  console.log(user, "zustand user in personal-infromation in front end");
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-300">

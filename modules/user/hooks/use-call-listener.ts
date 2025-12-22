@@ -11,24 +11,18 @@ export const useCallListeners = (currentUserId: string | undefined) => {
 
   // We need a stable function to handle call end, as it's a global socket event
   const handleCallEnded = useCallback(() => {
-    console.log("Global: Call ended by partner or locally.");
     // This calls the store action to reset the state
     endCallUI();
   }, [endCallUI]); // Dependency on stable store action
 
   useEffect(() => {
-    console.log(currentUserId, '------------currentUserId------------------------')
     if (!currentUserId) return; // Wait for user to be authenticated
-    console.log('==========================handlkngnIncoming calll nte munnye=============');
 
     const handleIncomingCall = (data: { from: string; conversationId: string; callType: 'video' | 'audio'; signalData: unknown }) => {
-      console.log("Global: Incoming call event received:", data);
       // Safety check: Don't notify if the caller is me
       if (data.from === currentUserId) {
-        console.log("Global: Ignoring my own incoming call event.");
         return;
       }
-      console.log("============if condition kahinj verunod myraaaaa=============")
 
       // CRITICAL: Update global store to show the notification
       useCallStore.getState().setIncomingCall({

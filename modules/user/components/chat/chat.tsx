@@ -64,7 +64,6 @@ export default function Chat({
 
   const handleStartCall = (type: "video" | "audio") => {
     const recipientId = selectedUser?.userId;
-    console.log(recipientId, "reciepientIdd");
     if (!recipientId || !currentUserId) return;
     useCallStore
       .getState()

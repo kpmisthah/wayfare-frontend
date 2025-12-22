@@ -4,7 +4,6 @@ export const getAgencies = async ({ page = 1, limit = 10, search = "" }) => {
     const response = await api.get(`/admin/agencies?page=${page}&limit=${limit}&search=${search}`);
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -18,7 +17,6 @@ export const approvalAgencies = async (
     const response = await api.patch(`/agency/${id}`, { action, reason });
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -28,7 +26,6 @@ export const updateAgencies = async (agencyId: string) => {
     const response = await api.patch(`/agency/profile/${agencyId}`);
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -45,7 +42,6 @@ export const updateAgencyDetails = async (
     const response = await api.patch(`/admin/agency/${agencyId}`, data);
     return response.data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

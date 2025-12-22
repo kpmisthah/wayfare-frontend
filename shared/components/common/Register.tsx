@@ -29,7 +29,6 @@ export const Signup = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { setAuthUser } = useAuthStore();
   const router = useRouter();
-  console.log(redirectLogin, "redirectLogin from signup agency");
 
   const {
     signupData,

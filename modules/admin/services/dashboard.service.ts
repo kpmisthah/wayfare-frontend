@@ -7,7 +7,6 @@ export const getDashboard = async () => {
     const response = await api.get("/admin/summary");
     return response.data;
   } catch (error) {
-    console.log(error);
   }
 };
 
@@ -16,7 +15,6 @@ export const getRecentBookings = async ()=>{
     const response = await api.get('/admin/recent-bookings')
     return response.data
   } catch (error) {
-    console.log(error);
     
   }
 }

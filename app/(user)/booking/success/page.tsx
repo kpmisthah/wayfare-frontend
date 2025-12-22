@@ -14,7 +14,6 @@ export default async function Success({ searchParams }: { searchParams: Promise<
     credentials: 'include'
   })
   const booking = await res.json()
-  console.log(booking, 'fetch from server side componenttttttt')
   return (
     <>
       <PaymentSuccessPage booking={booking} paymentMethod={payment_method} />

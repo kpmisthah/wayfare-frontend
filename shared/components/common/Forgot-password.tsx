@@ -18,7 +18,6 @@ import { ForgotPasswordProps } from "@/shared/types/auth.type";
 
 
 export const ForgotPasswordDialog = ({redirectUrl,children}:ForgotPasswordProps) => {
-  console.log(redirectUrl,'in modal forgotpasswordDialog');
   
   const {
     showForgotPassword,

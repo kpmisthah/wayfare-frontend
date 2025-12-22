@@ -38,11 +38,9 @@ export const usefetchAiTripPlan = () => {
     const fetchShortTrip = async () => {
       try {
         const result = await fetchShortTripDetails();
-        console.log(result, 'of fetchShrotTrippppp');
         setShortTrip(result);
         return result;
       } catch (error) {
-        console.log(error);
       }
     };
     fetchShortTrip();
@@ -93,7 +91,6 @@ export const useGenerateTrip = () => {
   });
 
   useEffect(() => {
-    console.log(formData, "fromDate");
   }, []);
 
   const handleInputChange = (field: string, value: string | number | boolean) => {
@@ -249,7 +246,6 @@ export const useGenerateTrip = () => {
       return;
     }
 
-    console.log(formData);
     try {
       setLoading(true);
       setErrors({});
@@ -264,7 +260,6 @@ export const useGenerateTrip = () => {
         preferences: formData.preferences,
       });
 
-      console.log(result, "result after ai model generate itineraries");
       router.push(`/trip/${result.id}/${result.destination}`);
     } catch (error: any) {
       console.error("Error generating trip:", error);
@@ -306,7 +301,6 @@ export const useGenerateTrip = () => {
       });
       return result;
     } catch (error) {
-      console.log(error);
     }
   };
   const handleTravelersChange = (increment: boolean) => {
@@ -353,13 +347,11 @@ export const useFetchtravellers = (destination: string) => {
   useEffect(() => {
     const fetchTravellers = async () => {
       const result = await fetchTravellersData(destination)
-      console.log(result, 'result from fethcingTravelllerres')
       setTravellersData(result)
     }
     fetchTravellers()
   }, [])
   useEffect(() => {
-    console.log(travellersData, 'travellrssssDataa');
   }, [travellersData])
   return {
     travellersData
