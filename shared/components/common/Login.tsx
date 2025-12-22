@@ -131,8 +131,8 @@ export const Login = ({
                 <li className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${loginData.password.length >= 8
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                       }`}
                   ></div>
                   At least 8 characters
@@ -140,8 +140,8 @@ export const Login = ({
                 <li className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${/[A-Z]/.test(loginData.password)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                       }`}
                   ></div>
                   One uppercase letter
@@ -149,8 +149,8 @@ export const Login = ({
                 <li className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${/[a-z]/.test(loginData.password)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                       }`}
                   ></div>
                   One lowercase letter
@@ -158,8 +158,8 @@ export const Login = ({
                 <li className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${/\d/.test(loginData.password)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                       }`}
                   ></div>
                   One number
@@ -167,8 +167,8 @@ export const Login = ({
                 <li className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${/[@$!%*?&]/.test(loginData.password)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
                       }`}
                   ></div>
                   One special character (@$!%*?&)
@@ -243,3 +243,4 @@ export const Login = ({
     </AuthLayout>
   );
 };
+
