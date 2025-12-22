@@ -19,6 +19,8 @@ import {
   Users,
   X,
   Search,
+  Loader2,
+  IndianRupee,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -35,6 +37,7 @@ export const Trips = () => {
     totalPages,
     loadMore,
     isLoadingTrips,
+    isCancelling,
     tripSearch,
     setTripSearch,
     tripStatus,
@@ -95,8 +98,16 @@ export const Trips = () => {
                 await cancelBooking(selectedTripForCancel?.id);
                 setCancelDialogOpen(false);
               }}
+              disabled={isCancelling}
             >
-              Confirm
+              {isCancelling ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                "Confirm"
+              )}
             </Button>
           </div>
         </Modal>
@@ -139,125 +150,139 @@ export const Trips = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {isLoadingTrips && filteredTrips.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Loading your trips...</p>
+          </div>
+        )}
+
         {/* Trips Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTrips.map((trip) => (
-            <Card
-              key={trip.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="relative h-48">
-                <img
-                  src={trip.photo?.[0]}
-                  alt={trip.destination}
-                  className="w-full h-full object-cover"
-                />
-                <Badge
-                  className={`absolute top-3 right-3 ${getStatusColor(
-                    trip.bookingStatus
-                  )}`}
-                >
-                  {trip.bookingStatus}
-                </Badge>
-              </div>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg">{trip.destination}</h3>
+        {!isLoadingTrips && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTrips.map((trip) => (
+              <Card
+                key={trip.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="relative h-48">
+                  <img
+                    src={trip.photo?.[0]}
+                    alt={trip.destination}
+                    className="w-full h-full object-cover"
+                  />
+                  <Badge
+                    className={`absolute top-3 right-3 ${getStatusColor(
+                      trip.bookingStatus
+                    )}`}
+                  >
+                    {trip.bookingStatus}
+                  </Badge>
                 </div>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-lg">{trip.destination}</h3>
+                  </div>
 
-                <div className="space-y-2 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Plane className="w-4 h-4 mr-2" />
-                    <span>{trip.agencyName}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>
-                      {trip.travellers} traveler{trip.travellers > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <Plane className="w-4 h-4 mr-2" />
-                    <span>Planned Date:{trip.travelDate}</span>
-                  </div>
-                </div>
-
-                {trip.highlights && (
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-1">
-                      {/* {trip.highlights.map((highlight, index) => ( */}
-                      <Badge variant="secondary" className="text-xs">
-                        {trip.highlights}
-                      </Badge>
-                      {/* ))} */}
+                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center">
+                      <Plane className="w-4 h-4 mr-2" />
+                      <span>{trip.agencyName}</span>
                     </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  {trip.bookingStatus === BookingStatus.COMPLETED && (
-                    <Button size="sm" variant="outline" className="flex-1">
-                      <Download className="w-4 h-4 mr-1" />
-                      Receipt
-                    </Button>
-                  )}
-
-                  {/* Pending Payment - Retry Option */}
-                  {trip.bookingStatus === BookingStatus.PENDING && (
-                    <div className="w-full space-y-2">
-                      <div className="flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
-                        <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
-                        <span className="text-xs text-orange-700">
-                          Payment pending. Complete payment to confirm your booking.
-                        </span>
-                      </div>
-                      <a
-                        href={`/booking/retry-payment/${trip.id}`}
-                        className="flex items-center justify-center gap-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                        Complete Payment
-                      </a>
-                    </div>
-                  )}
-
-                  {trip.bookingStatus == BookingStatus.CONFIRMED && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleCancelClick(trip)}
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Cancel
-                      </Button>
-                    </>
-                  )}
-
-                  {trip.bookingStatus === BookingStatus.CANCELLED && (
-                    <div className="w-full text-center">
-                      <span className="text-sm text-red-600">
-                        Booking Cancelled
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-2" />
+                      <span>
+                        {trip.travellers} traveler{trip.travellers > 1 ? "s" : ""}
                       </span>
                     </div>
-                  )}
-                </div>
-
-                {/* Cancellation Warning for confirmed trips only */}
-                {trip.bookingStatus === BookingStatus.CONFIRMED && (
-                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                    <div className="flex items-center text-blue-700">
-                      <Shield className="w-3 h-3 mr-1" />
-                      <span>Cancel for a refund based on our cancellation policy</span>
+                    <div className="flex items-center">
+                      <Plane className="w-4 h-4 mr-2" />
+                      <span>Planned Date:{trip.travelDate}</span>
+                    </div>
+                    <div className="flex items-center font-semibold text-green-600">
+                      <IndianRupee className="w-4 h-4 mr-1" />
+                      <span>{trip.price?.toLocaleString() || 'N/A'}</span>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                  {trip.highlights && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {/* {trip.highlights.map((highlight, index) => ( */}
+                        <Badge variant="secondary" className="text-xs">
+                          {trip.highlights}
+                        </Badge>
+                        {/* ))} */}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    {trip.bookingStatus === BookingStatus.COMPLETED && (
+                      <Button size="sm" variant="outline" className="flex-1">
+                        <Download className="w-4 h-4 mr-1" />
+                        Receipt
+                      </Button>
+                    )}
+
+                    {/* Pending Payment - Retry Option */}
+                    {trip.bookingStatus === BookingStatus.PENDING && (
+                      <div className="w-full space-y-2">
+                        <div className="flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                          <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                          <span className="text-xs text-orange-700">
+                            Payment pending. Complete payment to confirm your booking.
+                          </span>
+                        </div>
+                        <a
+                          href={`/booking/retry-payment/${trip.id}`}
+                          className="flex items-center justify-center gap-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Complete Payment
+                        </a>
+                      </div>
+                    )}
+
+                    {trip.bookingStatus == BookingStatus.CONFIRMED && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleCancelClick(trip)}
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Cancel
+                        </Button>
+                      </>
+                    )}
+
+                    {trip.bookingStatus === BookingStatus.CANCELLED && (
+                      <div className="w-full text-center">
+                        <span className="text-sm text-red-600">
+                          Booking Cancelled
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Cancellation Warning for confirmed trips only */}
+                  {trip.bookingStatus === BookingStatus.CONFIRMED && (
+                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                      <div className="flex items-center text-blue-700">
+                        <Shield className="w-3 h-3 mr-1" />
+                        <span>Cancel for a refund based on our cancellation policy</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
         {page < totalPages && (
           <div className="text-center mt-6">
             <button
