@@ -36,11 +36,12 @@ export const useBooking = (id: string) => {
     setLoading(true);
     try {
       if (packages) {
+        const numTravelers = Number(travelers) || 1;
         let data = {
           packageId: packages.id,
           travelDate: startDate,
-          peopleCount: Number(travelers),
-          totalAmount: Number(packages?.price),
+          peopleCount: numTravelers,
+          totalAmount: Number(packages?.price) * numTravelers,
           paymentType,
         };
         const result = await bookPackage(data);
