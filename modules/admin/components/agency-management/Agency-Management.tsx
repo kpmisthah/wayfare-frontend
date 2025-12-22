@@ -1,4 +1,4 @@
-import { Search, Eye, ChevronDown, ChevronRight, Edit, Loader2 } from "lucide-react";
+import { Search, Eye, ChevronDown, ChevronRight, Edit, Loader2, Building2, FileQuestion } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -42,6 +42,7 @@ const AgencyManagement = () => {
     currentPage,
     setCurrentPage,
     totalPages,
+    approvalLoading,
   } = agencyActions();
 
 
@@ -115,220 +116,246 @@ const AgencyManagement = () => {
               {/* Requests List */}
               {agencyTab === "requests" ? (
                 <div className="space-y-4">
-                  {filteredRequests.map((agency) => {
-                    const isRejected =
-                      agency.reason &&
-                      agency.reason.trim() !== "" &&
-                      agency.reason.trim().toLowerCase() !== "null";
-                    const isPending = !isRejected;
+                  {filteredRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <FileQuestion className="w-10 h-10 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-700 mb-2">No Pending Requests</h3>
+                      <p className="text-gray-500 max-w-sm">
+                        There are no agency requests waiting for approval at the moment.
+                      </p>
+                    </div>
+                  ) : (
+                    filteredRequests.map((agency) => {
+                      const isRejected =
+                        agency.reason &&
+                        agency.reason.trim() !== "" &&
+                        agency.reason.trim().toLowerCase() !== "null";
+                      const isPending = !isRejected;
 
-                    return (
-                      <div
-                        key={agency.user.id}
-                        className="border border-gray-200 rounded-lg"
-                      >
-                        <div className="p-4 flex justify-between items-center">
-                          <div className="flex items-center gap-4 flex-1">
-                            <button
-                              onClick={() => toggleRowExpansion(agency.id)}
-                              className="p-1 hover:bg-gray-100 rounded"
-                              disabled={!isPending}
-                            >
-                              {expandedRows.has(agency.id) ? (
-                                <ChevronDown className="w-4 h-4" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4" />
-                              )}
-                            </button>
-
-                            <div className="grid grid-cols-1 md:grid-cols-4 flex-1 gap-4">
-                              <div>
-                                <p className="font-medium">{agency.user.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {agency.user.email}
-                                </p>
-                              </div>
-
-                              <div>
-                                <Badge
-                                  variant={isRejected ? "destructive" : "outline"}
-                                  className={
-                                    isRejected ? "bg-red-100 text-red-800" : ""
-                                  }
-                                >
-                                  {isRejected ? "Rejected" : "Pending"}
-                                </Badge>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedAgency(agency);
-                                    setShowDetailModal(true);
-                                  }}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  View
-                                </Button>
-
-                                {/* Only show action buttons if still pending */}
-                                {isPending ? (
-                                  <>
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() => {
-                                        setAgencyToApprove(agency);
-                                        setApprovalAction("accept");
-                                        setApprovalModalOpen(true);
-                                      }}
-                                    >
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() => {
-                                        setAgencyToApprove(agency);
-                                        setApprovalAction("reject");
-                                        setApprovalModalOpen(true);
-                                      }}
-                                    >
-                                      Reject
-                                    </Button>
-                                  </>
+                      return (
+                        <div
+                          key={agency.user.id}
+                          className="border border-gray-200 rounded-lg"
+                        >
+                          <div className="p-4 flex justify-between items-center">
+                            <div className="flex items-center gap-4 flex-1">
+                              <button
+                                onClick={() => toggleRowExpansion(agency.id)}
+                                className="p-1 hover:bg-gray-100 rounded"
+                                disabled={!isPending}
+                              >
+                                {expandedRows.has(agency.id) ? (
+                                  <ChevronDown className="w-4 h-4" />
                                 ) : (
-                                  <span className="text-sm text-gray-500 italic">
-                                    Action completed
-                                  </span>
+                                  <ChevronRight className="w-4 h-4" />
                                 )}
+                              </button>
+
+                              <div className="grid grid-cols-1 md:grid-cols-4 flex-1 gap-4">
+                                <div>
+                                  <p className="font-medium">{agency.user.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {agency.user.email}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <Badge
+                                    variant={isRejected ? "destructive" : "outline"}
+                                    className={
+                                      isRejected ? "bg-red-100 text-red-800" : ""
+                                    }
+                                  >
+                                    {isRejected ? "Rejected" : "Pending"}
+                                  </Badge>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedAgency(agency);
+                                      setShowDetailModal(true);
+                                    }}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    View
+                                  </Button>
+
+                                  {/* Only show action buttons if still pending */}
+                                  {isPending ? (
+                                    <>
+                                      <Button
+                                        variant="default"
+                                        size="sm"
+                                        onClick={() => {
+                                          setAgencyToApprove(agency);
+                                          setApprovalAction("accept");
+                                          setApprovalModalOpen(true);
+                                        }}
+                                      >
+                                        Accept
+                                      </Button>
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                          setAgencyToApprove(agency);
+                                          setApprovalAction("reject");
+                                          setApprovalModalOpen(true);
+                                        }}
+                                      >
+                                        Reject
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <span className="text-sm text-gray-500 italic">
+                                      Action completed
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
+
+                          {/* Expanded Details */}
+                          {expandedRows.has(agency.id) && (
+                            <div className="px-4 pb-4 border-t bg-gray-50">
+                              <p>
+                                <span className="font-medium">Owner:</span>{" "}
+                                {agency.ownerName ?? "Not Defined"}
+                              </p>
+                              <p>
+                                <span className="font-medium">License:</span>{" "}
+                                {agency.licenseNumber ?? "Not Defined"}
+                              </p>
+                              <p>
+                                <span className="font-medium">Website:</span>{" "}
+                                <a
+                                  href={agency.websiteUrl}
+                                  className="text-blue-600 hover:underline"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {agency.websiteUrl ?? "Not Defined"}
+                                </a>
+                              </p>
+                              <p>
+                                <span className="font-medium">Address:</span>{" "}
+                                {agency.address ?? "Not Defined"}
+                              </p>
+
+                              {/* Show rejection reason if exists */}
+                              {isRejected && agency.reason && (
+                                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                                  <p className="text-sm font-medium text-red-800">
+                                    Rejection Reason:
+                                  </p>
+                                  <p className="text-sm text-red-700 mt-1">
+                                    {agency.reason}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-
-                        {/* Expanded Details */}
-                        {expandedRows.has(agency.id) && (
-                          <div className="px-4 pb-4 border-t bg-gray-50">
-                            <p>
-                              <span className="font-medium">Owner:</span>{" "}
-                              {agency.ownerName ?? "Not Defined"}
-                            </p>
-                            <p>
-                              <span className="font-medium">License:</span>{" "}
-                              {agency.licenseNumber ?? "Not Defined"}
-                            </p>
-                            <p>
-                              <span className="font-medium">Website:</span>{" "}
-                              <a
-                                href={agency.websiteUrl}
-                                className="text-blue-600 hover:underline"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {agency.websiteUrl ?? "Not Defined"}
-                              </a>
-                            </p>
-                            <p>
-                              <span className="font-medium">Address:</span>{" "}
-                              {agency.address ?? "Not Defined"}
-                            </p>
-
-                            {/* Show rejection reason if exists */}
-                            {isRejected && agency.reason && (
-                              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
-                                <p className="text-sm font-medium text-red-800">
-                                  Rejection Reason:
-                                </p>
-                                <p className="text-sm text-red-700 mt-1">
-                                  {agency.reason}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               ) : (
                 /* Agencies Table */
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="px-4 py-3 text-left">Name</th>
-                      <th className="px-4 py-3 text-left">Email</th>
-                      <th className="px-4 py-3 text-left">Status</th>
-                      <th className="px-4 py-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAgencies.map((agency) => (
-                      <tr key={agency.user.id} className="border-b">
-                        <td className="px-4 py-3">{agency.user.name}</td>
-                        <td className="px-4 py-3">{agency.user.email}</td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant={
-                              agency.user.isBlock ? "destructive" : "default"
-                            }
-                          >
-                            {agency.user.isBlock ? "Blocked" : "Active"}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setSelectedAgency(agency);
-                              setShowDetailModal(true);
-                            }}
-                          >
-                            <Eye className="w-4 h-4" />
-                            View
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setSelectedAgency(agency);
-                              setEditAgencyOpen(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                            Edit
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant={
-                              agency.user.isBlock ? "default" : "destructive"
-                            }
-                            disabled={loadingAgencyId === agency.id}
-                            onClick={async () => {
-                              setLoadingAgencyId(agency.id);
-                              setAgencyToBlock(agency);
-                              setBlockModalOpen(true);
-                            }}
-                          >
-                            {loadingAgencyId === agency.id ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                                {agency.user.isBlock ? "Activating..." : "Deactivating..."}
-                              </>
-                            ) : (
-                              agency.user.isBlock ? "Activate" : "Deactivate"
-                            )}
-                          </Button>
-                        </td>
+                filteredAgencies.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                      <Building2 className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Agencies Found</h3>
+                    <p className="text-gray-500 max-w-sm">
+                      {searchTerm
+                        ? `No agencies match your search "${searchTerm}". Try a different search term.`
+                        : "There are no verified agencies registered yet."}
+                    </p>
+                  </div>
+                ) : (
+                  <table className="w-full table-auto">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="px-4 py-3 text-left">Name</th>
+                        <th className="px-4 py-3 text-left">Email</th>
+                        <th className="px-4 py-3 text-left">Status</th>
+                        <th className="px-4 py-3 text-left">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {filteredAgencies.map((agency) => (
+                        <tr key={agency.user.id} className="border-b">
+                          <td className="px-4 py-3">{agency.user.name}</td>
+                          <td className="px-4 py-3">{agency.user.email}</td>
+                          <td className="px-4 py-3">
+                            <Badge
+                              variant={
+                                agency.user.isBlock ? "destructive" : "default"
+                              }
+                            >
+                              {agency.user.isBlock ? "Blocked" : "Active"}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setSelectedAgency(agency);
+                                setShowDetailModal(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                              View
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setSelectedAgency(agency);
+                                setEditAgencyOpen(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant={
+                                agency.user.isBlock ? "default" : "destructive"
+                              }
+                              disabled={loadingAgencyId === agency.id}
+                              onClick={async () => {
+                                setLoadingAgencyId(agency.id);
+                                setAgencyToBlock(agency);
+                                setBlockModalOpen(true);
+                              }}
+                            >
+                              {loadingAgencyId === agency.id ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                  {agency.user.isBlock ? "Activating..." : "Deactivating..."}
+                                </>
+                              ) : (
+                                agency.user.isBlock ? "Activate" : "Deactivate"
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )
               )}
             </>
           )}
@@ -388,13 +415,13 @@ const AgencyManagement = () => {
         isOpen={approvalModalOpen}
         agency={agencyToApprove}
         action={approvalAction}
-        loading={loading}
+        loading={approvalLoading}
         onClose={() => {
           setApprovalModalOpen(false);
           setAgencyToApprove(null);
         }}
-        onConfirm={(agency, action, reason) => {
-          handleApprovalAgency(agency, action, reason);
+        onConfirm={async (agency, action, reason) => {
+          await handleApprovalAgency(agency, action, reason);
           setApprovalModalOpen(false);
           setAgencyToApprove(null);
         }}

@@ -51,6 +51,7 @@ export const agencyActions = () => {
   const [editAgencyOpen, setEditAgencyOpen] = useState(false);
   const [deleteAgencyOpen, setDeleteAgencyOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [approvalLoading, setApprovalLoading] = useState<boolean>(false);
   const [editRequestOpen, setEditRequestOpen] = useState(false);
   const [editSaveLoadingId, setEditSaveLoadingId] = useState(false);
   const handleDeleteAgency = () => {
@@ -67,6 +68,7 @@ export const agencyActions = () => {
     reason?: string
   ) => {
     try {
+      setApprovalLoading(true);
       const finalAction =
         action ??
         (updateAgency.status === AgencyStatus.ACTIVE ? "accept" : "reject");
@@ -86,6 +88,7 @@ export const agencyActions = () => {
     } catch (error) {
       setEditSaveLoadingId(false);
     } finally {
+      setApprovalLoading(false);
       setEditSaveLoadingId(false);
     }
   };
@@ -191,6 +194,7 @@ export const agencyActions = () => {
     selectedRequest,
     editRequestOpen,
     loading,
+    approvalLoading,
     handleBlockAgency,
     setEditSaveLoadingId,
     editSaveLoadingId,

@@ -10,7 +10,7 @@ interface ApprovalModalProps {
     onClose: () => void;
     agency: Agency | null;
     action: "accept" | "reject";
-    onConfirm: (agency: Agency, action: "accept" | "reject", reason?: string) => void;
+    onConfirm: (agency: Agency, action: "accept" | "reject", reason?: string) => void | Promise<void>;
     loading?: boolean;
 }
 
@@ -39,7 +39,9 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
 
         if (agency) {
             onConfirm(agency, action, action === "reject" ? reason : undefined);
-            handleClose();
+            // Don't close immediately - let the parent handle closing after the API call
+            setReason("");
+            setError("");
         }
     };
 
