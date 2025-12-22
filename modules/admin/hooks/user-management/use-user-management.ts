@@ -7,6 +7,7 @@ export const useUsers = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false);
+  const [blockLoading, setBlockLoading] = useState(false);
   const limit = 3;
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -34,6 +35,7 @@ export const useUsers = () => {
   };
   const handleToggleBlockUser = async (user: User) => {
     const updateStatus = !user.isBlock
+    setBlockLoading(true);
     try {
       await update(user.id, { isBlock: updateStatus })
       setUsers((prev) =>
@@ -43,6 +45,8 @@ export const useUsers = () => {
       )
     } catch (error) {
       console.error("Failed to update user block status", error);
+    } finally {
+      setBlockLoading(false);
     }
   };
 
@@ -113,5 +117,6 @@ export const useUsers = () => {
     userToBlock,
     setUserToBlock,
     isLoading,
+    blockLoading,
   };
 };
