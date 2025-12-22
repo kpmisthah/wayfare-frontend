@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -47,15 +46,31 @@ export async function middleware(request: NextRequest) {
   let hasValidAccessToken = accessToken && !accessTokenExpired;
 
   if (needsRefresh) {
-    const cookieStore = await cookies();
-    const cookieString = cookieStore
-      .getAll()
+    // Use request.cookies directly - this is the correct API for middleware
+    // Note: cookies() from next/headers is for Server Components, NOT middleware
+    const allCookies = request.cookies.getAll();
+    const cookieString = allCookies
       .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join(";");
+      .join("; ");
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+    // Debug logging - check your production logs
+    console.log('[Middleware Debug] ================');
+    console.log('[Middleware Debug] Path:', pathname);
+    console.log('[Middleware Debug] API URL:', apiUrl);
+    console.log('[Middleware Debug] Access Token Present:', !!accessToken);
+    console.log('[Middleware Debug] Refresh Token Present:', !!refreshToken);
+    console.log('[Middleware Debug] Access Token Expired:', accessTokenExpired);
+    console.log('[Middleware Debug] Needs Refresh:', needsRefresh);
+    console.log('[Middleware Debug] Cookie String:', cookieString ? `${cookieString.substring(0, 50)}...` : 'EMPTY');
 
     try {
+      const refreshUrl = `${apiUrl}/auth/refresh`;
+      console.log('[Middleware Debug] Fetching:', refreshUrl);
+
       const result = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+        refreshUrl,
         {
           method: "POST",
           headers: {
@@ -66,7 +81,8 @@ export async function middleware(request: NextRequest) {
         }
       );
 
-      console.log('[Middleware] Refresh token response status:', result.status);
+      console.log('[Middleware Debug] Response status:', result.status);
+      console.log('[Middleware Debug] Response ok:', result.ok);
 
       if (result.ok) {
         const response = NextResponse.next();
