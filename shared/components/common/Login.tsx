@@ -37,9 +37,6 @@ export const Login = ({
     handleLoginSubmit,
   } = useLoginForm({ role, onSubmit, redirectLogin });
 
-);
-
-
   return (
     <AuthLayout>
       <Card className="border-0 shadow-lg">
