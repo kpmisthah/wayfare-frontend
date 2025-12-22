@@ -79,6 +79,7 @@ export const useBooking = (id: string) => {
     travelers,
     clientSecret,
     bookingId,
-    paymentStatus
+    paymentStatus,
+    loading
   };
 };
