@@ -83,7 +83,7 @@ export async function middleware(request: NextRequest) {
               httpOnly: true,
               secure: true,
               sameSite: 'none',
-              domain: '.misthah.site',
+              domain: '.wayfare.misthah.site',
               path: "/",
             });
           }
