@@ -19,7 +19,8 @@ import {
   ChevronRight,
   Sparkles,
   Shield,
-  Users
+  Users,
+  Loader2
 } from "lucide-react";
 import { useAgencies } from "../../hooks/use-agency";
 
@@ -30,6 +31,7 @@ const Agencies = () => {
     sortBy,
     setSortBy,
     agencies,
+    loading,
     page,
     totalPages,
     nextPage,
@@ -136,7 +138,12 @@ const Agencies = () => {
       {/* Agencies Grid */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          {agencies.length > 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Loading agencies...</p>
+            </div>
+          ) : agencies.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {agencies.map((agency, index) => (
