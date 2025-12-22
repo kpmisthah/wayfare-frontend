@@ -57,11 +57,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
   }, []);
 
   const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'agencies', label: 'Agency Details', icon: Building2 },
-    { id: 'financial', label: 'Financial Management', icon: DollarSign },
-    { id: 'payouts', label: 'Payout History', icon: CreditCard },
-    { id: 'users', label: 'User Management', icon: Users },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, gradient: 'from-blue-500 to-indigo-600' },
+    { id: 'agencies', label: 'Agency Details', icon: Building2, gradient: 'from-purple-500 to-pink-600' },
+    { id: 'financial', label: 'Financial Management', icon: DollarSign, gradient: 'from-green-500 to-emerald-600' },
+    { id: 'payouts', label: 'Payout History', icon: CreditCard, gradient: 'from-orange-500 to-red-500' },
+    { id: 'users', label: 'User Management', icon: Users, gradient: 'from-cyan-500 to-blue-600' },
   ];
 
   const handleTabChange = (tab: string) => {
@@ -89,7 +89,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
       <div className={`
         ${isMobile ? 'fixed' : 'relative'}
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${isMobile ? 'w-64' : (sidebarOpen ? 'w-64' : 'w-16')}
+        ${isMobile ? 'w-72' : (sidebarOpen ? 'w-72' : 'w-20')}
         bg-white shadow-lg transition-all duration-300 flex flex-col z-50
         ${isMobile ? 'h-full' : 'h-screen'}
       `}>
@@ -116,20 +116,25 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 overflow-y-auto">
-          <div className="space-y-1 px-2">
+        <nav className="flex-1 py-6 overflow-y-auto">
+          <div className="space-y-2 px-3">
             {sidebarItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === item.id
-                    ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                    : 'text-gray-700 hover:bg-gray-50'
+                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-left transition-all duration-200 group ${activeTab === item.id
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm border border-blue-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${activeTab === item.id
+                  ? `bg-gradient-to-br ${item.gradient} shadow-lg`
+                  : 'bg-gray-100 group-hover:bg-gray-200'
+                  }`}>
+                  <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-white' : 'text-gray-600'}`} />
+                </div>
                 {(sidebarOpen || isMobile) && (
-                  <span className="text-sm font-medium truncate">{item.label}</span>
+                  <span className={`text-base font-medium truncate ${activeTab === item.id ? 'text-blue-700' : ''}`}>{item.label}</span>
                 )}
               </button>
             ))}
