@@ -48,6 +48,7 @@ const AgencyManagement = () => {
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [approvalAction, setApprovalAction] = useState<"accept" | "reject">("accept");
   const [agencyToApprove, setAgencyToApprove] = useState<Agency | null>(null);
+  const [loadingAgencyId, setLoadingAgencyId] = useState<string | null>(null);
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
@@ -73,16 +74,20 @@ const AgencyManagement = () => {
           <CardTitle>Agency Management</CardTitle>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Tabs */}
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               <Button
                 variant={agencyTab === "agencies" ? "default" : "outline"}
                 onClick={() => setAgencyTab("agencies")}
+                className="px-6 py-2 text-base font-medium"
+                size="lg"
               >
                 Agencies
               </Button>
               <Button
                 variant={agencyTab === "requests" ? "default" : "outline"}
                 onClick={() => setAgencyTab("requests")}
+                className="px-6 py-2 text-base font-medium"
+                size="lg"
               >
                 Requests
               </Button>
@@ -303,16 +308,21 @@ const AgencyManagement = () => {
                             variant={
                               agency.user.isBlock ? "default" : "destructive"
                             }
-                            onClick={() => {
+                            disabled={loadingAgencyId === agency.id}
+                            onClick={async () => {
+                              setLoadingAgencyId(agency.id);
                               setAgencyToBlock(agency);
                               setBlockModalOpen(true);
                             }}
                           >
-                            {loading
-                              ? "Updating..."
-                              : agency.user.isBlock
-                                ? "Activate"
-                                : "Deactivate"}
+                            {loadingAgencyId === agency.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                {agency.user.isBlock ? "Activating..." : "Deactivating..."}
+                              </>
+                            ) : (
+                              agency.user.isBlock ? "Activate" : "Deactivate"
+                            )}
                           </Button>
                         </td>
                       </tr>
@@ -362,11 +372,13 @@ const AgencyManagement = () => {
           onClose={() => {
             setBlockModalOpen(false);
             setAgencyToBlock(null);
+            setLoadingAgencyId(null);
           }}
           onConfirm={(updatedAgency) => {
             handleBlockAgency(updatedAgency);
             setBlockModalOpen(false);
             setAgencyToBlock(null);
+            setLoadingAgencyId(null);
           }}
         />
       )}
