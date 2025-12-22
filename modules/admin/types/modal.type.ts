@@ -5,7 +5,7 @@ export interface BlockAgencyModalProps {
   agency: Agency | null;
   loading?: boolean;
   onClose: () => void;
-  onConfirm: (updatedAgency: Agency) => void;
+  onConfirm: (updatedAgency: Agency) => void | Promise<void>;
 }
 
 export interface DeleteConfirmDialogProps {

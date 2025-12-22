@@ -43,6 +43,7 @@ const AgencyManagement = () => {
     setCurrentPage,
     totalPages,
     approvalLoading,
+    blockLoading,
   } = agencyActions();
 
 
@@ -395,14 +396,14 @@ const AgencyManagement = () => {
         <BlockAgencyModal
           isOpen={blockModalOpen}
           agency={agencyToBlock}
-          loading={loading}
+          loading={blockLoading}
           onClose={() => {
             setBlockModalOpen(false);
             setAgencyToBlock(null);
             setLoadingAgencyId(null);
           }}
-          onConfirm={(updatedAgency) => {
-            handleBlockAgency(updatedAgency);
+          onConfirm={async (updatedAgency) => {
+            await handleBlockAgency(updatedAgency);
             setBlockModalOpen(false);
             setAgencyToBlock(null);
             setLoadingAgencyId(null);

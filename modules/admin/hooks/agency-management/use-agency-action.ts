@@ -52,6 +52,7 @@ export const agencyActions = () => {
   const [deleteAgencyOpen, setDeleteAgencyOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [approvalLoading, setApprovalLoading] = useState<boolean>(false);
+  const [blockLoading, setBlockLoading] = useState<boolean>(false);
   const [editRequestOpen, setEditRequestOpen] = useState(false);
   const [editSaveLoadingId, setEditSaveLoadingId] = useState(false);
   const handleDeleteAgency = () => {
@@ -104,7 +105,7 @@ export const agencyActions = () => {
   const handleBlockAgency = async (updateAgency: Agency) => {
 
     try {
-      setLoading(true);
+      setBlockLoading(true);
       let agencyStatus = await updateAgencies(updateAgency.id);
       setAgencies((prev) =>
         prev.map((agency) =>
@@ -117,9 +118,9 @@ export const agencyActions = () => {
         )
       );
     } catch (error) {
-      setLoading(false);
+      setBlockLoading(false);
     } finally {
-      setLoading(false);
+      setBlockLoading(false);
     }
   };
 
@@ -195,6 +196,7 @@ export const agencyActions = () => {
     editRequestOpen,
     loading,
     approvalLoading,
+    blockLoading,
     handleBlockAgency,
     setEditSaveLoadingId,
     editSaveLoadingId,
