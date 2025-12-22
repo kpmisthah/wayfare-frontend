@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Calendar, MapPin, Users, Clock, CreditCard, Shield, Phone, Mail, ArrowLeft, CheckCircle, Wallet } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, CreditCard, Shield, Phone, Mail, ArrowLeft, CheckCircle, Wallet, Loader2 } from 'lucide-react';
 import { useBooking } from '../../hooks/use-booking';
 import { Header } from '../../../../shared/components/layout/Header';
 import CancellationPolicy from './cancellation-policy';
@@ -24,7 +24,8 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
     travelers,
     clientSecret,
     bookingId,
-    paymentStatus
+    paymentStatus,
+    loading
   } = useBooking(id);
   const { wallet, isProcessing, payWithWallet } = useWallet()
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
@@ -177,10 +178,10 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                     onClick={(e) => handleSubmit(e, 'wallet')}
                     disabled={!hasWalletBalance || isProcessing}
                     className={`w-full py-3 rounded font-medium transition-colors ${!hasWalletBalance
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : isProcessing
-                          ? 'bg-blue-400 text-white cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : isProcessing
+                        ? 'bg-blue-400 text-white cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}
                   >
                     {isProcessing ? (
@@ -201,12 +202,23 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
                     {!clientSecret ? (
                       <button
                         onClick={(e) => handleSubmit(e, 'card')}
-                        className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700 transition-colors"
+                        disabled={loading}
+                        className={`w-full py-3 rounded font-medium transition-colors ${loading
+                          ? 'bg-blue-400 text-white cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
                       >
-                        <div className="flex items-center justify-center gap-2">
-                          <CreditCard className="w-4 h-4" />
-                          Confirm Booking
-                        </div>
+                        {loading ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Processing...
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2">
+                            <CreditCard className="w-4 h-4" />
+                            Confirm Booking
+                          </div>
+                        )}
                       </button>
                     ) : (
                       <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -220,10 +232,10 @@ const BookingPage: React.FC<BookingProps> = ({ id }) => {
               {/* Payment Status Messages */}
               {paymentStatus && (
                 <div className={`mt-4 p-3 rounded-lg text-sm ${paymentStatus === 'wallet_success'
-                    ? 'bg-green-100 text-green-800'
-                    : paymentStatus === 'insufficient_balance'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
+                  ? 'bg-green-100 text-green-800'
+                  : paymentStatus === 'insufficient_balance'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-red-100 text-red-800'
                   }`}>
                   {paymentStatus === 'wallet_success' && (
                     <div className="flex items-center gap-2">
