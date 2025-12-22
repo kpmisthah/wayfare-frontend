@@ -15,6 +15,7 @@ import {
   Ban,
   Search,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useFetchPackages } from "../../hooks/use-fetch-packages";
 import { PackageData } from "../../types/package.type";
@@ -80,6 +81,8 @@ export const PackageManagement = () => {
     setBlockModal({ isOpen: false, pkg: null, action: "block" });
   };
 
+  const [isBlockLoading, setIsBlockLoading] = useState(false);
+
   const confirmBlockAction = async () => {
     if (!blockModal.pkg) return;
 
@@ -88,6 +91,7 @@ export const PackageManagement = () => {
         ? PackageStatus.INACTIVE
         : PackageStatus.ACTIVE;
 
+    setIsBlockLoading(true);
     try {
       await updatePackageStatus(newStatus, blockModal.pkg.id);
       setPackages((prev) =>
@@ -99,6 +103,8 @@ export const PackageManagement = () => {
     } catch (error) {
       alert("Failed to update package status. Please try again.");
       console.error(error);
+    } finally {
+      setIsBlockLoading(false);
     }
   }
 
@@ -245,8 +251,8 @@ export const PackageManagement = () => {
                       }}
                       disabled={!isVerified}
                       className={`mt-6 px-6 py-3 rounded-lg flex items-center gap-2 transition ${isVerified
-                          ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                     >
                       <Plus size={18} />{isVerified ? "Add Package" : "Verification Required"}
@@ -656,20 +662,31 @@ export const PackageManagement = () => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={closeBlockModal}
-                className="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                disabled={isBlockLoading}
+                className="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
               >
                 Cancel
               </button>
 
               <button
                 onClick={confirmBlockAction}
-                className={`px-6 py-2.5 rounded-lg text-white font-medium transition ${blockModal.action === "block"
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-green-600 hover:bg-green-700"
+                disabled={isBlockLoading}
+                className={`px-6 py-2.5 rounded-lg text-white font-medium transition flex items-center gap-2 ${blockModal.action === "block"
+                  ? "bg-red-600 hover:bg-red-700 disabled:bg-red-400"
+                  : "bg-green-600 hover:bg-green-700 disabled:bg-green-400"
                   }`}
               >
-                Yes, {blockModal.action === "block" ? "Block" : "Unblock"}{" "}
-                Package
+                {isBlockLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {blockModal.action === "block" ? "Blocking..." : "Unblocking..."}
+                  </>
+                ) : (
+                  <>
+                    Yes, {blockModal.action === "block" ? "Block" : "Unblock"}{" "}
+                    Package
+                  </>
+                )}
               </button>
             </div>
           </div>
