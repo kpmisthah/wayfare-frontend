@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Header } from "@/shared/components/layout/Header";
 import PackageCard from "./PackageCard";
 import { Button } from "@/shared/components/ui/button";
@@ -18,7 +18,6 @@ import {
   AvatarImage,
 } from "@/shared/components/ui/avatar";
 import {
-  Star,
   Phone,
   Mail,
   Globe,
@@ -26,31 +25,40 @@ import {
   Share2,
   Search,
   X,
+  Loader2,
 } from "lucide-react";
 import { useAgencyById, usePackages } from "../../hooks/use-agency";
-import { fetchAgencyPackages } from "../../services/agency-packages.api";
-import { fetchAgencyById } from "@/modules/agency/services/agency.api";
 
 
 const AgencyProfile = ({ id }: { id: string }) => {
   const [activeTab, setActiveTab] = useState("about");
-  const { agency, setAgency } = useAgencyById(id)
+  const { agency, isLoading } = useAgencyById(id)
   const { packages, page, totalPages, loadMore, search, setSearch } = usePackages(id);
 
   const filteredPackages = packages;
 
-  useEffect(() => {
-    async function fetchAgency() {
-      let agency = await fetchAgencyById(id);
-      setAgency(agency);
-    }
-    fetchAgency();
-  }, []);
+  // Show loading spinner while fetching agency data
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading agency details...</p>
+        </div>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-  }, [packages, id]);
-
-  if (!agency) return <p className="p-6">Agency not found</p>;
+  if (!agency) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-20">
+          <p className="text-lg text-muted-foreground">Agency not found</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-background">
       <Header />

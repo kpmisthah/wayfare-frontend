@@ -58,17 +58,27 @@ export const useAgencies = () => {
 }
 export const useAgencyById = (id: string) => {
   const [agency, setAgency] = useState<Agency>()
+  const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
     const fetchAgency = async () => {
-      const data = await fetchAgencyById(id)
-      setAgency(data)
+      try {
+        setIsLoading(true)
+        const data = await fetchAgencyById(id)
+        setAgency(data)
+      } catch (error) {
+        console.error('Failed to fetch agency:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
     fetchAgency()
-  }, [])
+  }, [id])
+
   return {
     agency,
-    setAgency
-
+    setAgency,
+    isLoading
   }
 }
 export const usePackages = (id: string) => {
