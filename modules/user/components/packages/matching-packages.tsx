@@ -120,7 +120,7 @@ const TravelPackages = () => {
     }
   };
 
- 
+
   const currentPackages = packages;
   const totalPages = Math.ceil(totalPackages / packagesPerPage);
 
@@ -470,108 +470,123 @@ const TravelPackages = () => {
         </div>
 
         {/* Package Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {currentPackages.map((pkg) => (
-            <div
-              key={pkg.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden"
-            >
-              <div className="relative">
-                <img
-                  src={
-                    pkg.picture && pkg.picture[0]
-                      ? pkg.picture[0]
-                      : "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&h=250&fit=crop"
-                  }
-                  alt={pkg.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute top-3 left-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${pkg.status === "ACTIVE"
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-500 text-white"
-                      }`}
-                  >
-                    {pkg.status}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {pkg.title}
-                  </h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm font-medium text-gray-700">
-                      {pkg.rating}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      ({pkg.reviews})
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center text-gray-600 text-sm mb-3">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  <span>{pkg.destination}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span>{pkg.duration} Days</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
-                    <span>{pkg.groupSize}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {pkg.highlights.split(",").map((highlight, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full"
-                    >
-                      {highlight.trim()}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="border-t pt-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold text-gray-900">
-                          ₹{pkg.price.toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600">per person</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">
-                        {pkg.agency}
-                      </p>
-                      <p className="text-xs text-gray-600">Travel Agency</p>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-2">
-                    <button
-                      className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      onClick={() => handleDetailsClick(pkg)}
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading packages...</p>
+          </div>
+        ) : currentPackages.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+            <div className="text-gray-400 mb-4">
+              <Search className="w-16 h-16 mx-auto" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Packages Found</h3>
+            <p className="text-gray-600">Try adjusting your filters or search criteria</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {currentPackages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+              >
+                <div className="relative">
+                  <img
+                    src={
+                      pkg.picture && pkg.picture[0]
+                        ? pkg.picture[0]
+                        : "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&h=250&fit=crop"
+                    }
+                    alt={pkg.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${pkg.status === "ACTIVE"
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-500 text-white"
+                        }`}
+                    >
+                      {pkg.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {pkg.title}
+                    </h3>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {pkg.rating}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        ({pkg.reviews})
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-gray-600 text-sm mb-3">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    <span>{pkg.destination}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      <span>{pkg.duration} Days</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-1" />
+                      <span>{pkg.groupSize}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {pkg.highlights.split(",").map((highlight, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full"
+                      >
+                        {highlight.trim()}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xl font-bold text-gray-900">
+                            ₹{pkg.price.toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600">per person</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-900">
+                          {pkg.agency}
+                        </p>
+                        <p className="text-xs text-gray-600">Travel Agency</p>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2">
+                      <button
+                        className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        onClick={() => handleDetailsClick(pkg)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
