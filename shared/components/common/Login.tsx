@@ -122,59 +122,6 @@ export const Login = ({
               )}
             </div>
 
-            {/* Password Requirements */}
-            <div className="bg-gray-50 rounded-xl p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Password Requirements:
-              </h4>
-              <ul className="text-xs text-gray-600 space-y-1">
-                <li className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${loginData.password.length >= 8
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                      }`}
-                  ></div>
-                  At least 8 characters
-                </li>
-                <li className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${/[A-Z]/.test(loginData.password)
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                      }`}
-                  ></div>
-                  One uppercase letter
-                </li>
-                <li className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${/[a-z]/.test(loginData.password)
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                      }`}
-                  ></div>
-                  One lowercase letter
-                </li>
-                <li className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${/\d/.test(loginData.password)
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                      }`}
-                  ></div>
-                  One number
-                </li>
-                <li className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${/[@$!%*?&]/.test(loginData.password)
-                      ? "bg-green-500"
-                      : "bg-gray-300"
-                      }`}
-                  ></div>
-                  One special character (@$!%*?&)
-                </li>
-              </ul>
-            </div>
             <Button
               onClick={handleLoginSubmit}
               className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-200"
