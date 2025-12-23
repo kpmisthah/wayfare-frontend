@@ -33,7 +33,7 @@ import { useAgencyById, usePackages } from "../../hooks/use-agency";
 const AgencyProfile = ({ id }: { id: string }) => {
   const [activeTab, setActiveTab] = useState("about");
   const { agency, isLoading } = useAgencyById(id)
-  const { packages, page, totalPages, loadMore, search, setSearch } = usePackages(id);
+  const { packages, page, totalPages, loadMore, search, setSearch, isLoadingPackages } = usePackages(id);
 
   const filteredPackages = packages;
 
@@ -225,7 +225,12 @@ const AgencyProfile = ({ id }: { id: string }) => {
               )}
             </div>
 
-            {filteredPackages.length > 0 ? (
+            {isLoadingPackages ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <p className="text-muted-foreground mt-4">Loading packages...</p>
+              </div>
+            ) : filteredPackages.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredPackages.map((pkg) => (
@@ -258,7 +263,7 @@ const AgencyProfile = ({ id }: { id: string }) => {
                   No Packages Available
                 </h4>
                 <p className="text-muted-foreground">
-                  This agency hasn’t added any travel packages yet. Please check
+                  This agency hasn't added any travel packages yet. Please check
                   back later.
                 </p>
               </div>
