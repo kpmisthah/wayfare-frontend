@@ -86,22 +86,28 @@ export const usePackages = (id: string) => {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [search, setSearch] = useState('')
+  const [isLoadingPackages, setIsLoadingPackages] = useState(true)
   const limit = 6
 
   useEffect(() => {
     const fetchPackages = async () => {
-      const res = await fetchAgencyPackages(id, page, limit, search);
-      setPackages((prev) => {
-        // Reset list if it's the first page (initial load or search)
-        if (page === 1) return res.data;
+      setIsLoadingPackages(true);
+      try {
+        const res = await fetchAgencyPackages(id, page, limit, search);
+        setPackages((prev) => {
+          // Reset list if it's the first page (initial load or search)
+          if (page === 1) return res.data;
 
-        // Append unique packages for load more
-        const newPackages = res.data.filter(
-          (newPkg: Package) => !prev.some((p) => p.id === newPkg.id)
-        );
-        return [...prev, ...newPackages];
-      });
-      setTotalPages(res.totalPages);
+          // Append unique packages for load more
+          const newPackages = res.data.filter(
+            (newPkg: Package) => !prev.some((p) => p.id === newPkg.id)
+          );
+          return [...prev, ...newPackages];
+        });
+        setTotalPages(res.totalPages);
+      } finally {
+        setIsLoadingPackages(false);
+      }
     };
 
     // Debounce search
@@ -128,7 +134,8 @@ export const usePackages = (id: string) => {
     page,
     totalPages,
     search,
-    setSearch
+    setSearch,
+    isLoadingPackages
   }
 }
 
