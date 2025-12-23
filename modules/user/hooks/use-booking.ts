@@ -53,7 +53,7 @@ export const useBooking = (id: string) => {
         if (paymentType == "wallet") {
           router.push(
             "/booking/success?booking_id=" +
-            result.booking.id +
+            result.bookingId +
             "&payment_method=wallet"
           );
         }
