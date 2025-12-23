@@ -9,26 +9,29 @@ export const useFetchPackages = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [search, setSearch] = useState(''); 
+  const [search, setSearch] = useState('');
   const limit = 6;
 
   useEffect(() => {
-    setLoading(true)
-    try {
-      const loadPackages = async () => {
-        const data = await fetchPackages(page, limit, search); 
+    const loadPackages = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchPackages(page, limit, search);
         setPage(data.page);
         setPackages(data.items || []);
         setTotalPage(data.totalPages);
-      };
-      const timeoutId = setTimeout(() => { 
-        loadPackages();
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    } catch (error) {
-    } finally {
-      setLoading(false)
-    }
+      } catch (error) {
+        console.error('Failed to fetch packages:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      loadPackages();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [page, limit, search]);
 
   const nextPage = () => page < totalPage && setPage((prev) => prev + 1);
