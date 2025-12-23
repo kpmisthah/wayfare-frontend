@@ -312,6 +312,7 @@ export const useGenerateTrip = () => {
   };
 
   const onSubmit = () => {
+    setLoading(true);
     router.push(
       `/packages/travel-packages?destination=${formData.destination}&startDate=${formData.startDate}&endDate=${formData.endDate}&minBudget=${formData.minBudget}&maxBudget=${formData.maxBudget}&travelers=${formData.travelers}`
     );
