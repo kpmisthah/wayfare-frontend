@@ -197,6 +197,9 @@ export async function middleware(request: NextRequest) {
     "/booking",
     "/connection",
     "/profile",
+    "/chat",
+    "/notifications",
+    "/trip",
   ];
 
   if (protectedUserPaths.some((path) => pathname.startsWith(path))) {
@@ -243,6 +246,29 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/admin/dashboard", request.url));
       }
       return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  // ============ STRICT RBAC: BLOCK ADMIN/AGENCY FROM USER PAGES ============
+  // User-side pages that only regular USERs (or unauthenticated visitors) should access
+  const userOnlyPages = [
+    "/",
+    "/agencies",
+    "/packages",
+  ];
+
+  // Check if current path is a user-only page
+  const isUserOnlyPage = userOnlyPages.some((path) =>
+    path === "/" ? pathname === "/" : pathname.startsWith(path)
+  );
+
+  // If logged-in user is ADMIN or AGENCY, redirect them away from user pages
+  if (isUserOnlyPage && hasValidAccessToken) {
+    if (userRole === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    if (userRole === "AGENCY") {
+      return NextResponse.redirect(new URL("/agency", request.url));
     }
   }
 
