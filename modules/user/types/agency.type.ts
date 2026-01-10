@@ -13,5 +13,6 @@ export interface Agency {
         verified: boolean;
         profileImage: string
         bannerImage:string
+        image:string
     }
 }

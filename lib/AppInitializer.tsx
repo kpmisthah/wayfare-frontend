@@ -21,7 +21,6 @@ export default function AppInitializer({
     if (user) {
       setAuthUser(user)
     } else {
-      // Clear persisted auth state when server confirms no user is authenticated
       clearAuth()
     }
     setLoaded(true)

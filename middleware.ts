@@ -128,18 +128,34 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Get user role from token for role-based access control
+  const userRole = accessToken ? getRoleFromToken(accessToken) : null;
+
+  // ============ ADMIN ROUTES ============
+  // If admin is already logged in and tries to access admin login page, redirect to dashboard
   if (pathname.startsWith("/admin/login") && hasValidAccessToken) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    const role = userRole;
+    if (role === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
   }
 
-  if (
-    pathname.startsWith("/admin") &&
-    !hasValidAccessToken &&
-    pathname !== "/admin/login"
-  ) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+  // Admin routes require ADMIN role
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (!hasValidAccessToken) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    // Check if user has ADMIN role
+    if (userRole !== "ADMIN") {
+      // Redirect non-admin users to their respective dashboards
+      if (userRole === "AGENCY") {
+        return NextResponse.redirect(new URL("/agency", request.url));
+      }
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
+  // ============ USER AUTH PAGES ============
   const authPages = [
     "/login",
     "/signup",
@@ -150,8 +166,17 @@ export async function middleware(request: NextRequest) {
   ];
 
   if (authPages.some((path) => pathname.startsWith(path)) && hasValidAccessToken) {
+    // Redirect to appropriate dashboard based on role
+    if (userRole === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    if (userRole === "AGENCY") {
+      return NextResponse.redirect(new URL("/agency", request.url));
+    }
     return NextResponse.redirect(new URL("/", request.url));
   }
+
+  // ============ AGENCY AUTH PAGES ============
   const agencyAuthPages = [
     "/agency/login",
     "/agency/signup",
@@ -165,19 +190,30 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.redirect(new URL("/agency", request.url));
   }
+
+  // ============ PROTECTED USER PATHS ============
   const protectedUserPaths = [
     "/plan-trip",
     "/booking",
     "/connection",
     "/profile",
   ];
-  if (
-    protectedUserPaths.some((path) => pathname.startsWith(path)) &&
-    !hasValidAccessToken
-  ) {
-    return NextResponse.redirect(new URL("/login", request.url));
+
+  if (protectedUserPaths.some((path) => pathname.startsWith(path))) {
+    // Must be logged in
+    if (!hasValidAccessToken) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    // Must be a USER role - Admin and Agency should not access user pages
+    if (userRole === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    if (userRole === "AGENCY") {
+      return NextResponse.redirect(new URL("/agency", request.url));
+    }
   }
 
+  // ============ PROTECTED AGENCY PATHS ============
   const protectedAgencyPaths = ["/agency"];
   const excludedAgencyPaths = [
     "/agency/login",
@@ -201,9 +237,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/agency/login", request.url));
     }
 
-    const userRole = accessToken ? getRoleFromToken(accessToken) : null;
+    // Must be AGENCY role
     if (userRole !== "AGENCY") {
-      return NextResponse.redirect(new URL("/agency/login", request.url));
+      if (userRole === "ADMIN") {
+        return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+      }
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 

@@ -156,7 +156,7 @@ const Agencies = () => {
                       id={agency.id}
                       name={agency.user.name}
                       description={agency.description}
-                      image={agency.user.profileImage}
+                      image={agency.user.image}
                       location={agency.address}
                     />
                   </div>
