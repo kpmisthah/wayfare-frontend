@@ -153,9 +153,9 @@ export const Header = () => {
 
                   {/* Dropdown */}
                   {isNotificationOpen && (
-                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
-                      <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="font-semibold text-gray-900">
+                    <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-16 sm:top-auto sm:mt-3 w-auto sm:w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden max-h-[80vh] sm:max-h-[500px]">
+                      <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
                           Notifications
                         </h3>
                         {unreadCount > 0 && (
@@ -165,7 +165,7 @@ export const Header = () => {
                         )}
                       </div>
 
-                      <div className="max-h-96 overflow-y-auto">
+                      <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
                         {connectionRequests.length > 0 && (
                           <div className="px-4 py-2 bg-indigo-50 border-b">
                             <p className="text-xs font-medium text-indigo-700">
@@ -176,45 +176,45 @@ export const Header = () => {
                         {connectionRequests.map((req) => (
                           <div
                             key={req.id}
-                            className="px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b"
+                            className="px-3 sm:px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b"
                           >
                             <img
                               src={req.profileImage}
                               alt={req.name}
-                              className="w-10 h-10 rounded-full"
+                              className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex-shrink-0"
                             />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{req.name}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{req.name}</p>
                               <p className="text-xs text-gray-500">
                                 wants to connect
                               </p>
                             </div>
-                            <Check className="w-4 h-4 text-green-600" />
+                            <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                           </div>
                         ))}
 
                         {notifications.length === 0 &&
                           connectionRequests.length === 0 ? (
-                          <div className="py-12 text-center text-gray-500">
-                            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                            <p>No notifications</p>
+                          <div className="py-10 sm:py-12 text-center text-gray-500">
+                            <Bell className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 text-gray-300" />
+                            <p className="text-sm">No notifications</p>
                           </div>
                         ) : (
                           notifications.slice(0, 5).map((notif) => (
                             <div
                               key={notif.id}
-                              className={`px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 ${notif.unread ? "bg-blue-50" : ""
+                              className={`px-3 sm:px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 ${notif.unread ? "bg-blue-50" : ""
                                 }`}
                             >
-                              <div className="flex justify-between">
-                                <h4 className="text-sm font-medium text-gray-900">
+                              <div className="flex justify-between items-start gap-2">
+                                <h4 className="text-sm font-medium text-gray-900 flex-1 min-w-0">
                                   {notif.title}
                                 </h4>
                                 {notif.unread && (
-                                  <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                  <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1.5"></span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 mt-1">
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                                 {notif.message}
                               </p>
                               <span className="text-xs text-gray-400">
