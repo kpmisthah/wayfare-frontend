@@ -22,7 +22,14 @@ import { Header } from "@/shared/components/layout/Header";
 import { useEffect, useState, useRef } from "react";
 import { ChatConnection } from "./types";
 import { getSocket } from "@/lib/socket";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import dynamic from "next/dynamic";
+import { EmojiClickData, Theme } from "emoji-picker-react";
+
+// Dynamically import EmojiPicker with SSR disabled
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+  loading: () => <div className="w-[320px] h-[400px] bg-white rounded-lg shadow-lg flex items-center justify-center">Loading...</div>,
+});
 export default function Chat({
   chatId,
   currentUserId,
