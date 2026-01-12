@@ -15,13 +15,14 @@ import {
   ArrowLeft,
   Check,
   CheckCheck,
+  X,
 } from "lucide-react";
 import { useCallStore } from "@/store/useCallStore";
 import { Header } from "@/shared/components/layout/Header";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ChatConnection } from "./types";
 import { getSocket } from "@/lib/socket";
-
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 export default function Chat({
   chatId,
   currentUserId,
@@ -33,12 +34,31 @@ export default function Chat({
   selectedUser?: ChatConnection;
   onBackClick?: () => void;
 }) {
-  const { messages, text, scrollRef, sendMessage, typingUsers, handleTyping } =
+  const { messages, text, scrollRef, sendMessage, typingUsers, handleTyping, setText } =
     useSocket(chatId, selectedUser, currentUserId);
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
   const isGroup = selectedUser?.type === "group";
   const { isCallActive } = useCallStore();
+
+  // Handle emoji selection
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    handleTyping(text + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getInitials = (name: string) => {
     return name
@@ -283,10 +303,34 @@ export default function Chat({
       </div>
 
       {/* Input Bar */}
-      <div className="bg-gray-50 p-4 border-t border-gray-200 flex-shrink-0">
+      <div className="bg-gray-50 p-4 border-t border-gray-200 flex-shrink-0 relative">
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div
+            ref={emojiPickerRef}
+            className="absolute bottom-full left-0 mb-2 z-50"
+          >
+            <EmojiPicker
+              onEmojiClick={onEmojiClick}
+              theme={Theme.LIGHT}
+              width={320}
+              height={400}
+              searchPlaceholder="Search emoji..."
+              previewConfig={{ showPreview: false }}
+            />
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-200 rounded-full transition">
-            <Smile className="w-6 h-6 text-gray-600" />
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className={`p-2 hover:bg-gray-200 rounded-full transition ${showEmojiPicker ? 'bg-gray-200' : ''}`}
+          >
+            {showEmojiPicker ? (
+              <X className="w-6 h-6 text-gray-600" />
+            ) : (
+              <Smile className="w-6 h-6 text-gray-600" />
+            )}
           </button>
 
           {/* Typing Indicator */}
@@ -317,6 +361,7 @@ export default function Chat({
                 sendMessage();
               }
             }}
+            onFocus={() => setShowEmojiPicker(false)}
             placeholder={isGroup ? "Message group" : "Type a message"}
             className="flex-1 px-4 py-3 bg-white rounded-full text-sm focus:outline-none border border-gray-200 focus:border-green-500 transition"
             disabled={isCallActive}

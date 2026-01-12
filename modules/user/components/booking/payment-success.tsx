@@ -243,36 +243,6 @@ const PaymentSuccessPage: React.FC<PaymentSuccessProps> = ({ booking, paymentMet
                 </div>
               </div>
             </div>
-            {/* Next Steps */}
-            <div className="bg-white rounded-xl shadow-sm border p-5 sm:p-6 space-y-3">
-              <h2 className="text-lg sm:text-xl font-semibold mb-3">
-                What's Next?
-              </h2>
-              {[
-                {
-                  title: "Confirmation Email",
-                  desc: "You'll receive a detailed confirmation email with your itinerary within 5 minutes.",
-                },
-                {
-                  title: "Travel Documents",
-                  desc: "Download your e-tickets and keep them handy for your trip.",
-                },
-                {
-                  title: "Pre-Travel Support",
-                  desc: "Our team will contact you 48 hours before departure with final details.",
-                },
-              ].map((step, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-                    {i + 1}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">{step.title}</h3>
-                    <p className="text-gray-600 text-sm">{step.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Sidebar */}
