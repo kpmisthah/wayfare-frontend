@@ -12,14 +12,16 @@ import {
   X,
   ArrowLeft,
   Check,
+  Home,
+  Plane,
 } from "lucide-react";
 import { getSocket } from "@/lib/socket";
-import { Header } from "@/shared/components/layout/Header";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import { ChatMessage, ChatConnection } from "./types";
 import Modal from "@/shared/components/common/Modal";
+import { useRouter } from "next/navigation";
 
 
 
@@ -32,6 +34,7 @@ export default function ChatUi() {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
   const { user } = useAuthStore();
+  const router = useRouter();
 
 
   const [isChatOpenOnMobile, setIsChatOpenOnMobile] = useState(false);
@@ -63,7 +66,7 @@ export default function ChatUi() {
                 ...chat,
                 lastMessage: msg,
                 unreadCount: isCurrentChatOpen
-                  ? 0 
+                  ? 0
                   : (chat.unreadCount || 0) +
                   (msg.senderId === user?.id ? 0 : 1),
               };
@@ -108,7 +111,7 @@ export default function ChatUi() {
       socket.off("receiveMessage", handleNewMessage);
       socket.off("messagesRead", handleMessagesRead);
     };
-  }, [user?.id]); 
+  }, [user?.id]);
 
 
   useEffect(() => {
@@ -221,7 +224,7 @@ export default function ChatUi() {
     try {
       const res = await api.post<ChatConnection>("/messages/group/create", {
         name: groupName,
-        memberIds: selectedMembers, 
+        memberIds: selectedMembers,
       });
       const createdGroup = res.data;
 
@@ -270,41 +273,61 @@ export default function ChatUi() {
 
   return (
     <>
-      <Header />
-      <div className="flex h-[calc(100vh-64px)] bg-gray-100 relative">
+      <div className="flex h-screen bg-gray-100 relative">
         {/* LEFT SIDEBAR (Chat List) */}
         <div
           className={`absolute inset-0 z-10 w-full bg-white border-r border-gray-200 flex flex-col 
                       md:relative md:w-96 md:flex-shrink-0 md:z-auto
                       ${isChatOpenOnMobile ? "hidden md:flex" : "flex"}`}
         >
-          {/* Header */}
-          <div className="bg-gray-50 p-4 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-xl font-semibold text-gray-800">Chats</h1>
-              <div className="flex items-center gap-2">
+          {/* Sidebar Header with Logo */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              {/* Logo and Brand */}
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center gap-2 hover:opacity-80 transition"
+              >
+                <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
+                  <Plane className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-lg font-bold text-white">Wayfare</span>
+              </button>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => router.push('/')}
+                  className="p-2 hover:bg-white/20 rounded-full transition"
+                  title="Go Home"
+                >
+                  <Home className="w-5 h-5 text-white" />
+                </button>
                 <button
                   onClick={() => setShowNewGroupModal(true)}
-                  className="p-2 hover:bg-gray-200 rounded-full transition"
+                  className="p-2 hover:bg-white/20 rounded-full transition"
                   title="New Group"
                 >
-                  <MessageSquarePlus className="w-5 h-5 text-gray-600" />
+                  <MessageSquarePlus className="w-5 h-5 text-white" />
                 </button>
-                <button className="p-2 hover:bg-gray-200 rounded-full transition">
-                  <MoreVertical className="w-5 h-5 text-gray-600" />
+                <button className="p-2 hover:bg-white/20 rounded-full transition">
+                  <MoreVertical className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>
 
+            {/* Title */}
+            <h1 className="text-xl font-semibold text-white mb-3">Chats</h1>
+
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
               <input
                 type="text"
                 placeholder="Search chats"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/20 rounded-lg text-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 border border-white/20"
               />
             </div>
           </div>
