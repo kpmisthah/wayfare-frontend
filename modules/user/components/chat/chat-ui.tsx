@@ -42,6 +42,7 @@ export default function ChatUi() {
 
 
   const selectedRef = useRef<ChatConnection | null>(null);
+  const lastSocketUpdateRef = useRef<number>(0); // Track last socket update time
 
   useEffect(() => {
     selectedRef.current = selected;
@@ -101,6 +102,9 @@ export default function ChatUi() {
 
         return sorted;
       });
+
+      // Mark that we received a socket update
+      lastSocketUpdateRef.current = Date.now();
     };
 
     const handleMessagesRead = (data: { messageIds: string[], conversationId?: string, groupId?: string }) => {
@@ -192,6 +196,11 @@ export default function ChatUi() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        // Skip if socket updated recently (within 2 seconds)
+        const timeSinceLastUpdate = Date.now() - lastSocketUpdateRef.current;
+        if (timeSinceLastUpdate < 2000) {
+          return;
+        }
         fetchConnections();
       }
     };
@@ -205,6 +214,11 @@ export default function ChatUi() {
 
   useEffect(() => {
     const handleFocus = () => {
+      // Skip if socket updated recently (within 2 seconds)
+      const timeSinceLastUpdate = Date.now() - lastSocketUpdateRef.current;
+      if (timeSinceLastUpdate < 2000) {
+        return;
+      }
       fetchConnections();
     };
 
