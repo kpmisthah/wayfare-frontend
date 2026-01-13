@@ -238,41 +238,9 @@ export default function ChatUi() {
     fetchConnections();
   }, []);
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // Skip if socket updated recently (within 2 seconds)
-        const timeSinceLastUpdate = Date.now() - lastSocketUpdateRef.current;
-        if (timeSinceLastUpdate < 2000) {
-          return;
-        }
-        fetchConnections();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleFocus = () => {
-      // Skip if socket updated recently (within 2 seconds)
-      const timeSinceLastUpdate = Date.now() - lastSocketUpdateRef.current;
-      if (timeSinceLastUpdate < 2000) {
-        return;
-      }
-      fetchConnections();
-    };
-
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, []);
+  // Removed visibilitychange and focus listeners to prevent overwriting 
+  // real-time socket states with potentially stale API data.
+  // Socket updates are the source of truth for the active session.
 
 
   const filteredConnections = useMemo(() => {
