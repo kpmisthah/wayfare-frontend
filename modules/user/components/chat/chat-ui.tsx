@@ -35,6 +35,7 @@ export default function ChatUi() {
   const [groupName, setGroupName] = useState("");
   const { user } = useAuthStore();
   const router = useRouter();
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 
 
   const [isChatOpenOnMobile, setIsChatOpenOnMobile] = useState(false);
@@ -219,7 +220,9 @@ export default function ChatUi() {
 
 
   const handleCreateGroup = async () => {
-    if (!groupName.trim() || selectedMembers.length === 0 || !user?.id) return;
+    if (!groupName.trim() || selectedMembers.length === 0 || !user?.id || isCreatingGroup) return;
+
+    setIsCreatingGroup(true);
 
     try {
       const res = await api.post<ChatConnection>("/messages/group/create", {
@@ -245,6 +248,8 @@ export default function ChatUi() {
       const err = error as { response?: { data?: { message?: string } } };
       console.error("Create group failed:", error);
       alert(err.response?.data?.message || "Failed to create group");
+    } finally {
+      setIsCreatingGroup(false);
     }
   };
 
@@ -281,7 +286,7 @@ export default function ChatUi() {
                       ${isChatOpenOnMobile ? "hidden md:flex" : "flex"}`}
         >
           {/* Sidebar Header with Logo */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex-shrink-0">
+          <div className="bg-gradient-to-r from-green-600 to-teal-600 p-4 flex-shrink-0">
             <div className="flex items-center justify-between mb-4">
               {/* Logo and Brand */}
               <button
@@ -506,10 +511,17 @@ export default function ChatUi() {
 
             <button
               onClick={handleCreateGroup}
-              disabled={!groupName.trim() || selectedMembers.length === 0}
-              className="w-full py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-200 disabled:text-gray-500 text-white rounded-lg font-semibold transition mt-2"
+              disabled={!groupName.trim() || selectedMembers.length === 0 || isCreatingGroup}
+              className="w-full py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-200 disabled:text-gray-500 text-white rounded-lg font-semibold transition mt-2 flex items-center justify-center gap-2"
             >
-              Create Group
+              {isCreatingGroup ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Creating...
+                </>
+              ) : (
+                'Create Group'
+              )}
             </button>
           </div>
         </Modal>
