@@ -181,9 +181,43 @@ export default function ChatUi() {
         return isNaN(parsed) ? 0 : parsed;
       };
 
-      const sorted = (res.data || []).sort((a, b) => getTimestamp(b) - getTimestamp(a));
+      // Merge API data with existing socket-updated data
+      // Keep the lastMessage that is newer (socket updates might be more recent than API)
+      setConnections((prevConnections) => {
+        const merged = (res.data || []).map((apiChat) => {
+          const chatId = apiChat.groupId || apiChat.conversationId;
+          const existingChat = prevConnections.find(
+            (c) => (c.groupId || c.conversationId) === chatId
+          );
 
-      setConnections(sorted);
+          // If we have existing data with a lastMessage, compare timestamps
+          if (existingChat?.lastMessage && apiChat.lastMessage) {
+            const existingTime = new Date(existingChat.lastMessage.createdAt).getTime();
+            const apiTime = new Date(apiChat.lastMessage.createdAt).getTime();
+
+            // Keep the newer lastMessage
+            if (existingTime > apiTime) {
+              return {
+                ...apiChat,
+                lastMessage: existingChat.lastMessage,
+                unreadCount: existingChat.unreadCount,
+              };
+            }
+          } else if (existingChat?.lastMessage && !apiChat.lastMessage) {
+            // API doesn't have lastMessage but we do - keep ours
+            return {
+              ...apiChat,
+              lastMessage: existingChat.lastMessage,
+              unreadCount: existingChat.unreadCount,
+            };
+          }
+
+          return apiChat;
+        });
+
+        // Sort by most recent
+        return merged.sort((a, b) => getTimestamp(b) - getTimestamp(a));
+      });
     } catch (err) {
       console.error("Failed to load connections", err);
     }
