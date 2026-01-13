@@ -55,40 +55,51 @@ export default function ChatUi() {
       setConnections((prev) => {
         const msgChatId = msg.groupId || msg.conversationId;
 
-        // Check if this chat exists and if the message is already processed
-        const existingChat = prev.find((chat) => {
+        // Find existing chat index
+        const existingChatIndex = prev.findIndex((chat) => {
           const chatId = chat.groupId || chat.conversationId;
           return chatId === msgChatId;
         });
 
-        // If the lastMessage is the same as incoming message, skip (duplicate)
-        if (existingChat?.lastMessage?.id === msg.id) {
-          return prev;
+        let updatedConnections = [...prev];
+
+        if (existingChatIndex !== -1) {
+          // UPDATE EXISTING CHAT
+          const existingChat = prev[existingChatIndex];
+          if (existingChat.lastMessage?.id === msg.id) {
+            return prev;
+          }
+
+          const currentSelected = selectedRef.current;
+          const isCurrentChatOpen =
+            currentSelected &&
+            (currentSelected.groupId || currentSelected.conversationId) === msgChatId;
+
+          updatedConnections[existingChatIndex] = {
+            ...existingChat,
+            lastMessage: msg,
+            unreadCount: isCurrentChatOpen
+              ? 0
+              : (existingChat.unreadCount || 0) +
+              (msg.senderId === user?.id ? 0 : 1),
+          };
+        } else {
+          // ADD NEW CHAT
+          const newChat: ChatConnection = {
+            conversationId: msg.conversationId,
+            groupId: msg.groupId,
+            userId: msg.senderId,
+            name: msg.senderName || "New Chat",
+            lastMessage: msg,
+            unreadCount: 1,
+            type: msg.groupId ? 'group' : 'direct',
+            createdAt: new Date().toISOString()
+          };
+          updatedConnections.push(newChat);
         }
 
-        const updated = prev.map((chat) => {
-          const chatId = chat.groupId || chat.conversationId;
-
-          if (chatId === msgChatId) {
-            const currentSelected = selectedRef.current;
-            const isCurrentChatOpen =
-              currentSelected &&
-              (currentSelected.groupId || currentSelected.conversationId) === chatId;
-
-            return {
-              ...chat,
-              lastMessage: msg,
-              unreadCount: isCurrentChatOpen
-                ? 0
-                : (chat.unreadCount || 0) +
-                (msg.senderId === user?.id ? 0 : 1),
-            };
-          }
-          return chat;
-        });
-
         // Sort by lastMessage time, most recent first
-        const sorted = [...updated].sort((a, b) => {
+        const sorted = updatedConnections.sort((a, b) => {
           // Get timestamp - prefer lastMessage.createdAt, fallback to chat.createdAt
           const getTimestamp = (chat: typeof a): number => {
             const time = chat.lastMessage?.createdAt || chat.createdAt;
