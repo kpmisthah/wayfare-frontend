@@ -93,7 +93,7 @@ export default function ChatUi() {
             lastMessage: msg,
             unreadCount: 1,
             type: msg.groupId ? 'group' : 'direct',
-            createdAt: new Date().toISOString()
+            createdAt: msg.createdAt || new Date().toISOString()
           };
           updatedConnections.push(newChat);
         }
@@ -206,8 +206,8 @@ export default function ChatUi() {
             const existingTime = new Date(existingChat.lastMessage.createdAt).getTime();
             const apiTime = new Date(apiChat.lastMessage.createdAt).getTime();
 
-            // Keep the newer lastMessage
-            if (existingTime > apiTime) {
+            // Keep the newer lastMessage OR if it's the same message (prevents timestamp precision issues)
+            if (existingTime > apiTime || existingChat.lastMessage.id === apiChat.lastMessage.id) {
               return {
                 ...apiChat,
                 lastMessage: existingChat.lastMessage,
