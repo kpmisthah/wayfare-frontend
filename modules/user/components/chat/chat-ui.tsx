@@ -52,33 +52,51 @@ export default function ChatUi() {
 
     const handleNewMessage = (msg: ChatMessage) => {
       setConnections((prev) => {
-        const updated = prev
-          .map((chat) => {
-            const chatId = chat.groupId || chat.conversationId;
-            const msgChatId = msg.groupId || msg.conversationId;
+        const msgChatId = msg.groupId || msg.conversationId;
 
-            if (chatId === msgChatId) {
-              const currentSelected = selectedRef.current;
-              const isCurrentChatOpen =
-                currentSelected &&
-                (currentSelected.groupId || currentSelected.conversationId) === chatId;
+        // Check if this chat exists and if the message is already processed
+        const existingChat = prev.find((chat) => {
+          const chatId = chat.groupId || chat.conversationId;
+          return chatId === msgChatId;
+        });
 
-              return {
-                ...chat,
-                lastMessage: msg,
-                unreadCount: isCurrentChatOpen
-                  ? 0
-                  : (chat.unreadCount || 0) +
-                  (msg.senderId === user?.id ? 0 : 1),
-              };
-            }
-            return chat;
-          });
+        // If the lastMessage is the same as incoming message, skip (duplicate)
+        if (existingChat?.lastMessage?.id === msg.id) {
+          return prev;
+        }
 
-        const sorted = updated.sort((a, b) => {
-          const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
-          const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
-          return new Date(timeB).getTime() - new Date(timeA).getTime();
+        const updated = prev.map((chat) => {
+          const chatId = chat.groupId || chat.conversationId;
+
+          if (chatId === msgChatId) {
+            const currentSelected = selectedRef.current;
+            const isCurrentChatOpen =
+              currentSelected &&
+              (currentSelected.groupId || currentSelected.conversationId) === chatId;
+
+            return {
+              ...chat,
+              lastMessage: msg,
+              unreadCount: isCurrentChatOpen
+                ? 0
+                : (chat.unreadCount || 0) +
+                (msg.senderId === user?.id ? 0 : 1),
+            };
+          }
+          return chat;
+        });
+
+        // Sort by lastMessage time, most recent first
+        const sorted = [...updated].sort((a, b) => {
+          // Get timestamp - prefer lastMessage.createdAt, fallback to chat.createdAt
+          const getTimestamp = (chat: typeof a): number => {
+            const time = chat.lastMessage?.createdAt || chat.createdAt;
+            if (!time) return 0;
+            const parsed = new Date(time).getTime();
+            return isNaN(parsed) ? 0 : parsed;
+          };
+
+          return getTimestamp(b) - getTimestamp(a);
         });
 
         return sorted;
@@ -152,11 +170,14 @@ export default function ChatUi() {
     try {
       const res = await api.get<ChatConnection[]>("/messages/chats");
 
-      const sorted = (res.data || []).sort((a, b) => {
-        const timeA = a.lastMessage?.createdAt || a.createdAt || 0;
-        const timeB = b.lastMessage?.createdAt || b.createdAt || 0;
-        return new Date(timeB).getTime() - new Date(timeA).getTime();
-      });
+      const getTimestamp = (chat: ChatConnection): number => {
+        const time = chat.lastMessage?.createdAt || chat.createdAt;
+        if (!time) return 0;
+        const parsed = new Date(time).getTime();
+        return isNaN(parsed) ? 0 : parsed;
+      };
+
+      const sorted = (res.data || []).sort((a, b) => getTimestamp(b) - getTimestamp(a));
 
       setConnections(sorted);
     } catch (err) {
